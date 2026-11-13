@@ -1007,5 +1007,12 @@
   "man rowing boat": "ボートを漕ぐ男",
   "woman rowing boat": "ボートを漕ぐ女性",
   "Diving mask": "ダイビングマスク",
-  "Ring buoy": "浮き輪"
+  "Ring buoy": "浮き輪",
+  "@Three ways ZZX0XZ to bring the motion ZZX1XZ": "絵文字を動かす ZZX0XZ 3 つの方法 ZZX1XZ",
+  "@Drop in a component, animate emoji already in your text, or design a motion of your own.": "コンポーネントを置く、文章中の絵文字をそのまま動かす、または独自のモーションを作れます。",
+  "Component": "コンポーネント",
+  "In your text": "文章の中で",
+  "Your own motion": "独自のモーション",
+  "Ways to use Emoji Motion": "Emoji Motion の使い方",
+  "@Use a component anywhere in your markup. Choose your framework and copy an emoji from the collection.": "マークアップのどこでもコンポーネントを使えます。フレームワークを選び、コレクションから絵文字をコピーしてください。"
 }

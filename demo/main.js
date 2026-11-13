@@ -227,17 +227,6 @@ const exampleCode = {
 </script>
 
 <p>Made with a little <emoji-motion emoji="❤️"></emoji-motion> and a lot of care.</p>`,
-  card: `<!-- Import once in your app's entry module. -->
-<script type="module">
-  import '@dofy/native-emoji-motion/element';
-</script>
-
-<div class="card">
-  <strong>Say hello</strong>
-  <div style="text-align: right">
-    <emoji-motion emoji="👋"></emoji-motion>
-  </div>
-</div>`,
   setup: `// Import once in your app's entry module.
 import '@dofy/native-emoji-motion/element';
 
@@ -270,18 +259,6 @@ const frameworkCode = {
 export function Message() {
   return <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>;
 }`,
-    card: `import { EmojiMotion } from '@dofy/native-emoji-motion/react';
-
-export function HelloCard() {
-  return (
-    <div className="card">
-      <strong>Say hello</strong>
-      <div style={{ textAlign: 'right' }}>
-        <EmojiMotion emoji="👋" />
-      </div>
-    </div>
-  );
-}`,
     setup: `import { EmojiMotion } from '@dofy/native-emoji-motion/react';
 
 // Paste <EmojiMotion emoji="👋" /> into your JSX.`
@@ -293,18 +270,6 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 
 <template>
   <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>
-</template>`,
-    card: `<script setup>
-import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
-</script>
-
-<template>
-  <div class="card">
-    <strong>Say hello</strong>
-    <div style="text-align: right">
-      <EmojiMotion emoji="👋" />
-    </div>
-  </div>
 </template>`,
     setup: `<script setup>
 import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
@@ -318,16 +283,6 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 </script>
 
 <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>`,
-    card: `<script>
-  import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
-</script>
-
-<div class="card">
-  <strong>Say hello</strong>
-  <div style="text-align: right">
-    <EmojiMotion emoji="👋" />
-  </div>
-</div>`,
     setup: `<script>
   import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
 </script>
@@ -436,12 +391,15 @@ for (const button of document.querySelectorAll('[data-copy-example]')) {
   });
 }
 const tabs = [...document.querySelectorAll('[role="tab"]')];
+const examplesFramework = document.querySelector('#examples-framework');
 function activateTab(tab, focus = false) {
   for (const item of tabs) {
     const active = item === tab;
     item.setAttribute('aria-selected', String(active)); item.tabIndex = active ? 0 : -1;
     document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
   }
+  // Text enhancement is framework independent, so its tab has no framework code.
+  examplesFramework.style.visibility = tab.id === 'tab-text' ? 'hidden' : '';
   savePreference('example-tab', tab.id);
   if (focus) tab.focus();
 }

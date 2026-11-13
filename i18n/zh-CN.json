@@ -1007,5 +1007,12 @@
   "man rowing boat": "男人划船",
   "woman rowing boat": "女人划船",
   "Diving mask": "潜水面罩",
-  "Ring buoy": "救生圈"
+  "Ring buoy": "救生圈",
+  "@Three ways ZZX0XZ to bring the motion ZZX1XZ": "三种方式 ZZX0XZ 让 emoji 动起来 ZZX1XZ",
+  "@Drop in a component, animate emoji already in your text, or design a motion of your own.": "放入一个组件、为文字中已有的 emoji 加上动效，或者设计属于你的动作。",
+  "Component": "组件",
+  "In your text": "文字中",
+  "Your own motion": "自定义动作",
+  "Ways to use Emoji Motion": "Emoji Motion 的使用方式",
+  "@Use a component anywhere in your markup. Choose your framework and copy an emoji from the collection.": "在页面任意位置使用组件。选择框架，然后从合集中复制 emoji。"
 }
