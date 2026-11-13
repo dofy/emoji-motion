@@ -1,0 +1,14 @@
+{
+  "name": "native-emoji-motion",
+  "version": "0.1.0",
+  "description": "Playful, extensible motion for native emoji",
+  "type": "module",
+  "exports": { ".": { "types": "./src/index.d.ts", "import": "./src/index.js", "default": "./src/index.js" } },
+  "types": "./src/index.d.ts",
+  "files": ["src", "README.md", "LICENSE"],
+  "scripts": { "dev": "node demo/server.js", "test": "node --test", "pack:check": "npm pack --dry-run" },
+  "engines": { "node": ">=18" },
+  "license": "MIT",
+  "keywords": ["emoji", "animation", "web-animations", "interaction"],
+  "sideEffects": false
+}
