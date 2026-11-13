@@ -3,15 +3,27 @@ function boundedNumber(name, value, min, max) {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) throw new RangeError(`${name} must be between ${min} and ${max}`);
   return value;
 }
+// Gravity easings: rising slows towards the top, falling speeds up into the landing.
+const rise = 'cubic-bezier(.2,.7,.35,1)';
+const fall = 'cubic-bezier(.6,0,.85,.45)';
+const crouch = 'cubic-bezier(.3,0,.6,1)';
+const settle = 'ease-out';
 /** Build a direction-neutral bounce; height is a percentage of glyph height. */
 export function createSpringMotion({ height = 24, rebounds = 1, duration = 900 } = {}) {
   boundedNumber('height', height, 0, 60); boundedNumber('duration', duration, 1, 10000);
   if (!Number.isInteger(rebounds) || rebounds < 0 || rebounds > 2) throw new RangeError('rebounds must be 0, 1, or 2');
-  const frames = [{ transform: 'translateY(0) scale(1)', offset: 0 }, { transform: `translateY(-${height}%) scale(.97,1.03)`, offset: .3 }, { transform: 'translateY(0) scale(1.09,.91)', offset: .6 }];
-  if (rebounds >= 1) frames.push({ transform: `translateY(-${height * .3}%) scale(1)`, offset: .78 });
-  if (rebounds === 2) frames.push({ transform: 'translateY(0) scale(1)', offset: .88 }, { transform: `translateY(-${height * .12}%) scale(1)`, offset: .94 });
+  // Crouch before take-off, stretch while rising, squash on landing.
+  const frames = [
+    { transform: 'translateY(0) scale(1)', offset: 0, easing: crouch },
+    { transform: 'translateY(0) scale(1.08,.92)', offset: .12, easing: rise },
+    { transform: `translateY(-${height}%) scale(.96,1.05)`, offset: .4, easing: fall },
+    { transform: 'translateY(0) scale(1.12,.88)', offset: .6, easing: rebounds ? rise : settle }
+  ];
+  if (rebounds >= 1) frames.push({ transform: `translateY(-${height * .28}%) scale(.98,1.02)`, offset: .74, easing: fall }, { transform: 'translateY(0) scale(1.04,.96)', offset: .85, easing: rebounds === 2 ? rise : settle });
+  if (rebounds === 2) frames.push({ transform: `translateY(-${height * .1}%) scale(1)`, offset: .92, easing: fall }, { transform: 'translateY(0) scale(1.01,.99)', offset: .97, easing: settle });
+  if (!rebounds) frames.push({ transform: 'translateY(0) scale(.98,1.02)', offset: .8, easing: settle });
   frames.push({ transform: 'translateY(0) scale(1)', offset: 1 });
-  return { keyframes: frames, options: { duration, easing: curve }, origin: '50% 90%' };
+  return { keyframes: frames, options: { duration, easing: 'linear' }, origin: '50% 90%' };
 }
 /** Build a balanced sway; no assumption about the native glyph's direction. */
 export function createSwayMotion({ angle = 8, duration = 1200, origin = '50% 90%' } = {}) {
@@ -23,7 +35,7 @@ export const motions = {
   glide: { keyframes: [{ transform: 'translate(0, 0) rotate(0deg)' }, { transform: 'translate(-12%, 8%) rotate(-9deg)', offset: .25 }, { transform: 'translate(12%, -22%) rotate(9deg)', offset: .6 }, { transform: 'translate(0, 0) rotate(0deg)' }], options: { duration: 1050, easing: 'cubic-bezier(.22,1,.36,1)' } },
   ride: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-15%) rotate(-6deg)', offset: .24 }, { transform: 'translateY(0) rotate(4deg)', offset: .48 }, { transform: 'translateY(-9%) rotate(-4deg)', offset: .68 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 950, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
   wave: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(18deg)' }, { transform: 'rotate(-12deg)' }, { transform: 'rotate(16deg)' }, { transform: 'rotate(-7deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '70% 75%' },
-  bounce: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-22%) scale(1.07,.94)', offset: .38 }, { transform: 'translateY(0) scale(.93,1.07)', offset: .72 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 650, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 85%' },
+  bounce: { ...createSpringMotion({ height: 22, rebounds: 0, duration: 700 }), origin: '50% 85%' },
   pulse: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.25)', offset: .28 }, { transform: 'scale(.96)', offset: .5 }, { transform: 'scale(1.16)', offset: .68 }, { transform: 'scale(1)' }], options: { duration: 750, easing: 'cubic-bezier(.22,1,.36,1)' } },
   wobble: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-13deg)' }, { transform: 'rotate(10deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(3deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 700, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
   spin: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], options: { duration: 800, easing: 'cubic-bezier(.22,1,.36,1)' } },
@@ -32,14 +44,14 @@ export const motions = {
   swing: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(18deg)' }, { transform: 'rotate(-15deg)' }, { transform: 'rotate(9deg)' }, { transform: 'rotate(-4deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 10%' },
   float: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-18%) rotate(-8deg)', offset: .4 }, { transform: 'translateY(-10%) rotate(6deg)', offset: .7 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   shake: { keyframes: [{ transform: 'translateX(0)' }, { transform: 'translateX(-10%) rotate(-8deg)' }, { transform: 'translateX(10%) rotate(8deg)' }, { transform: 'translateX(-6%) rotate(-5deg)' }, { transform: 'translateX(4%) rotate(3deg)' }, { transform: 'translateX(0)' }], options: { duration: 650, easing: 'cubic-bezier(.22,1,.36,1)' } },
-  hop: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-28%) scale(1.04,.96)', offset: .32 }, { transform: 'translateY(0) scale(1.1,.9)', offset: .64 }, { transform: 'translateY(-9%) scale(1)', offset: .8 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 90%' },
+  hop: createSpringMotion({ height: 28, rebounds: 1, duration: 850 }),
   flutter: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-12%) rotate(-8deg)' }, { transform: 'translateY(-21%) rotate(8deg)' }, { transform: 'translateY(-10%) rotate(-5deg)' }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' } },
   sway: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-9deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 95%' },
   flip: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(185deg)', offset: .5 }, { transform: 'rotate(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   sip: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-8%) rotate(-6deg)', offset: .35 }, { transform: 'translateY(-8%) rotate(6deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
   twirl: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-10deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 950, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
   nod: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(8deg)', offset: .3 }, { transform: 'rotate(-4deg)', offset: .6 }, { transform: 'rotate(0deg)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 85%' },
-  pop: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(.85)', offset: .2 }, { transform: 'scale(1.18)', offset: .48 }, { transform: 'scale(.97)', offset: .75 }, { transform: 'scale(1)' }], options: { duration: 750, easing: 'cubic-bezier(.22,1,.36,1)' } },
+  pop: { keyframes: [{ transform: 'scale(1)', easing: crouch }, { transform: 'scale(.84)', offset: .18, easing: rise }, { transform: 'scale(1.2)', offset: .45, easing: 'ease-in-out' }, { transform: 'scale(.95)', offset: .68, easing: settle }, { transform: 'scale(1.04)', offset: .84, easing: settle }, { transform: 'scale(1)' }], options: { duration: 750, easing: 'linear' } },
   bob: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-12%) rotate(-4deg)', offset: .3 }, { transform: 'translateY(4%) rotate(4deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   breathe: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.09,1.05)', offset: .48 }, { transform: 'scale(1)' }], options: { duration: 1200, easing: 'cubic-bezier(.22,1,.36,1)' } },
   spring: createSpringMotion(),
@@ -62,7 +74,7 @@ export const motions = {
   orbitFloat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-9%) scale(1.04)', offset: .45 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1200, easing: curve } },
   writingTilt: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-5deg)', offset: .3 }, { transform: 'rotate(5deg)', offset: .65 }, { transform: 'rotate(0deg)' }], options: { duration: 1000, easing: curve }, origin: '50% 65%' },
   gardenBounce: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-6%) rotate(-3deg)', offset: .32 }, { transform: 'translateY(-3%) rotate(3deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1050, easing: curve }, origin: '50% 85%' },
-  animalHop: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-11%) scale(1.02,.98)', offset: .35 }, { transform: 'translateY(0) scale(1.04,.96)', offset: .68 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: curve }, origin: '50% 90%' },
+  animalHop: createSpringMotion({ height: 11, rebounds: 0, duration: 900 }),
   fabricSway: createSwayMotion({ angle: 6, duration: 1250, origin: '50% 15%' }),
   toolWiggle: createSwayMotion({ angle: 7, duration: 900, origin: '50% 70%' }),
   bookPeek: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg) translateY(0)' }, { transform: 'perspective(500px) rotateY(-20deg) translateY(-3%)', offset: .32 }, { transform: 'perspective(500px) rotateY(20deg) translateY(-3%)', offset: .68 }, { transform: 'perspective(500px) rotateY(0deg) translateY(0)' }], options: { duration: 1050, easing: curve } },
