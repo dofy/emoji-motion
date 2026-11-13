@@ -3,6 +3,7 @@ import { readFile, writeFile, unlink } from 'node:fs/promises';
 import { compile } from 'svelte/compiler';
 const dom = new JSDOM('<!doctype html><body><main></main></body>', { url: 'https://example.test' });
 for (const key of ['window', 'document', 'Node', 'Element', 'HTMLElement', 'SVGElement', 'Text', 'Comment', 'Document']) globalThis[key] = key === 'window' ? dom.window : dom.window[key];
+if (!globalThis.navigator) Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true });
 globalThis.requestAnimationFrame = callback => setTimeout(callback, 0);
 globalThis.cancelAnimationFrame = clearTimeout;
 let played = 0;
