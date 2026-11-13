@@ -35,7 +35,7 @@ html[data-theme="dark"] .filter[aria-pressed="true"]{background:#493c55;border-c
 .filter-icon{display:inline-block;filter:drop-shadow(0 0 1px #fff) drop-shadow(0 1px 1px #0009)}
 html[data-theme="dark"] .filter-icon{filter:drop-shadow(0 0 1px #fff9) drop-shadow(0 1px 1px #000)}
 .top-links a,.docs-header nav a{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.nav-icon{width:16px;height:16px;flex:none}.nav-icon--github,.nav-icon--npm{fill:currentColor;stroke:none}.nav-icon--npm{width:20px}
+.nav-icon{width:16px;height:16px;flex:none}.nav-icon--github,.nav-icon--npm,.nav-icon--solid{fill:currentColor;stroke:none}.nav-icon--npm{width:20px}
 .copy-icon-button{display:grid!important;place-items:center;width:36px;height:36px;padding:0!important;border:0!important;border-radius:8px;background:transparent!important;color:inherit;cursor:pointer;opacity:.78}
 .copy-icon-button:hover{background:#ffffff18!important;opacity:1}.copy-icon-button:focus-visible{outline:3px solid #825ced;outline-offset:2px}.copy-icon-button svg{width:18px;height:18px}.copy-icon-button.is-copied{color:#a9d6ac;opacity:1}
 .example-code,.doc-code,.install-bar{position:relative}
