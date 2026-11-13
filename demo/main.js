@@ -5,6 +5,7 @@ const filters = document.querySelector('#filters');
 const count = document.querySelector('#count');
 const skinTone = document.querySelector('#skin-tone');
 const framework = document.querySelector('#framework');
+const frameworkSelectors = document.querySelectorAll('[data-framework]');
 const displayMode = document.querySelector('#display-mode');
 const autoInput = document.querySelector('#auto-emoji');
 const autoPreview = document.querySelector('#auto-preview');
@@ -181,7 +182,10 @@ function updateCode() {
   for (const label of document.querySelectorAll('.example-code-language')) label.textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'HTML + JAVASCRIPT';
   document.querySelector('#setup-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'JAVASCRIPT';
 }
-framework.addEventListener('change', () => { updateCode(); document.querySelector('#copy-status').textContent = ''; });
+for (const selector of frameworkSelectors) selector.addEventListener('change', () => {
+  for (const other of frameworkSelectors) other.value = selector.value;
+  updateCode(); document.querySelector('#copy-status').textContent = '';
+});
 displayMode.addEventListener('change', () => { document.querySelector('#copy-status').textContent = ''; });
 updateCode();
 for (const button of document.querySelectorAll('[data-copy-example]')) {
