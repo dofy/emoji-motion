@@ -4,6 +4,7 @@ import { subgroups } from '../src/unicode-data.js';
 await window.emojiSite.ready;
 window.emojiSite.translate(document.body);
 const t = window.emojiSite.t;
+window.emojiSite.setupCopyButtons();
 window.emojiSite.animateControls(emojiMotion);
 const customRegistry = createEmojiMotion({
   motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(14deg)' }, { transform: 'rotate(-14deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 700, easing: 'ease-out' }, origin: '50% 80%' } },
@@ -168,7 +169,7 @@ function render() {
   }
 }
 const filterIcons = { featured: '✨', all: '🗂️', family: '🧩', effects: '💫', gestures: '👋', faces: '😊', hearts: '❤️', objects: '💡', nature: '🌿', travel: '🚀', symbols: '🔣', people: '🧑', food: '🍎', activities: '🎨', flags: '🏳️', other: '🌟' };
-function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = `${filterIcons[id] ?? '✨'} ${t(label)}`; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; page = 1; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
+function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; const icon = document.createElement('span'); icon.className = 'filter-icon'; icon.setAttribute('aria-hidden', 'true'); icon.textContent = filterIcons[id] ?? '✨'; button.append(icon, document.createTextNode(` ${t(label)}`)); button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; page = 1; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
 function changePage(nextPage) {
   if (nextPage < 1 || nextPage > pageCount) return;
   page = nextPage;
@@ -418,22 +419,19 @@ updateCode();
 document.querySelector('#copy-install').addEventListener('click', async event => {
   const button = event.currentTarget;
   if (await copyText('npm install @dofy/native-emoji-motion', document.querySelector('#install-copy-status'), document.querySelector('#install-copy-fallback'), '')) {
-    button.textContent = t('Copied ✓');
-    setTimeout(() => { button.textContent = t('Copy'); }, 2000);
+    window.emojiSite.copyFeedback(button, 'copied');
   }
 });
 document.querySelector('#copy-custom').addEventListener('click', async event => {
   const button = event.currentTarget;
   if (await copyText(localizedExample(customCode[framework.value]), document.querySelector('#custom-copy-status'), document.querySelector('#custom-copy-fallback'), '')) {
-    button.textContent = t('Copied ✓');
-    setTimeout(() => { button.textContent = t('Copy code'); }, 2000);
+    window.emojiSite.copyFeedback(button, 'copied');
   }
 });
 for (const button of document.querySelectorAll('[data-copy-example]')) {
   button.addEventListener('click', async () => {
-    const original = button.dataset.copyExample === 'setup' ? t('Copy setup') : t('Copy code');
     if (await copyText(localizedExample(frameworkCode[framework.value][button.dataset.copyExample]), document.querySelector('#example-copy-status'), document.querySelector('#example-copy-fallback'), '')) {
-      button.textContent = t('Copied ✓'); setTimeout(() => { button.textContent = original; }, 2000);
+      window.emojiSite.copyFeedback(button, 'copied');
     }
   });
 }
@@ -512,8 +510,7 @@ document.querySelector('#enhance-toggle').addEventListener('click', event => {
 });
 for (const button of document.querySelectorAll('[data-enhance-copy]')) button.addEventListener('click', async () => {
   if (await copyText(enhanceExamples[button.dataset.enhanceCopy], document.querySelector('#enhance-copy-status'), document.querySelector('#enhance-copy-fallback'), '')) {
-    button.textContent = t('Copied ✓');
-    setTimeout(() => { button.textContent = t('Copy code'); }, 2000);
+    window.emojiSite.copyFeedback(button, 'copied');
   }
 });
 

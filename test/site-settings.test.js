@@ -68,3 +68,17 @@ test('settings expose a dismissible language menu and animated, persistent theme
   assert.equal(document.documentElement.dataset.theme, 'light');
   window.close();
 });
+
+test('copy icon preserves accessible labels and reports success', async () => {
+  const { window } = await setup();
+  const button = window.document.createElement('button');
+  button.className = 'copy-example'; button.textContent = 'Copy code';
+  window.document.body.append(button);
+  window.emojiSite.setupCopyButtons();
+  assert.equal(button.getAttribute('aria-label'), 'Copy code');
+  assert.equal(button.querySelector('svg')?.getAttribute('aria-hidden'), 'true');
+  window.emojiSite.copyFeedback(button, 'copied');
+  assert.equal(button.getAttribute('aria-label'), 'Copied ✓');
+  assert.ok(button.classList.contains('is-copied'));
+  window.close();
+});

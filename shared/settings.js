@@ -144,5 +144,28 @@
       registry.bind(glyph, glyph.textContent, { trigger: button, events: ['pointerenter', 'focus', 'click'] });
     }
   }
-  window.emojiSite = { ready, language, t, translate, animateControls };
+  const copyIcon = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg>';
+  const checkIcon = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>';
+  const feedbackTimers = new WeakMap();
+  function setupCopyButtons() {
+    for (const button of document.querySelectorAll('.doc-copy, .copy-example, #copy-install')) {
+      button.dataset.copyLabel = button.getAttribute('aria-label') || button.textContent.trim() || t('Copy code');
+      button.classList.add('copy-icon-button');
+      button.setAttribute('aria-label', button.dataset.copyLabel);
+      button.title = button.dataset.copyLabel;
+      button.innerHTML = copyIcon;
+    }
+  }
+  function copyFeedback(button, state) {
+    clearTimeout(feedbackTimers.get(button));
+    const label = state === 'copied' ? t('Copied ✓') : t('Select & copy');
+    button.setAttribute('aria-label', label); button.title = label;
+    button.classList.toggle('is-copied', state === 'copied');
+    button.innerHTML = state === 'copied' ? checkIcon : copyIcon;
+    feedbackTimers.set(button, setTimeout(() => {
+      button.setAttribute('aria-label', button.dataset.copyLabel); button.title = button.dataset.copyLabel;
+      button.classList.remove('is-copied'); button.innerHTML = copyIcon;
+    }, state === 'copied' ? 2000 : 3000));
+  }
+  window.emojiSite = { ready, language, t, translate, animateControls, setupCopyButtons, copyFeedback };
 })();
