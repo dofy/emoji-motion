@@ -993,5 +993,19 @@
   "ballot box with ballot": "投票箱",
   "wastebasket": "ごみ箱",
   "This guide describes Emoji Motion 0.6.0. Upgrading from 0.3.0? The": "このガイドでは Emoji Motion 0.6.0 について説明します。 0.3.0からアップグレードしますか?の",
-  "@This guide describes Emoji Motion 0.6.0. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "このガイドは Emoji Motion 0.6.0 を対象としています。0.3.0 からのアップグレードでは ZZX0XZ プロパティが削除されました。ブロック要素または CSS でレイアウトを調整してください。"
+  "@This guide describes Emoji Motion 0.6.0. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "このガイドは Emoji Motion 0.6.0 を対象としています。0.3.0 からのアップグレードでは ZZX0XZ プロパティが削除されました。ブロック要素または CSS でレイアウトを調整してください。",
+  "person swimming": "泳ぐ人",
+  "man swimming": "泳ぐ男",
+  "woman swimming": "泳ぐ女性",
+  "person surfing": "サーフィンをする人",
+  "man surfing": "サーフィンをする男",
+  "woman surfing": "サーフィンをする女性",
+  "person playing water polo": "水球をする人",
+  "man playing water polo": "水球をする男",
+  "woman playing water polo": "水球をする女性",
+  "person rowing boat": "ボートを漕ぐ人",
+  "man rowing boat": "ボートを漕ぐ男",
+  "woman rowing boat": "ボートを漕ぐ女性",
+  "Diving mask": "ダイビングマスク",
+  "Ring buoy": "浮き輪"
 }

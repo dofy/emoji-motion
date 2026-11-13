@@ -994,5 +994,19 @@
   "ballot box with ballot": "投票箱",
   "wastebasket": "垃圾桶",
   "This guide describes Emoji Motion 0.6.0. Upgrading from 0.3.0? The": "本指南介紹 Emoji Motion 0.6.0。從0.3.0升級？的",
-  "@This guide describes Emoji Motion 0.6.0. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "本指南介紹 Emoji Motion 0.6.0。從 0.3.0 升級時，請注意 ZZX0XZ 屬性已移除；使用區塊容器或 CSS 控制版面配置。"
+  "@This guide describes Emoji Motion 0.6.0. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "本指南介紹 Emoji Motion 0.6.0。從 0.3.0 升級時，請注意 ZZX0XZ 屬性已移除；使用區塊容器或 CSS 控制版面配置。",
+  "person swimming": "游泳的人",
+  "man swimming": "男人游泳",
+  "woman swimming": "女人游泳",
+  "person surfing": "衝浪的人",
+  "man surfing": "男人衝浪",
+  "woman surfing": "女人衝浪",
+  "person playing water polo": "打水球的人",
+  "man playing water polo": "男人打水球",
+  "woman playing water polo": "女人打水球",
+  "person rowing boat": "划船的人",
+  "man rowing boat": "男人划船",
+  "woman rowing boat": "女人划船",
+  "Diving mask": "潛水面罩",
+  "Ring buoy": "救生圈"
 }
