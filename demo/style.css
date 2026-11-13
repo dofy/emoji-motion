@@ -27,7 +27,7 @@
 }
 @media(max-width:360px){.topbar{padding-left:16px;padding-right:16px;gap:8px}.topbar .brand{font-size:18px}.topbar .brand-mark{width:28px;height:28px;margin-right:4px}.topbar .brand-mark svg{width:20px;height:20px}}
 
-.hero-wave{position:relative;z-index:1;padding:0;border:0;background:transparent;cursor:pointer;transform:rotate(-14deg);line-height:1}.hero-wave .art-main{display:inline-block;transform:none}.hero-wave:focus-visible{outline:3px solid #825ced;outline-offset:8px;border-radius:12px}
+.hero-wave{position:relative;z-index:1;padding:0;border:0;background:transparent;cursor:pointer;line-height:1}.hero-wave .art-main{display:inline-block;transform:none}.hero-wave:focus-visible{outline:3px solid #825ced;outline-offset:8px;border-radius:12px}
 
 .copyright{font-size:12px;line-height:16px;color:#817a71}@media(max-width:650px){.copyright{order:3;flex-basis:100%}}
 
@@ -55,3 +55,7 @@
 
 /* Shared brand artwork is used by the site, docs, README and favicon. */
 img.brand-mark{display:inline-block;vertical-align:middle;background:none;object-fit:contain}.top-links{display:flex;align-items:center;gap:24px;margin-left:auto}.top-links .repo-link{margin-left:0}.docs-link,.footer-docs{font-size:14px;font-weight:700}.docs-link:hover,.repo-link:hover,.footer-docs:hover,.footer-github:hover{text-decoration:underline;text-underline-offset:4px}@media(max-width:650px){.top-links{gap:16px}.docs-link{font-size:12px}}
+
+.brand-mark{display:inline-block;width:auto;height:auto;background:none;color:inherit;border-radius:0;vertical-align:middle;font-size:24px;line-height:1;margin-right:8px}.topbar .brand-mark{width:auto;height:auto}.detail-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#9a8aac;flex:none}.row-icon .detail-dot{width:8px;height:8px;vertical-align:middle}@media(max-width:360px){.topbar .brand-mark{width:auto;height:auto;font-size:22px}}
+
+.npm-link{font-size:14px;font-weight:700;white-space:nowrap}.npm-link:hover{text-decoration:underline;text-underline-offset:4px}@media(max-width:650px){.npm-link{font-size:12px}}@media(max-width:360px){.top-links{gap:8px}.topbar .brand{font-size:16px}}

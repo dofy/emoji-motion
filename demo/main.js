@@ -7,16 +7,24 @@ const customRegistry = createEmojiMotion({
   emoji: { '🐙': { name: 'Octopus', group: 'creatures' } }
 });
 document.querySelector('#custom-preview').registry = customRegistry;
+// The brand remains a native emoji; motion uses the same registry as the gallery.
+for (const brand of document.querySelectorAll('.brand')) {
+  const mark = brand.querySelector('.brand-mark');
+  if (mark) emojiMotion.bind(mark, '👋', { trigger: brand, events: ['pointerenter', 'focus'] });
+}
+const brandMark = document.querySelector('.topbar .brand-mark');
+if (brandMark) requestAnimationFrame(() => emojiMotion.play(brandMark, '👋'));
 const heroWave = document.querySelector('.hero-wave');
 const heroGlyph = heroWave.querySelector('.art-main');
-emojiMotion.bind(heroGlyph, '👋', { trigger: heroWave, events: ['pointerenter', 'focus', 'click'] });
+const heroOptions = { decoration: { container: heroWave } };
+emojiMotion.bind(heroGlyph, '📡', { ...heroOptions, trigger: heroWave, events: ['pointerenter', 'focus', 'click'] });
 // Play once when the artwork enters view, including when it starts below the fold on mobile.
 if ('IntersectionObserver' in globalThis) {
   const observer = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); emojiMotion.play(heroGlyph, '👋'); }
+    if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); emojiMotion.play(heroGlyph, '📡', heroOptions); }
   }, { threshold: 0.25 });
   observer.observe(heroWave);
-} else emojiMotion.play(heroGlyph, '👋');
+} else emojiMotion.play(heroGlyph, '📡', heroOptions);
 const grid = document.querySelector('#grid');
 const filters = document.querySelector('#filters');
 const count = document.querySelector('#count');
