@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 — 2026-11-14
 
+- **Behavior change:** emoji that use the bounce, hop or spring motions, including most animals and faces, now move with the new rhythm. The game die, alarm clock, cartwheeling person and turtle use new motions, and the hammer leaves the hand tools family.
 - Give springs, bounces, hops and pop a gravity-aware rhythm with anticipation, per-segment easing and squash on landing.
 - Add toss, somersault, alarmRing, peek and slam motions for dice, cartwheels, alarm clocks and telephones, peeking faces and the hammer.
 - Burst sparkles one after another, and add a scan effect for screens and documents.
