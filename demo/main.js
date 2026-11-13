@@ -8,19 +8,23 @@ const framework = document.querySelector('#framework');
 const displayMode = document.querySelector('#display-mode');
 skinTone.addEventListener('change', () => { emojiMotion.setDefaultSkinTone(skinTone.value); render(); });
 const all = emojiMotion.list();
+// Curated examples live in the demo, not the library's complete registry.
+const featured = ['👋', '😊', '❤️', '🔔', '🌸', '🚀', '✨', '📡', '🔍', '🚲', '🔥', '🎵'];
 let cleanups = [];
-let selected = 'all';
+let selected = 'featured';
 const palette = ['peach', 'lilac', 'yellow', 'mint', 'blue', 'pink'];
 function render() {
   cleanups.forEach(cleanup => cleanup()); cleanups = []; grid.replaceChildren();
-  const shown = all.filter(glyph => selected === 'all' || (selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected));
+  const shown = selected === 'featured'
+    ? featured.filter(glyph => emojiMotion.resolve(glyph))
+    : all.filter(glyph => selected === 'all' || (selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected));
   count.textContent = `${String(shown.length).padStart(2, '0')} LITTLE MOVEMENTS`;
-  for (const glyph of shown) {
+  for (const [index, glyph] of shown.entries()) {
     const item = emojiMotion.resolve(glyph);
     const button = document.createElement('button');
     button.className = `emoji-card ${palette[all.indexOf(glyph) % palette.length]}`;
     button.type = 'button'; button.setAttribute('aria-label', `${item.name}, preview and copy component`);
-    const number = document.createElement('span'); number.className = 'card-number'; number.textContent = String(all.indexOf(glyph) + 1).padStart(2, '0');
+    const number = document.createElement('span'); number.className = 'card-number'; number.textContent = String(index + 1).padStart(2, '0');
     const arrow = document.createElement('span'); arrow.className = 'card-arrow'; arrow.textContent = '↗'; arrow.setAttribute('aria-hidden', 'true');
     const stage = document.createElement('span'); stage.className = 'emoji-stage';
     const visual = document.createElement('span'); visual.className = 'emoji-visual';
@@ -37,7 +41,7 @@ function render() {
   }
 }
 function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
-makeFilter('all', 'All emoji'); makeFilter('effects', 'With effects ✦'); for (const group of emojiMotion.groups()) makeFilter(group.id, group.label); render();
+makeFilter('featured', 'Featured'); makeFilter('all', 'All emoji'); makeFilter('effects', 'With effects ✦'); for (const group of emojiMotion.groups()) makeFilter(group.id, group.label); render();
 
 
 const exampleCode = {

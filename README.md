@@ -10,7 +10,7 @@ Small, expressive animations for native emoji. A framework independent, dependen
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **With effects** to preview all emoji with decorative SVG layers, or choose a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
+Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. The gallery starts with a curated selection from across the groups. Choose **All emoji** for the complete list, **With effects** for decorative SVG layers, or select a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
 
 ## Components
 
