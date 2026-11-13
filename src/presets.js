@@ -146,6 +146,7 @@ export const families = {
   poses: { label: 'People in poses', group: 'people', motion: 'pose', members: ['🧎', '🧍', '🙇'], aliases: familyToneAliases(['🧎', '🧍', '🙇']) },
   professionals: { label: 'Professionals', group: 'people', motion: 'pose', members: roleMembers, aliases: roleAliases },
   walkers: { label: 'Walking and running', group: 'people', motion: 'steps', members: walkerMembers, aliases: walkerAliases },
+  screens: { label: 'Screens and documents', group: 'objects', motion: 'steady', members: ['💻', '🖥️', '📠', '🧾', '📋'], aliases: { '🖥': '🖥️' }, decoration: 'scan' },
   swimmers: { label: 'Swimmers', group: 'people', motion: 'bob', members: gendered('🏊'), aliases: genderedToneAliases(gendered('🏊')), decoration: 'ripple' },
   surfers: { label: 'Surfers', group: 'people', motion: 'ride', members: gendered('🏄'), aliases: genderedToneAliases(gendered('🏄')), decoration: 'splash' },
   waterPolo: { label: 'Water polo', group: 'people', motion: 'bob', members: gendered('🤽'), aliases: genderedToneAliases(gendered('🤽')), decoration: 'splash' },
@@ -253,11 +254,25 @@ const notesShape = { viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M24 37c-7 3-7 8-3 10s9-1 9-5V23l12-3v15c-7 3-7 8-3 10s9-1 9-5V12l-24 6z', fill: 'var(--emoji-motion-note, #b780c8)' } },
   { tag: 'path', attrs: { d: 'M75 67c-5 2-5 6-2 7s7-1 7-4V54l8-2v12c-5 2-5 6-2 7s7-1 7-4V46l-18 5z', fill: 'var(--emoji-motion-note-accent, #dc8f72)' } }
 ] };
-const sparkleShape = { viewBox: '0 0 100 100', elements: [
-  { tag: 'path', attrs: { d: 'M18 9c1.5 9 3 10.5 12 12-9 1.5-10.5 3-12 12-1.5-9-3-10.5-12-12 9-1.5 10.5-3 12-12z', fill: 'var(--emoji-motion-sparkle, #e0a63e)' } },
-  { tag: 'path', attrs: { d: 'M80 58c1 6 2 7 8 8-6 1-7 2-8 8-1-6-2-7-8-8 6-1 7-2 8-8z', fill: 'var(--emoji-motion-sparkle-accent, #d787ad)' } }
-] };
 const centered = { width: '160%', height: '160%', overflow: 'visible' };
+// A four point star of radius r centered on (cx, cy) in viewBox units.
+const star = (cx, cy, r) => { const k = r / 12; const f = value => +(value * k).toFixed(2); return `M${cx} ${cy - r}c${f(1.5)} ${f(9)} ${f(3)} ${f(10.5)} ${f(12)} ${f(12)}-${f(9)} ${f(1.5)}-${f(10.5)} ${f(3)}-${f(12)} ${f(12)}-${f(1.5)}-${f(9)}-${f(3)}-${f(10.5)}-${f(12)}-${f(12)} ${f(9)}-${f(1.5)} ${f(10.5)}-${f(3)} ${f(12)}-${f(12)}z`; };
+// Sparkles burst one after another: a quick pop outwards, then a slower drift as they fade.
+const sparkleBurst = [[24, 24, 9, -7, -7, 'sparkle'], [78, 28, 6, 6, -6, 'sparkle-accent'], [82, 70, 7, 6, 5, 'sparkle'], [20, 66, 5, -6, 3, 'sparkle-accent']].map(([cx, cy, r, dx, dy, color], index) => ({
+  svg: { viewBox: '0 0 100 100', elements: [{ tag: 'path', attrs: { d: star(cx, cy, r), fill: `var(--emoji-motion-${color}, ${color === 'sparkle' ? '#e0a63e' : '#d787ad'})` } }] },
+  style: { ...centered, transformOrigin: `${cx}% ${cy}%` },
+  keyframes: [
+    { opacity: 0, transform: 'translate(-50%, -50%) scale(.3) rotate(0deg)', easing: 'cubic-bezier(.2,.8,.3,1)' },
+    { opacity: 1, transform: `translate(${-50 + dx * .4}%, ${-50 + dy * .4}%) scale(1.1) rotate(20deg)`, offset: .3, easing: 'ease-out' },
+    { opacity: 0, transform: `translate(${-50 + dx}%, ${-50 + dy}%) scale(.4) rotate(45deg)` }
+  ],
+  options: { duration: 700, delay: index * 60, easing: 'linear', fill: 'backwards' }
+}));
+// The scan line sweeps down, rests a beat at the bottom, then glides back and fades.
+const scanShape = { viewBox: '0 0 100 100', elements: [
+  { tag: 'line', attrs: { x1: '24', y1: '22', x2: '76', y2: '22', stroke: 'var(--emoji-motion-scan, #76b6a4)', 'stroke-width': '7', 'stroke-linecap': 'round', opacity: '.25' } },
+  { tag: 'line', attrs: { x1: '24', y1: '22', x2: '76', y2: '22', stroke: 'var(--emoji-motion-scan, #76b6a4)', 'stroke-width': '2.5', 'stroke-linecap': 'round' } }
+] };
 const steamShape = { viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M38 30c-5-5 5-8 0-14M50 27c-5-5 5-8 0-14M62 30c-5-5 5-8 0-14', fill: 'none', stroke: 'var(--emoji-motion-steam, #a29aa5)', 'stroke-width': '2.5', 'stroke-linecap': 'round' } }
 ] };
@@ -342,11 +357,15 @@ export const decorations = {
       options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' }
     }]
   },
-  sparkle: {
-    anchor: { x: '50%', y: '50%' },
-    layers: [{ svg: sparkleShape, style: centered,
-      keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.6) rotate(-15deg)' }, { opacity: 1, transform: 'translate(-50%, -50%) scale(1)', offset: .42 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.2) rotate(10deg)' }],
-      options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }
-    }]
-  }
+  sparkle: { anchor: { x: '50%', y: '50%' }, layers: sparkleBurst },
+  scan: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: scanShape, style: centered,
+    keyframes: [
+      { opacity: 0, transform: 'translate(-50%, -50%)', easing: 'ease-out' },
+      { opacity: 1, transform: 'translate(-50%, -48%)', offset: .1, easing: 'ease-in-out' },
+      { opacity: 1, transform: 'translate(-50%, -14%)', offset: .5, easing: 'linear' },
+      { opacity: 1, transform: 'translate(-50%, -14%)', offset: .62, easing: 'ease-in-out' },
+      { opacity: 0, transform: 'translate(-50%, -40%)' }
+    ],
+    options: { duration: 900, easing: 'linear' }
+  }] }
 };

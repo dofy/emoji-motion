@@ -62,6 +62,17 @@ test('water emoji and gear use water effects', () => {
   }
 });
 
+test('screens and documents are scanned', () => {
+  for (const glyph of ['💻', '🖥️', '🖥', '📠', '🧾', '📋']) {
+    for (const registry of [emojiMotion, lite]) {
+      const result = registry.resolve(glyph);
+      assert.equal(result.familyId, 'screens', glyph);
+      assert.equal(result.decoration, 'scan', glyph);
+      assert.equal(result.glyph, glyph, glyph);
+    }
+  }
+});
+
 test('new person and gesture presets use official complete skin tone sequences', () => {
   const glyphs = ['✌️', '🤟', '👊', '🤜', '🤛', '🫰', '🙋', '🧘', '🏃', '🤸', '🧑‍🍳', '🧑‍🎨', '🧑‍🚀', '🧑‍💻'];
   for (const glyph of glyphs) {
