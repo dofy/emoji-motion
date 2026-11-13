@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="./assets/logo.svg" width="104" height="104" alt="Emoji Motion logo" />
-</p>
+<h1 align="center">👋</h1>
 
 <h1 align="center">Emoji Motion</h1>
 
