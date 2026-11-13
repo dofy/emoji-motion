@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add ripple, splash and wake effects for water.
+- Add families for swimmers, surfers, water polo players and rowers, covering their gender and skin tone variants.
+- Boats, the ring buoy, the water wave, the dolphin and the diving mask now use water effects.
+
 ## 0.6.0 — 2026-11-14
 
 - Add motion families for vegetables, land animals, clothing, tools, books, hand gestures, boats and sweet treats.
