@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Give springs, bounces, hops and pop a gravity-aware rhythm with anticipation, per-segment easing and squash on landing.
+- Add toss, somersault, alarmRing, peek and slam motions for dice, cartwheels, alarm clocks and telephones, peeking faces and the hammer.
+- Burst sparkles one after another, and add a scan effect for screens and documents.
+- Let decoration layers paint behind the glyph, and read built-in effect colors from CSS custom properties.
+- `bind()` ignores touch hover, mouse focus and repeats within its new `cooldown` (260 ms by default).
+
 ## 0.6.4 — 2026-11-14
 
 - Add ripple, splash and wake effects for water.
