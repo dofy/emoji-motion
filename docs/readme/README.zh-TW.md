@@ -2,17 +2,17 @@
 
 <h1 align="center">Emoji Motion</h1>
 
-<p align="center"><a href="./README.md">English</a> · <a href="./README.zh-CN.md">简体中文</a> · <a href="./README.zh-TW.md">繁體中文</a> · <a href="./README.ja.md">日本語</a></p>
+<p align="center"><a href="https://github.com/dofy/emoji-motion/blob/main/README.md">English</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.zh-CN.md">简体中文</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.zh-TW.md">繁體中文</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.ja.md">日本語</a></p>
 
 <p align="center"><strong>讓你的 emoji 多一點情緒。 ✨</strong></p>
 
-<p align="center"><a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/npm/v/%40dofy%2Fnative-emoji-motion?label=npm" alt="npm version" /></a> <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license" /></a> <a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/node/v/%40dofy%2Fnative-emoji-motion" alt="Node.js version" /></a></p>
+<p align="center"><a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/npm/v/%40dofy%2Fnative-emoji-motion?label=npm" alt="npm version" /></a> <a href="../../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license" /></a> <a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/node/v/%40dofy%2Fnative-emoji-motion" alt="Node.js version" /></a></p>
 
 為裝置上的原生 emoji 加入小巧、富有表現力的動畫，支援 React、Vue、Svelte 和 Web Component。支援膚色、可選 SVG 裝飾、自訂動作與 Unicode 自動分類。前往[線上展示](https://emoji-motion.phpz.org/)體驗。
 
 ## 📊 專案概覽
 
-| 0.5.0 版本 | 數量 | 說明 |
+| 0.5.1 版本 | 數量 | 說明 |
 | --- | ---: | --- |
 | 個別訂製預設 | 177 | 逐一設定的基礎 emoji |
 | 已審核動作家族 | 16 | 另外涵蓋 123 個基礎 emoji |
@@ -41,4 +41,4 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/react';
 
 ## 📄 授權
 
-[MIT](./LICENSE)。Unicode 資料適用 [Unicode License](./UNICODE-LICENSE.txt)。
+[MIT](../../LICENSE)。Unicode 資料適用 [Unicode License](../../UNICODE-LICENSE.txt)。

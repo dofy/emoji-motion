@@ -2,17 +2,17 @@
 
 <h1 align="center">Emoji Motion</h1>
 
-<p align="center"><a href="./README.md">English</a> · <a href="./README.zh-CN.md">简体中文</a> · <a href="./README.zh-TW.md">繁體中文</a> · <a href="./README.ja.md">日本語</a></p>
+<p align="center"><a href="https://github.com/dofy/emoji-motion/blob/main/README.md">English</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.zh-CN.md">简体中文</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.zh-TW.md">繁體中文</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.ja.md">日本語</a></p>
 
 <p align="center"><strong>いつもの絵文字に、もう少し気持ちを。 ✨</strong></p>
 
-<p align="center"><a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/npm/v/%40dofy%2Fnative-emoji-motion?label=npm" alt="npm version" /></a> <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license" /></a> <a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/node/v/%40dofy%2Fnative-emoji-motion" alt="Node.js version" /></a></p>
+<p align="center"><a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/npm/v/%40dofy%2Fnative-emoji-motion?label=npm" alt="npm version" /></a> <a href="../../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license" /></a> <a href="https://www.npmjs.com/package/@dofy/native-emoji-motion"><img src="https://img.shields.io/node/v/%40dofy%2Fnative-emoji-motion" alt="Node.js version" /></a></p>
 
 端末のネイティブ絵文字に小さく表情豊かなアニメーションを追加します。React、Vue、Svelte、Web Component に対応し、肌の色、任意の SVG エフェクト、カスタムモーション、Unicode による自動分類を利用できます。[ライブデモ](https://emoji-motion.phpz.org/)でお試しください。
 
 ## 📊 コレクションの概要
 
-| バージョン 0.5.0 | 数 | 内容 |
+| バージョン 0.5.1 | 数 | 内容 |
 | --- | ---: | --- |
 | 個別のプリセット | 177 | 個別に設定された基本絵文字 |
 | 確認済みモーションファミリー | 16 | さらに 123 種類の基本絵文字に対応 |
@@ -41,4 +41,4 @@ React、Vue、Svelte コンポーネントまたは Web Component を使用で�
 
 ## 📄 ライセンス
 
-[MIT](./LICENSE)。Unicode データには [Unicode License](./UNICODE-LICENSE.txt) が適用されます。
+[MIT](../../LICENSE)。Unicode データには [Unicode License](../../UNICODE-LICENSE.txt) が適用されます。

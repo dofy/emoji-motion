@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 — 2026-11-13
+
+- Fix the npm package page to show the English README by default.
+
 ## 0.5.0 — 2026-11-13
 
 - Add reviewed motion families for fruit, animal faces, clouds, celestial bodies and writing tools.

@@ -2,7 +2,7 @@
 
 <h1 align="center">Emoji Motion</h1>
 
-<p align="center"><a href="./README.md">English</a> · <a href="./README.zh-CN.md">简体中文</a> · <a href="./README.zh-TW.md">繁體中文</a> · <a href="./README.ja.md">日本語</a></p>
+<p align="center"><a href="https://github.com/dofy/emoji-motion/blob/main/README.md">English</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.zh-CN.md">简体中文</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.zh-TW.md">繁體中文</a> · <a href="https://github.com/dofy/emoji-motion/blob/main/docs/readme/README.ja.md">日本語</a></p>
 
 <p align="center">
   <strong>Give your emoji a little more feeling. ✨</strong><br />
@@ -24,7 +24,7 @@ Bring 👋, ❤️, 📡 and more to life in React, Vue, Svelte or plain HTML. E
 
 ## 📊 Collection at a glance
 
-| In version 0.5.0 | Count | What it covers |
+| In version 0.5.1 | Count | What it covers |
 | --- | ---: | --- |
 | Handcrafted presets | 177 | Individually configured base emoji |
 | Reviewed motion families | 16 | 123 additional base emoji sharing reviewed motions |
