@@ -159,11 +159,17 @@ export function createRegistry(config = {}, classifier) {
           node.setAttribute('viewBox', layer.svg.viewBox);
           for (const shape of layer.svg.elements) {
             const child = container.ownerDocument.createElementNS('http://www.w3.org/2000/svg', shape.tag);
-            for (const [key, value] of Object.entries(shape.attrs)) child.setAttribute(key, value);
+            for (const [key, value] of Object.entries(shape.attrs)) {
+              // Presentation attributes cannot read custom properties, so a themed
+              // color goes through style and keeps its fallback as the attribute.
+              const themed = typeof value === 'string' && value.match(/^var\(\s*--[\w-]+\s*,\s*(.+)\)$/);
+              child.setAttribute(key, themed ? themed[1].trim() : value);
+              if (themed) child.style[key] = value;
+            }
             node.appendChild(child);
           }
         }
-        Object.assign(node.style, { position: 'absolute', left: '0', top: '0', opacity: '0', ...layer.style });
+        Object.assign(node.style, { position: 'absolute', left: '0', top: '0', opacity: '0', ...(layer.behind ? { zIndex: '-1' } : {}), ...layer.style });
         decorationRoot.appendChild(node);
         decorationAnimations.push(node.animate(layer.keyframes, layer.options));
       }

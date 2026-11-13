@@ -244,38 +244,41 @@ export const emoji = {
   '🎲': { group: 'activities', name: 'Game die', motion: 'spin' }
 };
 
-// Declarative SVG layers never alter the native glyph. Anchors are relative to
-// the consumer's glyph container and may be overridden for a particular font.
-const signalShape = { viewBox: '0 0 100 100', elements: [{ tag: 'circle', attrs: { cx: '50', cy: '50', r: '29', fill: 'none', stroke: '#7c8ee8', 'stroke-width': '2.5' } }] };
+// Declarative SVG layers never alter the native glyph. Colors read a CSS custom
+// property such as --emoji-motion-water and fall back to the listed value.
+// Anchors are relative to the consumer's glyph container and may be overridden
+// for a particular font.
+const signalShape = { viewBox: '0 0 100 100', elements: [{ tag: 'circle', attrs: { cx: '50', cy: '50', r: '29', fill: 'none', stroke: 'var(--emoji-motion-signal, #7c8ee8)', 'stroke-width': '2.5' } }] };
 const notesShape = { viewBox: '0 0 100 100', elements: [
-  { tag: 'path', attrs: { d: 'M24 37c-7 3-7 8-3 10s9-1 9-5V23l12-3v15c-7 3-7 8-3 10s9-1 9-5V12l-24 6z', fill: '#b780c8' } },
-  { tag: 'path', attrs: { d: 'M75 67c-5 2-5 6-2 7s7-1 7-4V54l8-2v12c-5 2-5 6-2 7s7-1 7-4V46l-18 5z', fill: '#dc8f72' } }
+  { tag: 'path', attrs: { d: 'M24 37c-7 3-7 8-3 10s9-1 9-5V23l12-3v15c-7 3-7 8-3 10s9-1 9-5V12l-24 6z', fill: 'var(--emoji-motion-note, #b780c8)' } },
+  { tag: 'path', attrs: { d: 'M75 67c-5 2-5 6-2 7s7-1 7-4V54l8-2v12c-5 2-5 6-2 7s7-1 7-4V46l-18 5z', fill: 'var(--emoji-motion-note-accent, #dc8f72)' } }
 ] };
 const sparkleShape = { viewBox: '0 0 100 100', elements: [
-  { tag: 'path', attrs: { d: 'M18 9c1.5 9 3 10.5 12 12-9 1.5-10.5 3-12 12-1.5-9-3-10.5-12-12 9-1.5 10.5-3 12-12z', fill: '#e0a63e' } },
-  { tag: 'path', attrs: { d: 'M80 58c1 6 2 7 8 8-6 1-7 2-8 8-1-6-2-7-8-8 6-1 7-2 8-8z', fill: '#d787ad' } }
+  { tag: 'path', attrs: { d: 'M18 9c1.5 9 3 10.5 12 12-9 1.5-10.5 3-12 12-1.5-9-3-10.5-12-12 9-1.5 10.5-3 12-12z', fill: 'var(--emoji-motion-sparkle, #e0a63e)' } },
+  { tag: 'path', attrs: { d: 'M80 58c1 6 2 7 8 8-6 1-7 2-8 8-1-6-2-7-8-8 6-1 7-2 8-8z', fill: 'var(--emoji-motion-sparkle-accent, #d787ad)' } }
 ] };
 const centered = { width: '160%', height: '160%', overflow: 'visible' };
 const steamShape = { viewBox: '0 0 100 100', elements: [
-  { tag: 'path', attrs: { d: 'M38 30c-5-5 5-8 0-14M50 27c-5-5 5-8 0-14M62 30c-5-5 5-8 0-14', fill: 'none', stroke: '#a29aa5', 'stroke-width': '2.5', 'stroke-linecap': 'round' } }
+  { tag: 'path', attrs: { d: 'M38 30c-5-5 5-8 0-14M50 27c-5-5 5-8 0-14M62 30c-5-5 5-8 0-14', fill: 'none', stroke: 'var(--emoji-motion-steam, #a29aa5)', 'stroke-width': '2.5', 'stroke-linecap': 'round' } }
 ] };
 // Water effects sit at the waterline below the glyph and spread symmetrically.
 // y is the waterline in viewBox units: at the body for swimmers, below the hull for boats.
-const rippleRings = y => [0, 320].map(delay => ({
-  svg: { viewBox: '0 0 100 100', elements: [{ tag: 'ellipse', attrs: { cx: '50', cy: String(y), rx: '30', ry: '6', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2.5' } }] },
+const rippleRings = (y, behind = false) => [0, 320].map(delay => ({
+  behind,
+  svg: { viewBox: '0 0 100 100', elements: [{ tag: 'ellipse', attrs: { cx: '50', cy: String(y), rx: '30', ry: '6', fill: 'none', stroke: 'var(--emoji-motion-water, #7cafd0)', 'stroke-width': '2.5' } }] },
   style: { ...centered, transformOrigin: `50% ${y}%` },
   keyframes: [{ opacity: .8, transform: 'translate(-50%, -50%) scale(.5)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.25)' }],
   options: { duration: 1100, delay, easing: 'cubic-bezier(.25,.6,.4,1)', fill: 'backwards' }
 }));
 const splashShape = { viewBox: '0 0 100 100', elements: [
-  { tag: 'path', attrs: { d: 'M39 70l-9-8M45 67l-3-10M61 70l9-8M55 67l3-10', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2.5', 'stroke-linecap': 'round' } },
-  { tag: 'circle', attrs: { cx: '25', cy: '56', r: '2.6', fill: '#7cafd0' } },
-  { tag: 'circle', attrs: { cx: '39', cy: '50', r: '2', fill: '#7cafd0' } },
-  { tag: 'circle', attrs: { cx: '75', cy: '56', r: '2.6', fill: '#7cafd0' } },
-  { tag: 'circle', attrs: { cx: '61', cy: '50', r: '2', fill: '#7cafd0' } }
+  { tag: 'path', attrs: { d: 'M39 70l-9-8M45 67l-3-10M61 70l9-8M55 67l3-10', fill: 'none', stroke: 'var(--emoji-motion-water, #7cafd0)', 'stroke-width': '2.5', 'stroke-linecap': 'round' } },
+  { tag: 'circle', attrs: { cx: '25', cy: '56', r: '2.6', fill: 'var(--emoji-motion-water, #7cafd0)' } },
+  { tag: 'circle', attrs: { cx: '39', cy: '50', r: '2', fill: 'var(--emoji-motion-water, #7cafd0)' } },
+  { tag: 'circle', attrs: { cx: '75', cy: '56', r: '2.6', fill: 'var(--emoji-motion-water, #7cafd0)' } },
+  { tag: 'circle', attrs: { cx: '61', cy: '50', r: '2', fill: 'var(--emoji-motion-water, #7cafd0)' } }
 ] };
 const rainShape = { viewBox: '0 0 100 100', elements: [
-  { tag: 'path', attrs: { d: 'M30 67v6M50 72v6M70 67v6', fill: 'none', stroke: '#7c9fca', 'stroke-width': '3', 'stroke-linecap': 'round' } }
+  { tag: 'path', attrs: { d: 'M30 67v6M50 72v6M70 67v6', fill: 'none', stroke: 'var(--emoji-motion-water, #7c9fca)', 'stroke-width': '3', 'stroke-linecap': 'round' } }
 ] };
 // Symmetric rays sit around the glyph rather than assuming a bulb, lens or flame position.
 const lightShape = color => ({ viewBox: '0 0 100 100', elements: [
@@ -283,30 +286,30 @@ const lightShape = color => ({ viewBox: '0 0 100 100', elements: [
 ] });
 export const decorations = {
   bubbles: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [
-    { tag: 'circle', attrs: { cx: '21', cy: '46', r: '3', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2' } },
-    { tag: 'circle', attrs: { cx: '76', cy: '38', r: '4', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2' } },
-    { tag: 'circle', attrs: { cx: '80', cy: '60', r: '2', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2' } }
+    { tag: 'circle', attrs: { cx: '21', cy: '46', r: '3', fill: 'none', stroke: 'var(--emoji-motion-water, #7cafd0)', 'stroke-width': '2' } },
+    { tag: 'circle', attrs: { cx: '76', cy: '38', r: '4', fill: 'none', stroke: 'var(--emoji-motion-water, #7cafd0)', 'stroke-width': '2' } },
+    { tag: 'circle', attrs: { cx: '80', cy: '60', r: '2', fill: 'none', stroke: 'var(--emoji-motion-water, #7cafd0)', 'stroke-width': '2' } }
   ] }, style: centered, keyframes: [{ opacity: 0, transform: 'translate(-50%, -43%)' }, { opacity: .85, transform: 'translate(-50%, -50%)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -64%)' }], options: { duration: 1100, easing: curve } }] },
-  alertLight: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#df625e'), style: centered,
+  alertLight: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('var(--emoji-motion-alert, #df625e)'), style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.85)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .3 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.12)' }],
     options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
-  glow: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#e0a63e'), style: centered,
+  glow: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('var(--emoji-motion-glow, #e0a63e)'), style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.85)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.08)' }],
     options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
-  flicker: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#df985c'), style: centered,
+  flicker: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('var(--emoji-motion-flame, #df985c)'), style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.9)' }, { opacity: .7, transform: 'translate(-50%, -50%) scale(1)', offset: .3 }, { opacity: .3, transform: 'translate(-50%, -50%) scale(.95)', offset: .5 }, { opacity: .75, transform: 'translate(-50%, -50%) scale(1.03)', offset: .7 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1)' }],
     options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
-  flash: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#a5b7df'), style: centered,
+  flash: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('var(--emoji-motion-flash, #a5b7df)'), style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.75)' }, { opacity: 1, transform: 'translate(-50%, -50%) scale(1)', offset: .18 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.2)', offset: .52 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.2)' }],
     options: { duration: 800, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
-  impact: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [{ tag: 'path', attrs: { d: 'M28 75l-5 4M72 75l5 4M50 79v6', fill: 'none', stroke: '#d49b70', 'stroke-width': '3', 'stroke-linecap': 'round' } }] }, style: centered,
+  impact: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [{ tag: 'path', attrs: { d: 'M28 75l-5 4M72 75l5 4M50 79v6', fill: 'none', stroke: 'var(--emoji-motion-impact, #d49b70)', 'stroke-width': '3', 'stroke-linecap': 'round' } }] }, style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.8)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(.8)', offset: .45 }, { opacity: .85, transform: 'translate(-50%, -50%) scale(1)', offset: .65 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.1)' }], options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
-  petals: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [{ tag: 'ellipse', attrs: { cx: '24', cy: '33', rx: '3', ry: '5', fill: '#d89cb9' } }, { tag: 'ellipse', attrs: { cx: '76', cy: '38', rx: '3', ry: '5', fill: '#d89cb9' } }] }, style: centered,
+  petals: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [{ tag: 'ellipse', attrs: { cx: '24', cy: '33', rx: '3', ry: '5', fill: 'var(--emoji-motion-petal, #d89cb9)' } }, { tag: 'ellipse', attrs: { cx: '76', cy: '38', rx: '3', ry: '5', fill: 'var(--emoji-motion-petal, #d89cb9)' } }] }, style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -58%) rotate(-8deg)' }, { opacity: .8, transform: 'translate(-50%, -50%) rotate(0deg)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -35%) rotate(8deg)' }], options: { duration: 1200, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
   steam: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: steamShape, style: centered,
@@ -318,7 +321,8 @@ export const decorations = {
     options: { duration: 950, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
   ripple: { anchor: { x: '50%', y: '50%' }, layers: rippleRings(66) },
-  wake: { anchor: { x: '50%', y: '50%' }, layers: rippleRings(75) },
+  // The hull hides the far side of its wake.
+  wake: { anchor: { x: '50%', y: '50%' }, layers: rippleRings(75, true) },
   splash: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: splashShape, style: { ...centered, transformOrigin: '50% 70%' },
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.55)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -54%) scale(1.15)' }],
     options: { duration: 850, easing: curve }

@@ -22,7 +22,7 @@ export function createEmojiMotionComponent(emojiMotion) {
     return () => {
       const result = props.registry.resolve(props.emoji, { skinTone: props.skinTone });
       return h('span', { ...attrs, ref: wrapper, 'data-emoji-motion': 'component', role: 'img', 'aria-label': props.label ?? result?.name ?? props.emoji, tabindex: attrs.tabindex ?? (props.trigger ? -1 : 0) },
-        h('span', { ref: visual, style: { display: 'inline-block', position: 'relative' } },
+        h('span', { ref: visual, style: { display: 'inline-block', position: 'relative', isolation: 'isolate' } },
           h('span', { ref: glyph, 'aria-hidden': 'true', style: { display: 'inline-block' } }, result?.glyph ?? props.emoji)));
     };
   }

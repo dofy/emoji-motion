@@ -14,7 +14,7 @@ export function createEmojiMotionComponent(emojiMotion) {
     return registry.bind(glyph.current, emoji, { trigger: triggerRef?.current ?? wrapper.current, events, skinTone, ...(decoration ? { decoration: { container: visual.current } } : {}) });
   }, [registry, emoji, skinTone, decoration, events, triggerRef]);
   return createElement('span', { ...attributes, className, ref: wrapper, 'data-emoji-motion': 'component', role: 'img', 'aria-label': label ?? result?.name ?? emoji, tabIndex: attributes.tabIndex ?? (triggerRef ? -1 : 0), style },
-    createElement('span', { ref: visual, style: { display: 'inline-block', position: 'relative' } },
+    createElement('span', { ref: visual, style: { display: 'inline-block', position: 'relative', isolation: 'isolate' } },
       createElement('span', { ref: glyph, 'aria-hidden': 'true', style: { display: 'inline-block' } }, result?.glyph ?? emoji)));
 }
 }

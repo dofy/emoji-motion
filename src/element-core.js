@@ -19,7 +19,7 @@ export function createEmojiMotionElement(emojiMotion) {
     this.setAttribute('aria-label', this.getAttribute('label') ?? result?.name ?? emoji);
     if (!this.hasAttribute('tabindex')) this.tabIndex = 0;
     const visual = this.ownerDocument.createElement('span');
-    Object.assign(visual.style, { display: 'inline-block', position: 'relative' });
+    Object.assign(visual.style, { display: 'inline-block', position: 'relative', isolation: 'isolate' });
     const glyph = this.ownerDocument.createElement('span');
     Object.assign(glyph.style, { display: 'inline-block' });
     glyph.setAttribute('aria-hidden', 'true'); glyph.textContent = result?.glyph ?? emoji;

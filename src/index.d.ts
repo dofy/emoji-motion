@@ -2,7 +2,7 @@ export interface Motion { keyframes: Keyframe[]; options?: KeyframeAnimationOpti
 export interface Group { label: string; description?: string; motion: string }
 export interface Anchor { x: string; y: string }
 export interface SvgShape { tag: 'path' | 'circle' | 'ellipse' | 'rect' | 'line' | 'polyline' | 'polygon'; attrs: Record<string, string> }
-export interface DecorationLayer { style: Partial<CSSStyleDeclaration>; keyframes: Keyframe[]; options?: KeyframeAnimationOptions; svg?: { viewBox: string; elements: SvgShape[] } }
+export interface DecorationLayer { /** Paint behind the glyph; the container must create a stacking context, for example with isolation: isolate. */ behind?: boolean; style: Partial<CSSStyleDeclaration>; keyframes: Keyframe[]; options?: KeyframeAnimationOptions; svg?: { viewBox: string; elements: SvgShape[] } }
 export interface Decoration { anchor: Anchor; layers: DecorationLayer[] }
 export type SkinTone = 'default' | 'light' | 'medium-light' | 'medium' | 'medium-dark' | 'dark';
 export interface EmojiEntry { group: string; name: string; motion?: string; decoration?: string; variants?: string[]; skinTones?: Partial<Record<Exclude<SkinTone, 'default'>, string>> }

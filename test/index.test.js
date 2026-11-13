@@ -160,6 +160,18 @@ test('decorations are validated and skipped when no container or reduced motion 
   try { assert.equal(emojiMotion.play(el, '📡', { decoration: { container } }), null); assert.equal(created, 0); } finally { if (old) globalThis.matchMedia = old; else delete globalThis.matchMedia; }
 });
 
+test('themed decoration colors keep a fallback and behind layers sit under the glyph', () => {
+  const made = [];
+  function node() { const item = { style: {}, attrs: {}, children: [], setAttribute(key, value) { this.attrs[key] = value; }, appendChild(child) { this.children.push(child); }, append(child) { this.children.push(child); }, remove() {}, animate() { return { finished: new Promise(() => {}), cancel() {} }; } }; made.push(item); return item; }
+  const container = node(); container.ownerDocument = { createElement: node, createElementNS: node };
+  emojiMotion.play(node(), '🛶', { ignoreReducedMotion: true, decoration: { container } });
+  const layer = container.children[0].children[0];
+  assert.equal(layer.style.zIndex, '-1');
+  const ring = layer.children[0];
+  assert.equal(ring.attrs.stroke, '#7cafd0');
+  assert.equal(ring.style.stroke, 'var(--emoji-motion-water, #7cafd0)');
+});
+
 test('custom SVG decoration creates its declared shapes', () => {
   const nodes = [];
   function makeNode(tag) { const value = { tag, style: {}, attrs: {}, children: [], setAttribute(key, val) { this.attrs[key] = val; }, appendChild(child) { this.children.push(child); }, remove() {}, animate() { return { finished: new Promise(() => {}), cancel() {} }; } }; nodes.push(value); return value; }

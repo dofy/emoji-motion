@@ -36,7 +36,7 @@ export function enhance(registry, options = {}) {
       if (index > cursor) fragment.append(node.ownerDocument.createTextNode(text.slice(cursor, index)));
       const wrapper = node.ownerDocument.createElement('span');
       wrapper.setAttribute('data-emoji-motion', 'enhanced');
-      Object.assign(wrapper.style, { display: 'inline-block', position: 'relative' });
+      Object.assign(wrapper.style, { display: 'inline-block', position: 'relative', isolation: 'isolate' });
       const inner = node.ownerDocument.createElement('span');
       inner.style.display = 'inline-block';
       inner.textContent = glyph;
