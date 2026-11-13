@@ -84,6 +84,64 @@ export const motions = {
   clockTick: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-3deg)', offset: .25 }, { transform: 'rotate(3deg)', offset: .5 }, { transform: 'rotate(-2deg)', offset: .75 }, { transform: 'rotate(0deg)' }], options: { duration: 1200, easing: curve }, origin: '50% 50%' },
   gentleFall: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(7%) scale(.98,1.02)', offset: .45 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1100, easing: curve } },
   softSettle: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-5%) scale(1)', offset: .35 }, { transform: 'translateY(0) scale(1.03,.97)', offset: .7 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: curve }, origin: '50% 90%' },
+  // Rhythm motions: a beat of anticipation, the move, a held pause, then a reversal into rest.
+  // Tumble up, hang near the top, drop flat, overshoot and settle back.
+  toss: { keyframes: [
+    { transform: 'translateY(0) rotate(0deg) scale(1)', easing: crouch },
+    { transform: 'translateY(4%) rotate(-10deg) scale(1.12,.88)', offset: .12, easing: 'cubic-bezier(.15,.75,.35,1)' },
+    { transform: 'translateY(-56%) rotate(190deg) scale(1.06)', offset: .44, easing: 'cubic-bezier(.45,.05,.55,.95)' },
+    { transform: 'translateY(-50%) rotate(255deg) scale(1.06)', offset: .56, easing: fall },
+    { transform: 'translateY(0) rotate(360deg) scale(1.14,.86)', offset: .76, easing: settle },
+    { transform: 'translateY(-4%) rotate(366deg) scale(.98,1.02)', offset: .86, easing: settle },
+    { transform: 'translateY(0) rotate(357deg) scale(1)', offset: .93, easing: settle },
+    { transform: 'translateY(0) rotate(360deg) scale(1)' }
+  ], options: { duration: 1000, easing: 'linear' }, origin: '50% 55%' },
+  // A full roll whose slowest part is the top, so the turn seems to hang before landing.
+  somersault: { keyframes: [
+    { transform: 'translateY(0) rotate(0deg) scale(1)', easing: crouch },
+    { transform: 'translateY(5%) rotate(0deg) scale(1.1,.9)', offset: .14, easing: rise },
+    { transform: 'translateY(-40%) rotate(-150deg) scale(1)', offset: .36, easing: 'linear' },
+    { transform: 'translateY(-44%) rotate(-215deg) scale(1)', offset: .5, easing: fall },
+    { transform: 'translateY(0) rotate(-360deg) scale(1.12,.88)', offset: .72, easing: settle },
+    { transform: 'translateY(-3%) rotate(-360deg) scale(.98,1.02)', offset: .86, easing: settle },
+    { transform: 'translateY(0) rotate(-360deg) scale(1)' }
+  ], options: { duration: 1100, easing: 'linear' }, origin: '50% 60%' },
+  // Two bursts of quick shaking separated by a held breath, like an alarm clock.
+  alarmRing: { keyframes: [
+    { transform: 'translateY(0) rotate(0deg)', easing: 'ease-out' },
+    { transform: 'translateY(-8%) rotate(-16deg)', offset: .06 },
+    { transform: 'translateY(-8%) rotate(16deg)', offset: .12 },
+    { transform: 'translateY(-8%) rotate(-15deg)', offset: .18 },
+    { transform: 'translateY(-8%) rotate(15deg)', offset: .24 },
+    { transform: 'translateY(-8%) rotate(-9deg)', offset: .3, easing: 'ease-out' },
+    { transform: 'translateY(-7%) rotate(0deg)', offset: .36 },
+    { transform: 'translateY(-6%) rotate(0deg)', offset: .5 },
+    { transform: 'translateY(-6%) rotate(-12deg)', offset: .56 },
+    { transform: 'translateY(-6%) rotate(12deg)', offset: .62 },
+    { transform: 'translateY(-6%) rotate(-8deg)', offset: .68 },
+    { transform: 'translateY(-5%) rotate(6deg)', offset: .74, easing: 'ease-out' },
+    { transform: 'translateY(0) rotate(-2deg)', offset: .86, easing: settle },
+    { transform: 'translateY(0) rotate(0deg)' }
+  ], options: { duration: 1100, easing: 'linear' }, origin: '50% 60%' },
+  // Duck out of sight, wait, then pop back with a look one way and the other.
+  peek: { keyframes: [
+    { transform: 'translateY(0) scale(1) rotate(0deg)', opacity: 1, easing: 'cubic-bezier(.5,0,.75,0)' },
+    { transform: 'translateY(8%) scale(.6) rotate(0deg)', opacity: .2, offset: .16, easing: 'linear' },
+    { transform: 'translateY(8%) scale(.6) rotate(0deg)', opacity: .2, offset: .4, easing: rise },
+    { transform: 'translateY(-6%) scale(1.08) rotate(10deg)', opacity: 1, offset: .58, easing: 'ease-in-out' },
+    { transform: 'translateY(-4%) scale(1.04) rotate(-7deg)', opacity: 1, offset: .74, easing: settle },
+    { transform: 'translateY(0) scale(1) rotate(2deg)', opacity: 1, offset: .88, easing: settle },
+    { transform: 'translateY(0) scale(1) rotate(0deg)', opacity: 1 }
+  ], options: { duration: 1100, easing: 'linear' } },
+  // Lift and hold at the top, then come down hard and squash on impact.
+  slam: { keyframes: [
+    { transform: 'translateY(0) rotate(0deg) scale(1)', easing: rise },
+    { transform: 'translateY(-30%) rotate(-10deg) scale(1.06)', offset: .34, easing: 'linear' },
+    { transform: 'translateY(-32%) rotate(-12deg) scale(1.06)', offset: .44, easing: fall },
+    { transform: 'translateY(3%) rotate(0deg) scale(1.18,.82)', offset: .56, easing: settle },
+    { transform: 'translateY(-4%) rotate(2deg) scale(.96,1.04)', offset: .72, easing: settle },
+    { transform: 'translateY(0) rotate(0deg) scale(1)' }
+  ], options: { duration: 900, easing: 'linear' }, origin: '50% 90%' },
   steps: { keyframes: [{ transform: 'translateY(0)' }, { transform: 'translateY(-7%)', offset: .25 }, { transform: 'translateY(0)', offset: .5 }, { transform: 'translateY(-5%)', offset: .75 }, { transform: 'translateY(0)' }], options: { duration: 1000, easing: curve }, origin: '50% 90%' }
 };
 
@@ -129,7 +187,7 @@ export const families = {
   vegetables: { label: 'Vegetables', group: 'food', motion: 'gardenBounce', members: ['🥕', '🥦', '🥬', '🥒', '🌽', '🫑', '🍆', '🧅', '🧄', '🥔'] },
   landAnimals: { label: 'Land animals', group: 'nature', motion: 'animalHop', members: ['🐕', '🐈', '🐖', '🐑', '🐐', '🐄', '🐎', '🦌', '🐘', '🦒'] },
   clothing: { label: 'Clothing', group: 'objects', motion: 'fabricSway', members: ['👕', '👖', '🧥', '👗', '🩳', '👚', '👔'] },
-  handTools: { label: 'Hand tools', group: 'objects', motion: 'toolWiggle', members: ['🔨', '🪓', '🪚', '🪛', '🔧', '🪠', '🔩'] },
+  handTools: { label: 'Hand tools', group: 'objects', motion: 'toolWiggle', members: ['🪓', '🪚', '🪛', '🔧', '🪠', '🔩'] },
   books: { label: 'Books', group: 'objects', motion: 'bookPeek', members: ['📕', '📗', '📘', '📙', '📔', '📓', '📒'] },
   handGestures: { label: 'Hand gestures', group: 'gestures', motion: 'handEmphasis', members: ['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵'], aliases: familyToneAliases(['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵']) },
   vessels: { label: 'Boats', group: 'travel', motion: 'vesselRock', members: ['🚤', '🛥️', '🛳️', '⛴️', '🛶'], aliases: { '🛥': '🛥️', '🛳': '🛳️', '⛴': '⛴️' }, decoration: 'wake' },
@@ -146,6 +204,8 @@ export const families = {
   poses: { label: 'People in poses', group: 'people', motion: 'pose', members: ['🧎', '🧍', '🙇'], aliases: familyToneAliases(['🧎', '🧍', '🙇']) },
   professionals: { label: 'Professionals', group: 'people', motion: 'pose', members: roleMembers, aliases: roleAliases },
   walkers: { label: 'Walking and running', group: 'people', motion: 'steps', members: walkerMembers, aliases: walkerAliases },
+  ringers: { label: 'Ringing things', group: 'objects', motion: 'alarmRing', members: ['☎️', '📞', '🛎️'], aliases: { '☎': '☎️', '🛎': '🛎️' }, decoration: 'sound' },
+  peekers: { label: 'Peeking faces', group: 'faces', motion: 'peek', members: ['🫣', '🙈', '🙉', '🙊'] },
   screens: { label: 'Screens and documents', group: 'objects', motion: 'steady', members: ['💻', '🖥️', '📠', '🧾', '📋'], aliases: { '🖥': '🖥️' }, decoration: 'scan' },
   swimmers: { label: 'Swimmers', group: 'people', motion: 'bob', members: gendered('🏊'), aliases: genderedToneAliases(gendered('🏊')), decoration: 'ripple' },
   surfers: { label: 'Surfers', group: 'people', motion: 'ride', members: gendered('🏄'), aliases: genderedToneAliases(gendered('🏄')), decoration: 'splash' },
@@ -191,7 +251,7 @@ export const emoji = {
   '☕': { group: 'food', name: 'Hot beverage', motion: 'sip', decoration: 'steam' }, '🍵': { group: 'food', name: 'Teacup', motion: 'sip', decoration: 'steam' }, '🍕': { group: 'food', name: 'Pizza', motion: 'bounce' }, '🍦': { group: 'food', name: 'Soft ice cream', motion: 'sway' },
   '🏀': { group: 'activities', name: 'Basketball', motion: 'hop' }, '⚽': { group: 'activities', name: 'Soccer ball', motion: 'hop' }, '🎈': { group: 'activities', name: 'Balloon', motion: 'float' }, '🎉': { group: 'activities', name: 'Party popper', motion: 'bounce', decoration: 'sparkle' },
   '💃': { group: 'people', name: 'Woman dancing', motion: 'twirl', skinTones: skinTones('💃') }, '🕺': { group: 'people', name: 'Man dancing', motion: 'twirl', skinTones: skinTones('🕺') },
-  '⏳': { group: 'objects', name: 'Hourglass', motion: 'hourglassTurn' }, '⏰': { group: 'objects', name: 'Alarm clock', motion: 'shake' }, '🕯️': { group: 'objects', name: 'Candle', motion: 'steady', decoration: 'flicker', variants: ['🕯'] },
+  '⏳': { group: 'objects', name: 'Hourglass', motion: 'hourglassTurn' }, '⏰': { group: 'objects', name: 'Alarm clock', motion: 'alarmRing', decoration: 'sound' }, '🕯️': { group: 'objects', name: 'Candle', motion: 'steady', decoration: 'flicker', variants: ['🕯'] },
 
   // Additional handcrafted entries share motions where their physical action fits.
   '😀': { group: 'faces', name: 'Grinning face', motion: 'bounce' }, '🤣': { group: 'faces', name: 'Rolling on the floor laughing', motion: 'shake' },
@@ -204,7 +264,7 @@ export const emoji = {
   '🫰': { group: 'gestures', name: 'Hand with index finger and thumb crossed', motion: 'pop', skinTones: skinTones('🫰') },
   '🐱': { group: 'nature', name: 'Cat face', motion: 'nod' }, '🐻': { group: 'nature', name: 'Bear', motion: 'nod' }, '🐼': { group: 'nature', name: 'Panda', motion: 'sway' },
   '🐸': { group: 'nature', name: 'Frog', motion: 'hop' }, '🐧': { group: 'nature', name: 'Penguin', motion: 'sway' }, '🐥': { group: 'nature', name: 'Front facing baby chick', motion: 'hop' },
-  '🐢': { group: 'nature', name: 'Turtle', motion: 'bob' }, '🐟': { group: 'nature', name: 'Fish', motion: 'bob' }, '🐬': { group: 'nature', name: 'Dolphin', motion: 'hop', decoration: 'splash' },
+  '🐢': { group: 'nature', name: 'Turtle', motion: 'peek' }, '🐟': { group: 'nature', name: 'Fish', motion: 'bob' }, '🐬': { group: 'nature', name: 'Dolphin', motion: 'hop', decoration: 'splash' },
   '🐙': { group: 'nature', name: 'Octopus', motion: 'twirl' }, '🌵': { group: 'nature', name: 'Cactus', motion: 'sway' }, '🌲': { group: 'nature', name: 'Evergreen tree', motion: 'sway' },
   '🌼': { group: 'nature', name: 'Blossom flower', motion: 'sway', decoration: 'petals' }, '❄️': { group: 'nature', name: 'Snowflake', motion: 'float', variants: ['❄'] }, '☁️': { group: 'nature', name: 'Cloud', motion: 'float', variants: ['☁'] },
   '🍎': { group: 'food', name: 'Red apple', motion: 'nod' }, '🍉': { group: 'food', name: 'Watermelon', motion: 'wobble' }, '🍓': { group: 'food', name: 'Strawberry', motion: 'bounce' },
@@ -215,7 +275,7 @@ export const emoji = {
   '🎨': { group: 'activities', name: 'Artist palette', motion: 'twirl' }, '🎸': { group: 'activities', name: 'Guitar', motion: 'sway', decoration: 'sound' },
   '🥁': { group: 'activities', name: 'Drum', motion: 'shake', decoration: 'sound' }, '🎮': { group: 'activities', name: 'Game controller', motion: 'wobble' }, '🪁': { group: 'activities', name: 'Kite', motion: 'flutter' },
   '🙋': { group: 'people', name: 'Person raising hand', motion: 'wave', skinTones: skinTones('🙋') }, '🧘': { group: 'people', name: 'Person in lotus position', motion: 'breathe', skinTones: skinTones('🧘') },
-  '🏃': { group: 'people', name: 'Person running', motion: 'hop', skinTones: skinTones('🏃') }, '🤸': { group: 'people', name: 'Person cartwheeling', motion: 'twirl', skinTones: skinTones('🤸') },
+  '🏃': { group: 'people', name: 'Person running', motion: 'hop', skinTones: skinTones('🏃') }, '🤸': { group: 'people', name: 'Person cartwheeling', motion: 'somersault', skinTones: skinTones('🤸') },
   '🧑‍🍳': { group: 'people', name: 'Cook', motion: 'nod', skinTones: personSkinTones('🍳') }, '🧑‍🎨': { group: 'people', name: 'Artist', motion: 'twirl', skinTones: personSkinTones('🎨') },
   '🧑‍🚀': { group: 'people', name: 'Astronaut', motion: 'float', skinTones: personSkinTones('🚀') }, '🧑‍💻': { group: 'people', name: 'Technologist', motion: 'nod', skinTones: personSkinTones('💻') },
   '📱': { group: 'objects', name: 'Mobile phone', motion: 'shake' }, '📚': { group: 'objects', name: 'Books', motion: 'nod' }, '✉️': { group: 'objects', name: 'Envelope', motion: 'bob', variants: ['✉'] },
@@ -242,7 +302,12 @@ export const emoji = {
   '🤿': { group: 'activities', name: 'Diving mask', motion: 'underwater', decoration: 'bubbles' },
   '🛟': { group: 'travel', name: 'Ring buoy', motion: 'vesselRock', decoration: 'wake' },
   '🪙': { group: 'objects', name: 'Coin', motion: 'flipHorizontal' },
-  '🎲': { group: 'activities', name: 'Game die', motion: 'spin' }
+  '🔨': { group: 'objects', name: 'Hammer', motion: 'slam', decoration: 'impact' },
+  '🔢': { group: 'symbols', name: 'Input numbers', motion: 'toss' },
+  '🪃': { group: 'activities', name: 'Boomerang', motion: 'toss' },
+  '🥏': { group: 'activities', name: 'Flying disc', motion: 'toss' },
+  '📳': { group: 'symbols', name: 'Vibration mode', motion: 'alarmRing' },
+  '🎲': { group: 'activities', name: 'Game die', motion: 'toss' }
 };
 
 // Declarative SVG layers never alter the native glyph. Colors read a CSS custom
@@ -322,7 +387,8 @@ export const decorations = {
     options: { duration: 800, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
   impact: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [{ tag: 'path', attrs: { d: 'M28 75l-5 4M72 75l5 4M50 79v6', fill: 'none', stroke: 'var(--emoji-motion-impact, #d49b70)', 'stroke-width': '3', 'stroke-linecap': 'round' } }] }, style: centered,
-    keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.8)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(.8)', offset: .45 }, { opacity: .85, transform: 'translate(-50%, -50%) scale(1)', offset: .65 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.1)' }], options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' }
+    // A linear timeline keeps the burst on the landing frame instead of drifting early.
+    keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.8)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(.8)', offset: .54, easing: 'ease-out' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .62, easing: settle }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.12)' }], options: { duration: 900, easing: 'linear' }
   }] },
   petals: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [{ tag: 'ellipse', attrs: { cx: '24', cy: '33', rx: '3', ry: '5', fill: 'var(--emoji-motion-petal, #d89cb9)' } }, { tag: 'ellipse', attrs: { cx: '76', cy: '38', rx: '3', ry: '5', fill: 'var(--emoji-motion-petal, #d89cb9)' } }] }, style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -58%) rotate(-8deg)' }, { opacity: .8, transform: 'translate(-50%, -50%) rotate(0deg)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -35%) rotate(8deg)' }], options: { duration: 1200, easing: 'cubic-bezier(.22,1,.36,1)' }

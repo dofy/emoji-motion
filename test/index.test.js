@@ -87,13 +87,25 @@ test('rides, dice, and upright objects use appropriate motion', () => {
   assert.ok(wheel.motion.keyframes.every(frame => !frame.transform.includes('rotate')));
   assert.ok(emojiMotion.resolve('🎠').motion.keyframes.some(frame => frame.transform.includes('rotateY(')));
   assert.ok(emojiMotion.resolve('🪙').motion.keyframes.some(frame => frame.transform.includes('rotateY(360deg)')));
-  assert.equal(emojiMotion.resolve('🎲').motionId, 'spin');
+  assert.equal(emojiMotion.resolve('🎲').motionId, 'toss');
   assert.ok(emojiMotion.resolve('🎲').motion.keyframes.some(frame => frame.transform.includes('rotate(360deg)')));
   assert.equal(emojiMotion.resolve('🌻').motion.origin, '50% 90%');
   assert.equal(emojiMotion.resolve('🧭').motionId, 'wobble');
   assert.equal(emojiMotion.resolve('🕯️').motionId, 'steady');
   assert.ok(emojiMotion.resolve('⏳').motion.keyframes.some(frame => frame.transform === 'rotate(180deg)'));
 });
+test('rhythm motions are assigned and return to rest', () => {
+  for (const [glyph, motion] of [['🎲', 'toss'], ['🔢', 'toss'], ['🤸', 'somersault'], ['⏰', 'alarmRing'], ['☎️', 'alarmRing'], ['🛎', 'alarmRing'], ['🫣', 'peek'], ['🐢', 'peek'], ['🔨', 'slam']]) {
+    const result = emojiMotion.resolve(glyph);
+    assert.equal(result.motionId, motion, glyph);
+    const frames = result.motion.keyframes; const last = frames.at(-1);
+    assert.ok(!/translateY\((?!0\))/.test(frames[0].transform + last.transform), `${motion} starts and ends level`);
+    assert.ok(/rotate\((0|360|-360)deg\)/.test(last.transform), `${motion} ends upright`);
+    if ('opacity' in last) assert.equal(last.opacity, 1);
+  }
+  assert.equal(emojiMotion.resolve('🔨').decoration, 'impact');
+});
+
 test('custom registries are isolated and validate references', () => {
   const custom = createEmojiMotion({ defaults: false, motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }] } }, groups: { creatures: { label: 'Creatures', motion: 'wiggle' } }, emoji: { '🐙': { name: 'Octopus', group: 'creatures', variants: ['🐙️'] } } });
   assert.equal(custom.resolve('🐙️').motionId, 'wiggle');
