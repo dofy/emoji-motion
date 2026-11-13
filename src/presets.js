@@ -61,6 +61,17 @@ export const motions = {
   cloudDrift: { keyframes: [{ transform: 'translate(0, 0)' }, { transform: 'translate(-5%, -4%)', offset: .35 }, { transform: 'translate(5%, -4%)', offset: .7 }, { transform: 'translate(0, 0)' }], options: { duration: 1400, easing: curve } },
   orbitFloat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-9%) scale(1.04)', offset: .45 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1200, easing: curve } },
   writingTilt: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-5deg)', offset: .3 }, { transform: 'rotate(5deg)', offset: .65 }, { transform: 'rotate(0deg)' }], options: { duration: 1000, easing: curve }, origin: '50% 65%' },
+  gardenBounce: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-6%) rotate(-3deg)', offset: .32 }, { transform: 'translateY(-3%) rotate(3deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1050, easing: curve }, origin: '50% 85%' },
+  animalHop: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-11%) scale(1.02,.98)', offset: .35 }, { transform: 'translateY(0) scale(1.04,.96)', offset: .68 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: curve }, origin: '50% 90%' },
+  fabricSway: createSwayMotion({ angle: 6, duration: 1250, origin: '50% 15%' }),
+  toolWiggle: createSwayMotion({ angle: 7, duration: 900, origin: '50% 70%' }),
+  bookPeek: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg) translateY(0)' }, { transform: 'perspective(500px) rotateY(-20deg) translateY(-3%)', offset: .32 }, { transform: 'perspective(500px) rotateY(20deg) translateY(-3%)', offset: .68 }, { transform: 'perspective(500px) rotateY(0deg) translateY(0)' }], options: { duration: 1050, easing: curve } },
+  handEmphasis: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-5%) scale(1.08)', offset: .35 }, { transform: 'translateY(0) scale(.98)', offset: .7 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 800, easing: curve }, origin: '50% 80%' },
+  vesselRock: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-4%) rotate(-4deg)', offset: .3 }, { transform: 'translateY(2%) rotate(4deg)', offset: .68 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1300, easing: curve }, origin: '50% 80%' },
+  treatPop: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(.96)', offset: .22 }, { transform: 'scale(1.08)', offset: .5 }, { transform: 'scale(1)' }], options: { duration: 850, easing: curve } },
+  clockTick: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-3deg)', offset: .25 }, { transform: 'rotate(3deg)', offset: .5 }, { transform: 'rotate(-2deg)', offset: .75 }, { transform: 'rotate(0deg)' }], options: { duration: 1200, easing: curve }, origin: '50% 50%' },
+  gentleFall: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(7%) scale(.98,1.02)', offset: .45 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1100, easing: curve } },
+  softSettle: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-5%) scale(1)', offset: .35 }, { transform: 'translateY(0) scale(1.03,.97)', offset: .7 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: curve }, origin: '50% 90%' },
   steps: { keyframes: [{ transform: 'translateY(0)' }, { transform: 'translateY(-7%)', offset: .25 }, { transform: 'translateY(0)', offset: .5 }, { transform: 'translateY(-5%)', offset: .75 }, { transform: 'translateY(0)' }], options: { duration: 1000, easing: curve }, origin: '50% 90%' }
 };
 
@@ -97,6 +108,17 @@ const walkerAliases = Object.fromEntries(walkerMembers.flatMap(glyph => {
 }));
 // Members are reviewed explicitly; no entire Unicode subgroup is assumed to move alike.
 export const families = {
+  clocks: { label: 'Clocks', group: 'objects', motion: 'clockTick', members: ['⌚', '🕰️', '⏲️', '🕛', '🕧'], aliases: { '🕰': '🕰️', '⏲': '⏲️' } },
+  rain: { label: 'Rain and water', group: 'nature', motion: 'gentleFall', members: ['💧', '💦', '🌨️', '☔'], aliases: { '🌨': '🌨️' } },
+  containers: { label: 'Containers', group: 'objects', motion: 'softSettle', members: ['🧳', '🧰', '🧺', '🗃️', '🗄️', '🗳️', '🗑️'], aliases: { '🗃': '🗃️', '🗄': '🗄️', '🗳': '🗳️', '🗑': '🗑️' } },
+  vegetables: { label: 'Vegetables', group: 'food', motion: 'gardenBounce', members: ['🥕', '🥦', '🥬', '🥒', '🌽', '🫑', '🍆', '🧅', '🧄', '🥔'] },
+  landAnimals: { label: 'Land animals', group: 'nature', motion: 'animalHop', members: ['🐕', '🐈', '🐖', '🐑', '🐐', '🐄', '🐎', '🦌', '🐘', '🦒'] },
+  clothing: { label: 'Clothing', group: 'objects', motion: 'fabricSway', members: ['👕', '👖', '🧥', '👗', '🩳', '👚', '👔'] },
+  handTools: { label: 'Hand tools', group: 'objects', motion: 'toolWiggle', members: ['🔨', '🪓', '🪚', '🪛', '🔧', '🪠', '🔩'] },
+  books: { label: 'Books', group: 'objects', motion: 'bookPeek', members: ['📕', '📗', '📘', '📙', '📔', '📓', '📒'] },
+  handGestures: { label: 'Hand gestures', group: 'gestures', motion: 'handEmphasis', members: ['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵'], aliases: familyToneAliases(['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵']) },
+  vessels: { label: 'Boats', group: 'travel', motion: 'vesselRock', members: ['🚤', '🛥️', '🛳️', '⛴️', '🛶'], aliases: { '🛥': '🛥️', '🛳': '🛳️', '⛴': '⛴️' } },
+  treats: { label: 'Sweet treats', group: 'food', motion: 'treatPop', members: ['🍬', '🍭', '🍫', '🍮', '🧁', '🍨'], decoration: 'sparkle' },
   fruit: { label: 'Fruit', group: 'food', motion: 'fruitBounce', members: ['🍊', '🍋', '🍐', '🍑', '🍇', '🫐', '🍒', '🥝', '🍍', '🥭'], decoration: 'sparkle' },
   animalFaces: { label: 'Animal faces', group: 'nature', motion: 'curiousTilt', members: ['🐶', '🦊', '🐹', '🦝', '🐨', '🐯', '🐭', '🐻‍❄️'] },
   clouds: { label: 'Clouds', group: 'nature', motion: 'cloudDrift', members: ['🌤️', '⛅', '🌥️', '🌦️', '🌫️'], aliases: { '🌤': '🌤️', '🌥': '🌥️', '🌦': '🌦️', '🌫': '🌫️' } },

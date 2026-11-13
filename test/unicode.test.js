@@ -181,3 +181,66 @@ test('new professions preserve official gender and skin tone sequences', () => {
     }
   }
 });
+
+test('expanded families resolve reviewed members in full and lite entries', () => {
+  const ids = ['vegetables', 'landAnimals', 'clothing', 'handTools', 'books', 'handGestures', 'vessels', 'treats'];
+  for (const id of ids) {
+    for (const glyph of families[id].members) {
+      for (const registry of [emojiMotion, lite]) {
+        const result = registry.resolve(glyph);
+        assert.equal(result.source, 'family', glyph);
+        assert.equal(result.familyId, id, glyph);
+        assert.equal(result.glyph, glyph, glyph);
+        assert.equal(result.motionId, families[id].motion, glyph);
+        assert.equal(Boolean(result.decorationPreset), id === 'treats', glyph);
+      }
+    }
+  }
+  for (const [variant, canonical] of [['🛥', '🛥️'], ['🛳', '🛳️'], ['⛴', '⛴️']]) {
+    assert.equal(lite.resolve(variant).canonical, canonical);
+    assert.equal(emojiMotion.resolve(variant).glyph, variant);
+  }
+  const custom = createEmojiMotion({ classifications: { subgroups: { 'food-vegetable': { group: 'hearts', motion: 'pulse' } } }, emoji: { '🐕': { name: 'My dog', group: 'faces', motion: 'spin' } } });
+  assert.equal(custom.resolve('🥕').source, 'user-classification');
+  assert.equal(custom.resolve('🐕').motionId, 'spin');
+  assert.equal(custom.resolve('🐕').source, 'user');
+});
+
+test('new hand gestures preserve all official skin tones and custom overrides', () => {
+  for (const glyph of families.handGestures.members) {
+    const official = lookupUnicode(glyph);
+    assert.equal(Object.keys(official.skinTones).length, 5, glyph);
+    for (const [tone, variant] of Object.entries(official.skinTones)) {
+      for (const registry of [emojiMotion, lite]) {
+        assert.equal(registry.resolve(glyph, { skinTone: tone }).glyph, variant, `${glyph} ${tone}`);
+        assert.equal(registry.resolve(variant).familyId, 'handGestures', variant);
+        assert.equal(registry.resolve(variant, { skinTone: 'default' }).glyph, glyph);
+      }
+    }
+  }
+  const custom = createEmojiMotion({ defaultSkinTone: 'medium', emoji: { '🤏': { group: 'gestures', motion: 'spin', skinTones: lookupUnicode('🤏').skinTones } } });
+  assert.equal(custom.resolve('🤏').glyph, '🤏🏽');
+  assert.equal(custom.resolve('🤏🏽').source, 'user');
+  assert.equal(custom.resolve('🤏🏽').motionId, 'spin');
+});
+
+test('gentle clock, rain and container motions are distinct and preserve variants', () => {
+  const expected = [['clocks', 'clockTick'], ['rain', 'gentleFall'], ['containers', 'softSettle']];
+  for (const [id, motion] of expected) {
+    for (const glyph of families[id].members) {
+      for (const registry of [emojiMotion, lite]) {
+        const result = registry.resolve(glyph);
+        assert.equal(result.source, 'family');
+        assert.equal(result.motionId, motion);
+        assert.equal(result.glyph, glyph);
+      }
+    }
+  }
+  for (const [glyph, canonical] of [['🕰', '🕰️'], ['🌨', '🌨️'], ['🗃', '🗃️']]) {
+    assert.equal(lite.resolve(glyph).canonical, canonical);
+    assert.equal(emojiMotion.resolve(glyph).glyph, glyph);
+  }
+  const custom = createEmojiMotion({ emoji: { '💧': { group: 'nature', motion: 'spin' } } });
+  assert.equal(custom.resolve('💧').source, 'user');
+  assert.equal(custom.resolve('💧').motionId, 'spin');
+});

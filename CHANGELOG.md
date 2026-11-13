@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 — 2026-11-13
+
+- Add motion families for vegetables, land animals, clothing, tools, books, hand gestures, boats and sweet treats.
+- Support the official skin tone variants for the new hand gestures.
+- Add gentle ticking, falling and settling motions for clocks, rain and containers.
+
 ## 0.5.1 — 2026-11-13
 
 - Fix the npm package page to show the English README by default.
