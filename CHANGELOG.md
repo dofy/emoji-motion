@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add reviewed motion families for fruit, animal faces, clouds, celestial bodies and writing tools.
+- Add judges, pilots and singers with their official skin tone variants.
+- Add five reusable motions and optional sparkles for fruit.
+
 ## 0.4.0 — 2026-11-13
 
 - **Breaking:** Remove the component `display` prop and web component attribute. Components use normal inline layout; use a block container or CSS for placement.

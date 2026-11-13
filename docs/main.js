@@ -1,17 +1,26 @@
+import { emojiMotion } from '../src/index.js';
+await window.emojiSite.ready;
+window.emojiSite.translate(document.body);
+const t = window.emojiSite.t;
+window.emojiSite.animateControls(emojiMotion);
+
+// Enhance ordinary page text; code and preformatted blocks are excluded by the library.
+emojiMotion.enhance({ decoration: true });
+
 for (const button of document.querySelectorAll('.doc-copy')) {
   button.addEventListener('click', async () => {
     const code = button.parentElement.querySelector('code').textContent;
     try {
       await navigator.clipboard.writeText(code);
-      button.textContent = 'Copied ✓';
-      setTimeout(() => { button.textContent = 'Copy'; }, 2000);
+      button.textContent = t('Copied ✓');
+      setTimeout(() => { button.textContent = t('Copy'); }, 2000);
     } catch {
       const selection = window.getSelection();
       const range = document.createRange();
       range.selectNodeContents(button.parentElement.querySelector('code'));
       selection.removeAllRanges(); selection.addRange(range);
-      button.textContent = 'Select & copy';
-      setTimeout(() => { button.textContent = 'Copy'; }, 3000);
+      button.textContent = t('Select & copy');
+      setTimeout(() => { button.textContent = t('Copy'); }, 3000);
     }
   });
 }

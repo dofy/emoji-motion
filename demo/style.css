@@ -59,3 +59,9 @@ img.brand-mark{display:inline-block;vertical-align:middle;background:none;object
 .brand-mark{display:inline-block;width:auto;height:auto;background:none;color:inherit;border-radius:0;vertical-align:middle;font-size:24px;line-height:1;margin-right:8px}.topbar .brand-mark{width:auto;height:auto}.detail-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#9a8aac;flex:none}.row-icon .detail-dot{width:8px;height:8px;vertical-align:middle}@media(max-width:360px){.topbar .brand-mark{width:auto;height:auto;font-size:22px}}
 
 .npm-link{font-size:14px;font-weight:700;white-space:nowrap}.npm-link:hover{text-decoration:underline;text-underline-offset:4px}@media(max-width:650px){.npm-link{font-size:12px}}@media(max-width:360px){.top-links{gap:8px}.topbar .brand{font-size:16px}}
+
+.collection-release-note{margin:8px 0 0;color:#817a71;font-size:12px;line-height:16px}
+
+.collection-release-note+.filter-bar{margin-top:24px}
+
+.collection-stat--coverage{white-space:normal}

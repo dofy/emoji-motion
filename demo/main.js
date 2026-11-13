@@ -1,6 +1,10 @@
 import { createEmojiMotion, emojiMotion, motions } from '../src/index.js';
 import '../src/element.js';
 import { subgroups } from '../src/unicode-data.js';
+await window.emojiSite.ready;
+window.emojiSite.translate(document.body);
+const t = window.emojiSite.t;
+window.emojiSite.animateControls(emojiMotion);
 const customRegistry = createEmojiMotion({
   motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(14deg)' }, { transform: 'rotate(-14deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 700, easing: 'ease-out' }, origin: '50% 80%' } },
   groups: { creatures: { label: 'Creatures', motion: 'wiggle' } },
@@ -50,16 +54,29 @@ emojiMotion.setDefaultSkinTone(skinTone.value);
 skinTone.addEventListener('change', () => { savePreference('skin-tone', skinTone.value); emojiMotion.setDefaultSkinTone(skinTone.value); render(); updateAutoPreview(); });
 const all = emojiMotion.list();
 // Curated examples live in the demo, not the library's complete registry.
-const featured = ['👋', '😊', '❤️', '🔔', '🌸', '🚀', '✨', '📡', '🐠', '🦋', '🥐', '☕', '💡', '📷', '🔦', '💃', '🕯️', '🚶‍♀️', '🚄', '🎻', '🧑‍⚕️', '🪄', '🧑‍🚀', '🏄', '🥎', '🌷', '🧋', '🦜', '🧎', '🎡', '🎠', '🪙', '🎲', '⏳', '🧭', '🌻'];
+const featured = ['👋', '🍊', '🐶', '🌤️', '🪐', '✏️', '👩‍⚖️', '📡', '🥐', '🎻', '❤️', '🪄', '😊', '🔔', '🌸', '🚀', '✨', '🐠', '🦋', '☕', '💡', '📷', '🔦', '💃', '🕯️', '🚶‍♀️', '🚄', '🧑‍⚕️', '🧑‍🚀', '🏄', '🥎', '🌷', '🧋', '🦜', '🧎', '🎡', '🎠', '🪙', '🎲', '⏳', '🧭', '🌻'];
 let cleanups = [];
 const familyGlyphs = [...new Set(emojiMotion.families().flatMap(family => family.members))].filter(glyph => emojiMotion.resolve(glyph)?.source === 'family');
 const galleryGlyphs = [...new Set([...all, ...familyGlyphs])];
 const filterGroups = emojiMotion.groups().filter(group => galleryGlyphs.some(glyph => emojiMotion.resolve(glyph).groupId === group.id));
 const effectCount = galleryGlyphs.filter(glyph => emojiMotion.resolve(glyph).decorationPreset).length;
 const unicodeSequenceCount = subgroups.reduce((total, [, , entries]) => total + entries.split(' ').length, 0);
-const stats = [[all.length, 'handcrafted emoji'], [emojiMotion.families().length, 'motion families'], [filterGroups.length, 'categories'], [Object.keys(motions).length, 'shared motions'], [effectCount, 'with SVG effects'], [unicodeSequenceCount.toLocaleString('en-US'), 'Unicode sequences incl. variants']];
+// Count fully qualified sequences, not unique base emoji: skin tones and ZWJ variants are included.
+// An independent default registry keeps this statistic stable when a visitor changes the skin tone.
+const statsRegistry = createEmojiMotion();
+let qualifiedCount = 0; let customizedCount = 0;
+for (const [, , entries] of subgroups) for (const token of entries.split(' ')) {
+  if (!token.endsWith('!')) continue;
+  qualifiedCount++;
+  const result = statsRegistry.resolve(token.slice(0, token.lastIndexOf('=')));
+  if (result?.source === 'preset' || result?.source === 'family') customizedCount++;
+}
+const coverage = `${customizedCount.toLocaleString('en-US')} / ${qualifiedCount.toLocaleString('en-US')}`;
+const percentage = (customizedCount / qualifiedCount * 100).toFixed(1);
+const stats = [[all.length, t('handcrafted emoji')], [emojiMotion.families().length, t('motion families')], [filterGroups.length, t('categories')], [Object.keys(motions).length, t('shared motions')], [effectCount, t('with SVG effects')], [coverage, `${t('fully qualified sequences customized')} (${percentage}%, ${t('including skin tones')})`], [unicodeSequenceCount.toLocaleString('en-US'), t('Unicode sequences incl. variants')]];
 for (const [value, label] of stats) {
   const item = document.createElement('span'); item.className = 'collection-stat';
+  if (value === coverage) item.classList.add('collection-stat--coverage');
   const number = document.createElement('strong'); number.textContent = value;
   item.append(number, document.createTextNode(` ${label}`));
   document.querySelector('#collection-stats').append(item);
@@ -83,20 +100,20 @@ function render() {
     ? featured.filter(glyph => emojiMotion.resolve(glyph))
     : selected === 'all' ? all : selected === 'family' ? familyGlyphs
     : galleryGlyphs.filter(glyph => selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected);
-  count.textContent = `${String(shown.length).padStart(2, '0')} LITTLE MOVEMENTS`;
+  count.textContent = `${String(shown.length).padStart(2, '0')} ${t('LITTLE MOVEMENTS')}`;
   pageCount = Math.max(1, Math.ceil(shown.length / pageSize));
   page = Math.min(page, pageCount);
   savePreference('gallery-page', String(page));
   pagination.hidden = pageCount <= 1;
   pagePrevious.disabled = page === 1;
   pageNext.disabled = page === pageCount;
-  pageLabel.textContent = `Page ${page} of ${pageCount}`;
+  pageLabel.textContent = window.emojiSite.language === 'en' ? `Page ${page} of ${pageCount}` : `${page} / ${pageCount}`;
   const offset = (page - 1) * pageSize;
   for (const [index, glyph] of shown.slice(offset, offset + pageSize).entries()) {
     const item = emojiMotion.resolve(glyph);
     const button = document.createElement('button');
     button.className = `emoji-card ${palette[galleryGlyphs.indexOf(glyph) % palette.length]}`;
-    button.type = 'button'; button.setAttribute('aria-label', `${item.name}, preview and copy component`);
+    button.type = 'button'; button.setAttribute('aria-label', `${t(item.name)}, ${t('preview and copy component')}`);
     const number = document.createElement('span'); number.className = 'card-number'; number.textContent = String(offset + index + 1).padStart(2, '0');
     const copyIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     copyIcon.classList.add('card-arrow'); copyIcon.setAttribute('viewBox', '0 0 24 24'); copyIcon.setAttribute('fill', 'none'); copyIcon.setAttribute('stroke', 'currentColor'); copyIcon.setAttribute('stroke-width', '1.6'); copyIcon.setAttribute('aria-hidden', 'true');
@@ -106,19 +123,19 @@ function render() {
     const visual = document.createElement('span'); visual.className = 'emoji-visual';
     const glyphEl = document.createElement('span'); glyphEl.className = 'glyph'; glyphEl.textContent = item.glyph; glyphEl.setAttribute('aria-hidden','true'); visual.append(glyphEl); stage.append(visual);
     const bottom = document.createElement('span'); bottom.className = 'card-bottom';
-    const name = document.createElement('span'); name.textContent = item.name;
-    const groupLabel = item.source === 'family' ? `${item.group.label} · Family` : item.group.label;
+    const name = document.createElement('span'); name.textContent = t(item.name);
+    const groupLabel = item.source === 'family' ? `${t(item.group.label)} · ${t('Family')}` : t(item.group.label);
     const group = document.createElement('span'); group.textContent = groupLabel; group.setAttribute('aria-live', 'polite');
     bottom.append(name, group); button.append(number, copyIcon, stage, bottom); grid.append(button);
     let copiedTimer;
     button.addEventListener('click', async () => {
       const copied = await copyText(markupFor(item), document.querySelector('#copy-status'), document.querySelector('#copy-fallback'), '');
-      if (copied) { clearTimeout(copiedTimer); group.textContent = 'Copied ✓'; group.classList.add('card-copied'); copiedTimer = setTimeout(() => { group.textContent = groupLabel; group.classList.remove('card-copied'); }, 2000); }
+      if (copied) { clearTimeout(copiedTimer); group.textContent = t('Copied ✓'); group.classList.add('card-copied'); copiedTimer = setTimeout(() => { group.textContent = groupLabel; group.classList.remove('card-copied'); }, 2000); }
     });
     cleanups.push(emojiMotion.bind(glyphEl, glyph, { trigger: button, events: ['pointerenter', 'focus', 'click'], ...(item.decorationPreset ? { decoration: { container: visual } } : {}) }));
   }
 }
-function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; page = 1; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
+function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = t(label); button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; page = 1; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
 function changePage(nextPage) {
   if (nextPage < 1 || nextPage > pageCount) return;
   page = nextPage;
@@ -132,12 +149,13 @@ function updateAutoPreview() {
   const value = autoInput.value.trim();
   const result = emojiMotion.resolve(value);
   autoPreview.hidden = !result;
-  if (!result) { autoResult.textContent = value ? 'Enter one recognized emoji.' : 'Enter an emoji to try it.'; return; }
+  if (!result) { autoResult.textContent = value ? t('Enter one recognized emoji.') : t('Enter an emoji to try it.'); return; }
   autoPreview.setAttribute('emoji', value);
   if (skinTone.value === 'default') autoPreview.removeAttribute('skin-tone');
   else autoPreview.setAttribute('skin-tone', skinTone.value);
-  const category = result.unicodeSubgroup?.replaceAll('-', ' ') ?? result.group.label;
-  const source = result.source === 'preset' ? 'Handcrafted preset' : result.source === 'family' ? `Motion family: ${result.familyId}` : result.source === 'unicode' ? 'Automatic' : 'Fallback';
+  const category = t(result.unicodeSubgroup?.replaceAll('-', ' ') ?? result.group.label);
+  const familyName = emojiMotion.families().find(family => family.id === result.familyId)?.label ?? result.familyId;
+  const source = result.source === 'preset' ? t('Handcrafted preset') : result.source === 'family' ? `${t('Motion family')}: ${t(familyName)}` : result.source === 'unicode' ? t('Automatic') : t('Fallback');
   autoResult.textContent = `${source} · ${category} · ${result.motionId}`;
 }
 autoInput.addEventListener('input', () => { savePreference('auto-emoji', autoInput.value); updateAutoPreview(); });
@@ -206,7 +224,7 @@ async function copyText(value, status, fallback, success) {
     return true;
   } catch {
     fallback.value = value; fallback.hidden = false; fallback.focus(); fallback.select();
-    status.textContent = 'Copy was unavailable. Select and copy the code below.';
+    status.textContent = t('Copy was unavailable. Select and copy the code below.');
     return false;
   }
 }
@@ -337,11 +355,15 @@ ${customDefinition}
 document.querySelector('#octopus').registry = motion;
 </script>`
 };
+function localizedExample(source) {
+  for (const phrase of ['Made with a little', 'and a lot of care.', 'Say hello', 'A little', 'goes a long way.']) source = source.replaceAll(phrase, t(phrase));
+  return source;
+}
 function updateCode() {
   const selected = frameworkCode[framework.value];
   for (const [id, source] of Object.entries(selected)) {
     const element = document.querySelector(`#code-${id}`);
-    element.textContent = source;
+    element.textContent = localizedExample(source);
     const language = framework.value === 'react' ? 'jsx' : (id === 'setup' && framework.value === 'vanilla' ? 'javascript' : 'markup');
     element.className = `language-${language}`;
     if (globalThis.Prism) globalThis.Prism.highlightElement(element);
@@ -349,7 +371,7 @@ function updateCode() {
   for (const label of document.querySelectorAll('.example-code-language')) label.textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'HTML + JAVASCRIPT';
   document.querySelector('#setup-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'JAVASCRIPT';
   const custom = document.querySelector('#code-custom');
-  custom.textContent = customCode[framework.value];
+  custom.textContent = localizedExample(customCode[framework.value]);
   custom.className = `language-${framework.value === 'react' ? 'jsx' : 'markup'}`;
   if (globalThis.Prism) globalThis.Prism.highlightElement(custom);
   document.querySelector('#custom-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'HTML + JAVASCRIPT';
@@ -363,22 +385,22 @@ updateCode();
 document.querySelector('#copy-install').addEventListener('click', async event => {
   const button = event.currentTarget;
   if (await copyText('npm install @dofy/native-emoji-motion', document.querySelector('#install-copy-status'), document.querySelector('#install-copy-fallback'), '')) {
-    button.textContent = 'Copied ✓';
-    setTimeout(() => { button.textContent = 'Copy'; }, 2000);
+    button.textContent = t('Copied ✓');
+    setTimeout(() => { button.textContent = t('Copy'); }, 2000);
   }
 });
 document.querySelector('#copy-custom').addEventListener('click', async event => {
   const button = event.currentTarget;
-  if (await copyText(customCode[framework.value], document.querySelector('#custom-copy-status'), document.querySelector('#custom-copy-fallback'), '')) {
-    button.textContent = 'Copied ✓';
-    setTimeout(() => { button.textContent = 'Copy code'; }, 2000);
+  if (await copyText(localizedExample(customCode[framework.value]), document.querySelector('#custom-copy-status'), document.querySelector('#custom-copy-fallback'), '')) {
+    button.textContent = t('Copied ✓');
+    setTimeout(() => { button.textContent = t('Copy code'); }, 2000);
   }
 });
 for (const button of document.querySelectorAll('[data-copy-example]')) {
   button.addEventListener('click', async () => {
-    const original = button.dataset.copyExample === 'setup' ? 'Copy setup' : 'Copy code';
-    if (await copyText(frameworkCode[framework.value][button.dataset.copyExample], document.querySelector('#example-copy-status'), document.querySelector('#example-copy-fallback'), '')) {
-      button.textContent = 'Copied ✓'; setTimeout(() => { button.textContent = original; }, 2000);
+    const original = button.dataset.copyExample === 'setup' ? t('Copy setup') : t('Copy code');
+    if (await copyText(localizedExample(frameworkCode[framework.value][button.dataset.copyExample]), document.querySelector('#example-copy-status'), document.querySelector('#example-copy-fallback'), '')) {
+      button.textContent = t('Copied ✓'); setTimeout(() => { button.textContent = original; }, 2000);
     }
   });
 }
@@ -409,8 +431,8 @@ for (const tab of tabs) {
 const enhanceContent = document.querySelector('#enhance-content');
 const enhanceExamples = {
   html: `<div id="enhance-content">
-  <p>Good morning 👋🏽 The coffee is ready ☕</p>
-  <p>Let’s make something lovely today ✨</p>
+  <p>${t('Good morning 👋🏽 The coffee is ready ☕')}</p>
+  <p>${t('Let’s make something lovely today ✨')}</p>
 </div>`,
   js: `import { emojiMotion } from '@dofy/native-emoji-motion';
 
@@ -445,7 +467,7 @@ document.querySelector('#enhance-add').addEventListener('click', () => {
   if (additions.length >= 4) additions[0].remove();
   const paragraph = document.createElement('p');
   paragraph.dataset.demoSentence = '';
-  paragraph.textContent = demoSentences[nextSentence];
+  paragraph.textContent = t(demoSentences[nextSentence]);
   nextSentence = (nextSentence + 1) % demoSentences.length;
   enhanceContent.append(paragraph);
 });
@@ -453,11 +475,11 @@ document.querySelector('#enhance-toggle').addEventListener('click', event => {
   if (enhanceEnabled) enhancer.disable();
   else enhancer.enable();
   enhanceEnabled = !enhanceEnabled;
-  event.currentTarget.textContent = enhanceEnabled ? 'Turn off animation' : 'Turn on animation';
+  event.currentTarget.textContent = enhanceEnabled ? t('Turn off animation') : t('Turn on animation');
 });
 for (const button of document.querySelectorAll('[data-enhance-copy]')) button.addEventListener('click', async () => {
   if (await copyText(enhanceExamples[button.dataset.enhanceCopy], document.querySelector('#enhance-copy-status'), document.querySelector('#enhance-copy-fallback'), '')) {
-    button.textContent = 'Copied ✓';
-    setTimeout(() => { button.textContent = 'Copy code'; }, 2000);
+    button.textContent = t('Copied ✓');
+    setTimeout(() => { button.textContent = t('Copy code'); }, 2000);
   }
 });

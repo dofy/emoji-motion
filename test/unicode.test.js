@@ -64,7 +64,7 @@ test('every generated Unicode entry resolves without treating text as emoji', ()
 });
 
 test('unknown emoji choose semantic group and preserve the entire sequence', () => {
-  for (const [glyph, group, subgroup, motion] of [['🐶', 'nature', 'animal-mammal', 'bounce'], ['🍔', 'food', 'food-prepared', 'bounce'], ['🇨🇳', 'flags', 'country-flag', 'float'], ['👩🏽‍🚀', 'people', 'person-role', 'bounce']]) {
+  for (const [glyph, group, subgroup, motion] of [['🐷', 'nature', 'animal-mammal', 'bounce'], ['🍔', 'food', 'food-prepared', 'bounce'], ['🇨🇳', 'flags', 'country-flag', 'float'], ['👩🏽‍🚀', 'people', 'person-role', 'bounce']]) {
     const result = emojiMotion.resolve(glyph);
     assert.equal(result.source, 'unicode'); assert.equal(result.glyph, glyph); assert.equal(result.groupId, group); assert.equal(result.unicodeSubgroup, subgroup); assert.equal(result.motionId, motion);
   }
@@ -95,10 +95,10 @@ test('user emoji and category rules override presets, aliases and Unicode defaul
 
 test('lite entry contains presets only and rejects enabling unavailable data', () => {
   assert.equal(lite.resolve('👋').motionId, 'wave');
-  assert.equal(lite.resolve('🐶'), undefined);
+  assert.equal(lite.resolve('🐷'), undefined);
   assert.throws(() => createLite({ autoDetect: true }), /not included/);
-  assert.equal(createEmojiMotion({ autoDetect: false }).resolve('🐶'), undefined);
-  assert.equal(createEmojiMotion({ defaults: false }).resolve('🐶'), undefined);
+  assert.equal(createEmojiMotion({ autoDetect: false }).resolve('🐷'), undefined);
+  assert.equal(createEmojiMotion({ defaults: false }).resolve('🐷'), undefined);
 });
 
 test('user fallback rule has priority over the built in fallback', async () => {
@@ -132,4 +132,52 @@ test('user group defaults override handcrafted and automatic motions', () => {
   assert.equal(registry.resolve('👋').motionId, 'pulse');
   assert.equal(registry.resolve('🐶').motionId, 'shake');
   assert.equal(registry.resolve('👌').motionId, 'spin');
+});
+
+test('new motion families preserve presentation variants and user overrides', () => {
+  for (const [glyph, family, motion, effect] of [
+    ['🍊', 'fruit', 'fruitBounce', true], ['🐶', 'animalFaces', 'curiousTilt', false],
+    ['🌤️', 'clouds', 'cloudDrift', false], ['🪐', 'celestial', 'orbitFloat', false],
+    ['✏️', 'writingTools', 'writingTilt', false],
+  ]) {
+    for (const registry of [emojiMotion, lite]) {
+      const result = registry.resolve(glyph);
+      assert.equal(result.source, 'family', glyph);
+      assert.equal(result.familyId, family, glyph);
+      assert.equal(result.motionId, motion, glyph);
+      assert.equal(Boolean(result.decorationPreset), effect, glyph);
+      assert.equal(result.glyph, glyph, glyph);
+    }
+  }
+  for (const [variant, canonical, family] of [['✏', '✏️', 'writingTools'], ['🌦', '🌦️', 'clouds']]) {
+    for (const registry of [emojiMotion, lite]) {
+      const result = registry.resolve(variant);
+      assert.equal(result.familyId, family);
+      assert.equal(result.canonical, canonical);
+      assert.equal(result.glyph, variant);
+    }
+  }
+  const custom = createEmojiMotion({
+    classifications: { subgroups: { 'food-fruit': { group: 'hearts', motion: 'pulse' } } },
+    emoji: { '🐶': { group: 'objects', name: 'My dog', motion: 'spin' } },
+  });
+  assert.equal(custom.resolve('🍊').source, 'user-classification');
+  assert.equal(custom.resolve('🍊').motionId, 'pulse');
+  assert.equal(custom.resolve('🐶').source, 'user');
+  assert.equal(custom.resolve('🐶').motionId, 'spin');
+});
+
+test('new professions preserve official gender and skin tone sequences', () => {
+  for (const base of ['👩‍⚖️', '👨‍⚖️', '🧑‍✈️', '👨‍✈️', '👩‍🎤', '🧑‍🎤']) {
+    const official = lookupUnicode(base);
+    assert.equal(emojiMotion.resolve(base).familyId, 'professionals');
+    for (const [tone, variant] of Object.entries(official.skinTones)) {
+      for (const registry of [emojiMotion, lite]) {
+        const result = registry.resolve(variant);
+        assert.equal(result.familyId, 'professionals');
+        assert.equal(result.glyph, variant);
+        assert.equal(result.skinTone, tone);
+      }
+    }
+  }
 });

@@ -56,6 +56,11 @@ export const motions = {
   pastryBounce: createSpringMotion({ height: 12, rebounds: 1, duration: 850 }),
   railRide: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-3%) rotate(-2deg)', offset: .25 }, { transform: 'translateY(0) rotate(2deg)', offset: .55 }, { transform: 'translateY(-2%) rotate(-1deg)', offset: .75 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: curve }, origin: '50% 85%' },
   rhythm: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(5deg)' }, { transform: 'rotate(-3deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 1050, easing: curve }, origin: '50% 80%' },
+  fruitBounce: createSpringMotion({ height: 10, rebounds: 1, duration: 850 }),
+  curiousTilt: { keyframes: [{ transform: 'rotate(0deg) translateY(0)' }, { transform: 'rotate(-7deg) translateY(-3%)', offset: .3 }, { transform: 'rotate(7deg) translateY(-3%)', offset: .62 }, { transform: 'rotate(0deg) translateY(0)' }], options: { duration: 1100, easing: curve }, origin: '50% 85%' },
+  cloudDrift: { keyframes: [{ transform: 'translate(0, 0)' }, { transform: 'translate(-5%, -4%)', offset: .35 }, { transform: 'translate(5%, -4%)', offset: .7 }, { transform: 'translate(0, 0)' }], options: { duration: 1400, easing: curve } },
+  orbitFloat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-9%) scale(1.04)', offset: .45 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1200, easing: curve } },
+  writingTilt: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-5deg)', offset: .3 }, { transform: 'rotate(5deg)', offset: .65 }, { transform: 'rotate(0deg)' }], options: { duration: 1000, easing: curve }, origin: '50% 65%' },
   steps: { keyframes: [{ transform: 'translateY(0)' }, { transform: 'translateY(-7%)', offset: .25 }, { transform: 'translateY(0)', offset: .5 }, { transform: 'translateY(-5%)', offset: .75 }, { transform: 'translateY(0)' }], options: { duration: 1000, easing: curve }, origin: '50% 90%' }
 };
 
@@ -82,7 +87,7 @@ const personSkinTones = suffix => Object.fromEntries(['light', 'medium-light', '
 const familyToneAliases = glyphs => Object.fromEntries(glyphs.flatMap(glyph => Object.values(skinTones(glyph)).map(variant => [variant, glyph])));
 // These reviewed ZWJ families use explicit suffixes; tests check every sequence against Unicode.
 const rolePeople = ['🧑', '👨', '👩'];
-const roleSuffixes = ['⚕️', '🎓', '🏫', '🌾', '🔧', '🔬', '🚒'];
+const roleSuffixes = ['⚕️', '🎓', '🏫', '🌾', '🔧', '🔬', '🚒', '⚖️', '✈️', '🎤'];
 const roleMembers = roleSuffixes.flatMap(suffix => rolePeople.map(person => `${person}‍${suffix}`));
 const roleAliases = Object.fromEntries(roleSuffixes.flatMap(suffix => rolePeople.flatMap(person => Object.values(skinTones(person)).map(variant => [`${variant}‍${suffix}`, `${person}‍${suffix}`]))));
 const walkerMembers = ['🚶', '🚶‍♂️', '🚶‍♀️', '🏃‍♂️', '🏃‍♀️'];
@@ -92,6 +97,11 @@ const walkerAliases = Object.fromEntries(walkerMembers.flatMap(glyph => {
 }));
 // Members are reviewed explicitly; no entire Unicode subgroup is assumed to move alike.
 export const families = {
+  fruit: { label: 'Fruit', group: 'food', motion: 'fruitBounce', members: ['🍊', '🍋', '🍐', '🍑', '🍇', '🫐', '🍒', '🥝', '🍍', '🥭'], decoration: 'sparkle' },
+  animalFaces: { label: 'Animal faces', group: 'nature', motion: 'curiousTilt', members: ['🐶', '🦊', '🐹', '🦝', '🐨', '🐯', '🐭', '🐻‍❄️'] },
+  clouds: { label: 'Clouds', group: 'nature', motion: 'cloudDrift', members: ['🌤️', '⛅', '🌥️', '🌦️', '🌫️'], aliases: { '🌤': '🌤️', '🌥': '🌥️', '🌦': '🌦️', '🌫': '🌫️' } },
+  celestial: { label: 'Celestial bodies', group: 'nature', motion: 'orbitFloat', members: ['🌛', '🌜', '🌝', '🪐', '🌍', '🌎', '🌏', '🌚'] },
+  writingTools: { label: 'Writing tools', group: 'objects', motion: 'writingTilt', members: ['✏️', '🖊️', '🖋️', '🖌️', '🖍️'], aliases: { '✏': '✏️', '🖊': '🖊️', '🖋': '🖋️', '🖌': '🖌️', '🖍': '🖍️' } },
   balls: { label: 'Balls', group: 'activities', motion: 'spring', members: ['⚾', '🥎', '🎱', '🎳'], animation: { duration: 900 }, decorations: ['impact', 'sparkle'] },
   plants: { label: 'Plants', group: 'nature', motion: 'leafSway', members: ['🌷', '🌹', '🌺', '🪻', '🌴', '🌿', '🍀'] },
   drinks: { label: 'Drinks', group: 'food', motion: 'gentleSip', members: ['🥤', '🧃', '🧋', '🍹', '🍸'] },

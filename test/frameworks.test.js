@@ -120,7 +120,7 @@ test('lite framework components retain presets without automatic classification'
   const { EmojiMotion: LiteVue } = await import('../src/vue-lite.js');
   const el = document.createElement('div'); document.body.append(el); animations = [];
   const root = createRoot(el);
-  await React.act(() => root.render(React.createElement(LiteReact, { emoji: '🐶' })));
+  await React.act(() => root.render(React.createElement(LiteReact, { emoji: '🐷' })));
   el.firstChild.dispatchEvent(new dom.window.Event('click')); assert.equal(animations.length, 0);
   await React.act(() => root.render(React.createElement(LiteReact, { emoji: '👋' })));
   el.firstChild.dispatchEvent(new dom.window.Event('click')); assert.equal(animations.length, 1);

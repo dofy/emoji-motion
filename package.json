@@ -62,6 +62,9 @@
     "src",
     "assets/logo.svg",
     "README.md",
+    "README.zh-CN.md",
+    "README.zh-TW.md",
+    "README.ja.md",
     "LICENSE",
     "UNICODE-LICENSE.txt",
     "CHANGELOG.md"

@@ -34,7 +34,7 @@ test('enhance preserves text and emoji sequences, skips protected areas, and cle
 });
 
 test('enhance supports lite, exclusions and disabled observation', async () => {
-  const dom = new JSDOM('<body><div id="root"><p>👋 🐶</p><p class="skip">👋</p></div></body>');
+  const dom = new JSDOM('<body><div id="root"><p>👋 🐷</p><p class="skip">👋</p></div></body>');
   const previous = globalThis.document; globalThis.document = dom.window.document;
   try {
     const root = document.querySelector('#root');
