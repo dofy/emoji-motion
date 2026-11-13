@@ -11,13 +11,17 @@
 .brand-mark svg{display:block;width:20px;height:20px}.hero-meta-item{display:inline-flex;align-items:center;gap:8px}.hero-meta-item svg{width:12px;height:12px;flex:none}.row-icon svg{display:block;width:24px;height:24px}
 
 .auto-try{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:24px;background:#f1eee7;border-radius:12px;margin:0 0 32px}.auto-try h3{font-size:20px;line-height:28px;margin:8px 0 4px}.auto-try p{font-size:14px;line-height:20px;color:#817a71;margin:0}.auto-try-control{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.auto-try-control label{font-size:12px;font-weight:700;color:#817a71}.auto-try-control input{font:24px/32px Manrope,system-ui,sans-serif;width:96px;padding:8px 12px;border:1px solid #e1dbd1;border-radius:8px;background:#fbfaf6;color:#302d29}.auto-try-control input:focus-visible{outline:3px solid #825ced;outline-offset:3px}.auto-try-control emoji-motion{font-size:36px;line-height:40px}.auto-try-control emoji-motion[hidden]{display:none!important}.auto-try-control #auto-result{font-size:12px;line-height:16px;color:#817a71;max-width:180px}@media(max-width:650px){.auto-try{align-items:flex-start;flex-direction:column;gap:16px}.auto-try-control{gap:8px}}
-/* The filter bar stays within the gallery while providing a single scrollable row on phones. */
-.filter-bar{margin-top:48px}.toolbar{margin:24px 0}.repo-link{font-size:14px;font-weight:700;white-space:nowrap}.nav-label-short,.copy-hint-mobile,.framework-picker--examples{display:none}.footer-github{font-size:12px;font-weight:700}
+/* Keep category navigation on one scrollable line at every viewport width. */
+.filter-bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:8px;margin-top:48px;padding:8px 0;background:#fbfaf6;box-shadow:0 4px 12px #4c3c2812}
+.filters{min-width:0;flex:1;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:4px 4px 8px;scroll-padding-inline:4px}
+.filter{flex:0 0 auto;white-space:nowrap}
+.filter-arrow{flex:none;width:32px;height:32px;display:grid;place-items:center;border:1px solid #e8e4db;border-radius:50%;background:#fbfaf6;color:#554b45;font-size:20px;line-height:1;cursor:pointer}
+.filter-arrow:hover:not(:disabled){background:#f1eee7}.filter-arrow:disabled{opacity:.35;cursor:default}.filter-arrow[hidden]{display:none}
+@media(hover:none),(pointer:coarse){.filter-arrow{display:none}}.toolbar{margin:24px 0}.repo-link{font-size:14px;font-weight:700;white-space:nowrap}.nav-label-short,.copy-hint-mobile,.framework-picker--examples{display:none}.footer-github{font-size:12px;font-weight:700}
 @media(max-width:650px){
   .topbar{gap:12px}.nav-link{white-space:nowrap}.nav-link .nav-label,.nav-link .nav-label-short{margin:0}.nav-label{display:none}.nav-label-short{display:inline}.repo-link{font-size:12px}.nav-link{font-size:12px}
-  .filter-bar{position:sticky;top:0;z-index:10;margin:32px -24px 0;padding:8px 24px;background:#fbfaf6;box-shadow:0 4px 12px #4c3c2812}
-  .filters{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:4px 2px 8px;scroll-padding-inline:4px}
-  .filter{flex:0 0 auto;white-space:nowrap}
+  .filter-bar{margin:32px -24px 0;padding:8px 24px}
+  .filter-arrow{display:none}
   .toolbar{margin:16px 0 24px}.toolbar-meta{width:100%;justify-content:space-between;gap:12px}.framework-picker--gallery,.copy-hint-desktop{display:none}.copy-hint-mobile{display:inline}
   .framework-picker--examples{display:flex;margin:24px 0 16px}.framework-picker--examples select{max-width:100%;padding-right:40px}.example-tabs{margin-top:16px}
 }

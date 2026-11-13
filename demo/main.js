@@ -70,6 +70,20 @@ function updateAutoPreview() {
 autoInput.addEventListener('input', updateAutoPreview);
 updateAutoPreview();
 makeFilter('featured', 'Featured'); makeFilter('all', 'All presets'); makeFilter('effects', 'With effects ✦'); for (const group of emojiMotion.groups()) if (all.some(glyph => emojiMotion.resolve(glyph).groupId === group.id)) makeFilter(group.id, group.label); render();
+const previousFilter = document.querySelector('#filter-prev');
+const nextFilter = document.querySelector('#filter-next');
+function updateFilterControls() {
+  const overflow = filters.scrollWidth > filters.clientWidth + 1;
+  previousFilter.hidden = nextFilter.hidden = !overflow;
+  previousFilter.disabled = filters.scrollLeft <= 1;
+  nextFilter.disabled = filters.scrollLeft + filters.clientWidth >= filters.scrollWidth - 1;
+}
+previousFilter.addEventListener('click', () => filters.scrollBy({ left: -filters.clientWidth * 0.7, behavior: 'auto' }));
+nextFilter.addEventListener('click', () => filters.scrollBy({ left: filters.clientWidth * 0.7, behavior: 'auto' }));
+filters.addEventListener('scroll', updateFilterControls, { passive: true });
+window.addEventListener('resize', updateFilterControls);
+if (document.fonts?.ready) document.fonts.ready.then(updateFilterControls);
+updateFilterControls();
 
 
 const exampleCode = {
