@@ -101,11 +101,14 @@ const rolePeople = ['🧑', '👨', '👩'];
 const roleSuffixes = ['⚕️', '🎓', '🏫', '🌾', '🔧', '🔬', '🚒', '⚖️', '✈️', '🎤'];
 const roleMembers = roleSuffixes.flatMap(suffix => rolePeople.map(person => `${person}‍${suffix}`));
 const roleAliases = Object.fromEntries(roleSuffixes.flatMap(suffix => rolePeople.flatMap(person => Object.values(skinTones(person)).map(variant => [`${variant}‍${suffix}`, `${person}‍${suffix}`]))));
-const walkerMembers = ['🚶', '🚶‍♂️', '🚶‍♀️', '🏃‍♂️', '🏃‍♀️'];
-const walkerAliases = Object.fromEntries(walkerMembers.flatMap(glyph => {
+// Gendered sequences take the modifier on the person, before the joiner.
+const genderedToneAliases = glyphs => Object.fromEntries(glyphs.flatMap(glyph => {
   const [person, suffix = ''] = glyph.split('‍');
   return Object.values(skinTones(person)).map(variant => [suffix ? `${variant}‍${suffix}` : variant, glyph]);
 }));
+const gendered = person => [person, `${person}‍♂️`, `${person}‍♀️`];
+const walkerMembers = ['🚶', '🚶‍♂️', '🚶‍♀️', '🏃‍♂️', '🏃‍♀️'];
+const walkerAliases = genderedToneAliases(walkerMembers);
 // Members are reviewed explicitly; no entire Unicode subgroup is assumed to move alike.
 export const families = {
   clocks: { label: 'Clocks', group: 'objects', motion: 'clockTick', members: ['⌚', '🕰️', '⏲️', '🕛', '🕧'], aliases: { '🕰': '🕰️', '⏲': '⏲️' } },
@@ -131,6 +134,10 @@ export const families = {
   poses: { label: 'People in poses', group: 'people', motion: 'pose', members: ['🧎', '🧍', '🙇'], aliases: familyToneAliases(['🧎', '🧍', '🙇']) },
   professionals: { label: 'Professionals', group: 'people', motion: 'pose', members: roleMembers, aliases: roleAliases },
   walkers: { label: 'Walking and running', group: 'people', motion: 'steps', members: walkerMembers, aliases: walkerAliases },
+  swimmers: { label: 'Swimmers', group: 'people', motion: 'bob', members: gendered('🏊'), aliases: genderedToneAliases(gendered('🏊')), decoration: 'ripple' },
+  surfers: { label: 'Surfers', group: 'people', motion: 'ride', members: gendered('🏄'), aliases: genderedToneAliases(gendered('🏄')), decoration: 'splash' },
+  waterPolo: { label: 'Water polo', group: 'people', motion: 'bob', members: gendered('🤽'), aliases: genderedToneAliases(gendered('🤽')), decoration: 'splash' },
+  rowers: { label: 'Rowers', group: 'people', motion: 'vesselRock', members: gendered('🚣'), aliases: genderedToneAliases(gendered('🚣')), decoration: 'ripple' },
   seaLife: { label: 'Sea life', group: 'nature', motion: 'underwater', members: ['🐠', '🐡', '🦈', '🐋', '🐳', '🦭'], decoration: 'bubbles' },
   bakery: { label: 'Bakery', group: 'food', motion: 'pastryBounce', members: ['🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇'] },
   rail: { label: 'Rail vehicles', group: 'travel', motion: 'railRide', members: ['🚄', '🚅', '🚆', '🚇', '🚈', '🚊', '🚝', '🚞'] },
@@ -196,7 +203,6 @@ export const emoji = {
   '🥁': { group: 'activities', name: 'Drum', motion: 'shake', decoration: 'sound' }, '🎮': { group: 'activities', name: 'Game controller', motion: 'wobble' }, '🪁': { group: 'activities', name: 'Kite', motion: 'flutter' },
   '🙋': { group: 'people', name: 'Person raising hand', motion: 'wave', skinTones: skinTones('🙋') }, '🧘': { group: 'people', name: 'Person in lotus position', motion: 'breathe', skinTones: skinTones('🧘') },
   '🏃': { group: 'people', name: 'Person running', motion: 'hop', skinTones: skinTones('🏃') }, '🤸': { group: 'people', name: 'Person cartwheeling', motion: 'twirl', skinTones: skinTones('🤸') },
-  '🏊': { group: 'people', name: 'Person swimming', motion: 'bob', skinTones: skinTones('🏊') }, '🏄': { group: 'people', name: 'Person surfing', motion: 'bob', skinTones: skinTones('🏄') },
   '🧑‍🍳': { group: 'people', name: 'Cook', motion: 'nod', skinTones: personSkinTones('🍳') }, '🧑‍🎨': { group: 'people', name: 'Artist', motion: 'twirl', skinTones: personSkinTones('🎨') },
   '🧑‍🚀': { group: 'people', name: 'Astronaut', motion: 'float', skinTones: personSkinTones('🚀') }, '🧑‍💻': { group: 'people', name: 'Technologist', motion: 'nod', skinTones: personSkinTones('💻') },
   '📱': { group: 'objects', name: 'Mobile phone', motion: 'shake' }, '📚': { group: 'objects', name: 'Books', motion: 'nod' }, '✉️': { group: 'objects', name: 'Envelope', motion: 'bob', variants: ['✉'] },
@@ -237,6 +243,17 @@ const sparkleShape = { viewBox: '0 0 100 100', elements: [
 const centered = { width: '160%', height: '160%', overflow: 'visible' };
 const steamShape = { viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M38 30c-5-5 5-8 0-14M50 27c-5-5 5-8 0-14M62 30c-5-5 5-8 0-14', fill: 'none', stroke: '#a29aa5', 'stroke-width': '2.5', 'stroke-linecap': 'round' } }
+] };
+// Water effects sit at the waterline below the glyph and spread symmetrically.
+const rippleShape = { viewBox: '0 0 100 100', elements: [
+  { tag: 'ellipse', attrs: { cx: '50', cy: '66', rx: '30', ry: '6', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2.5' } }
+] };
+const splashShape = { viewBox: '0 0 100 100', elements: [
+  { tag: 'path', attrs: { d: 'M39 70l-9-8M45 67l-3-10M61 70l9-8M55 67l3-10', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2.5', 'stroke-linecap': 'round' } },
+  { tag: 'circle', attrs: { cx: '25', cy: '56', r: '2.6', fill: '#7cafd0' } },
+  { tag: 'circle', attrs: { cx: '39', cy: '50', r: '2', fill: '#7cafd0' } },
+  { tag: 'circle', attrs: { cx: '75', cy: '56', r: '2.6', fill: '#7cafd0' } },
+  { tag: 'circle', attrs: { cx: '61', cy: '50', r: '2', fill: '#7cafd0' } }
 ] };
 const rainShape = { viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M30 67v6M50 72v6M70 67v6', fill: 'none', stroke: '#7c9fca', 'stroke-width': '3', 'stroke-linecap': 'round' } }
@@ -280,6 +297,18 @@ export const decorations = {
   rain: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: rainShape, style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -55%)' }, { opacity: .9, transform: 'translate(-50%, -50%)', offset: .3 }, { opacity: 0, transform: 'translate(-50%, -40%)' }],
     options: { duration: 950, easing: 'cubic-bezier(.22,1,.36,1)' }
+  }] },
+  ripple: {
+    anchor: { x: '50%', y: '50%' },
+    layers: [0, 320].map(delay => ({
+      svg: rippleShape, style: { ...centered, transformOrigin: '50% 66%' },
+      keyframes: [{ opacity: .8, transform: 'translate(-50%, -50%) scale(.5)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.25)' }],
+      options: { duration: 1100, delay, easing: 'cubic-bezier(.25,.6,.4,1)', fill: 'backwards' }
+    }))
+  },
+  splash: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: splashShape, style: { ...centered, transformOrigin: '50% 70%' },
+    keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.55)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -54%) scale(1.15)' }],
+    options: { duration: 850, easing: curve }
   }] },
   signal: {
     anchor: { x: '50%', y: '50%' },

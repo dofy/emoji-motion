@@ -4,7 +4,7 @@ import { emojiMotion, createEmojiMotion, unicodeVersion } from '../src/index.js'
 import { emojiMotion as lite, createEmojiMotion as createLite } from '../src/lite.js';
 import { subgroups } from '../src/unicode-data.js';
 import { lookupUnicode } from '../src/unicode.js';
-import { emoji as presets, families } from '../src/presets.js';
+import { emoji as presets, families, decorations } from '../src/presets.js';
 
 test('family members and declared skin tone aliases match Unicode', () => {
   for (const [id, family] of Object.entries(families)) {
@@ -18,7 +18,7 @@ test('family members and declared skin tone aliases match Unicode', () => {
 });
 
 test('reviewed role and walking families preserve official variants and user overrides', () => {
-  for (const id of ['professionals', 'walkers']) {
+  for (const id of ['professionals', 'walkers', 'swimmers', 'surfers', 'waterPolo', 'rowers']) {
     const family = families[id];
     for (const base of family.members) {
       const official = lookupUnicode(base);
@@ -40,8 +40,20 @@ test('reviewed role and walking families preserve official variants and user ove
   assert.equal(override.resolve('👩🏽‍⚕️').glyph, '👩🏽‍⚕️');
 });
 
+test('water sports keep their water effects across gender and skin tone variants', () => {
+  for (const [glyph, family, decoration] of [['🏊', 'swimmers', 'ripple'], ['🏊🏽‍♀️', 'swimmers', 'ripple'], ['🏄🏿‍♂️', 'surfers', 'splash'], ['🤽‍♀️', 'waterPolo', 'splash'], ['🚣🏻', 'rowers', 'ripple']]) {
+    for (const registry of [emojiMotion, lite]) {
+      const result = registry.resolve(glyph);
+      assert.equal(result.familyId, family, glyph);
+      assert.equal(result.glyph, glyph, glyph);
+      assert.equal(result.decoration, decoration, glyph);
+      assert.equal(result.decorationPreset, decorations[decoration], glyph);
+    }
+  }
+});
+
 test('new person and gesture presets use official complete skin tone sequences', () => {
-  const glyphs = ['✌️', '🤟', '👊', '🤜', '🤛', '🫰', '🙋', '🧘', '🏃', '🤸', '🏊', '🏄', '🧑‍🍳', '🧑‍🎨', '🧑‍🚀', '🧑‍💻'];
+  const glyphs = ['✌️', '🤟', '👊', '🤜', '🤛', '🫰', '🙋', '🧘', '🏃', '🤸', '🧑‍🍳', '🧑‍🎨', '🧑‍🚀', '🧑‍💻'];
   for (const glyph of glyphs) {
     const entry = presets[glyph];
     const official = lookupUnicode(glyph);
