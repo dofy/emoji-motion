@@ -1,5 +1,15 @@
 import { emojiMotion } from '../src/index.js';
 import '../src/element.js';
+const heroWave = document.querySelector('.hero-wave');
+const heroGlyph = heroWave.querySelector('.art-main');
+emojiMotion.bind(heroGlyph, '👋', { trigger: heroWave, events: ['pointerenter', 'focus', 'click'] });
+// Play once when the artwork enters view, including when it starts below the fold on mobile.
+if ('IntersectionObserver' in globalThis) {
+  const observer = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); emojiMotion.play(heroGlyph, '👋'); }
+  }, { threshold: 0.25 });
+  observer.observe(heroWave);
+} else emojiMotion.play(heroGlyph, '👋');
 const grid = document.querySelector('#grid');
 const filters = document.querySelector('#filters');
 const count = document.querySelector('#count');

@@ -22,3 +22,5 @@
   .framework-picker--examples{display:flex;margin:24px 0 16px}.framework-picker--examples select{max-width:100%;padding-right:40px}.example-tabs{margin-top:16px}
 }
 @media(max-width:360px){.topbar{padding-left:16px;padding-right:16px;gap:8px}.topbar .brand{font-size:18px}.topbar .brand-mark{width:28px;height:28px;margin-right:4px}.topbar .brand-mark svg{width:20px;height:20px}}
+
+.hero-wave{position:relative;z-index:1;padding:0;border:0;background:transparent;cursor:pointer;transform:rotate(-14deg);line-height:1}.hero-wave .art-main{display:inline-block;transform:none}.hero-wave:focus-visible{outline:3px solid #825ced;outline-offset:8px;border-radius:12px}
