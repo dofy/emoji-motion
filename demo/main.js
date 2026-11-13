@@ -89,13 +89,13 @@ updateFilterControls();
 const exampleCode = {
   inline: `<!-- Import once in your app's entry module. -->
 <script type="module">
-  import 'native-emoji-motion/element';
+  import '@dofy/native-emoji-motion/element';
 </script>
 
 <p>Made with a little <emoji-motion emoji="❤️"></emoji-motion> and a lot of care.</p>`,
   card: `<!-- Import once in your app's entry module. -->
 <script type="module">
-  import 'native-emoji-motion/element';
+  import '@dofy/native-emoji-motion/element';
 </script>
 
 <div class="card">
@@ -103,7 +103,7 @@ const exampleCode = {
   <emoji-motion emoji="👋" display="block"></emoji-motion>
 </div>`,
   setup: `// Import once in your app's entry module.
-import 'native-emoji-motion/element';
+import '@dofy/native-emoji-motion/element';
 
 // Paste <emoji-motion emoji="👋"></emoji-motion> into your HTML.`
 };
@@ -130,12 +130,12 @@ async function copyText(value, status, fallback, success) {
 const frameworkCode = {
   vanilla: exampleCode,
   react: {
-    inline: `import { EmojiMotion } from 'native-emoji-motion/react';
+    inline: `import { EmojiMotion } from '@dofy/native-emoji-motion/react';
 
 export function Message() {
   return <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>;
 }`,
-    card: `import { EmojiMotion } from 'native-emoji-motion/react';
+    card: `import { EmojiMotion } from '@dofy/native-emoji-motion/react';
 
 export function HelloCard() {
   return (
@@ -145,20 +145,20 @@ export function HelloCard() {
     </div>
   );
 }`,
-    setup: `import { EmojiMotion } from 'native-emoji-motion/react';
+    setup: `import { EmojiMotion } from '@dofy/native-emoji-motion/react';
 
 // Paste <EmojiMotion emoji="👋" /> into your JSX.`
   },
   vue: {
     inline: `<script setup>
-import { EmojiMotion } from 'native-emoji-motion/vue';
+import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 </script>
 
 <template>
   <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>
 </template>`,
     card: `<script setup>
-import { EmojiMotion } from 'native-emoji-motion/vue';
+import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 </script>
 
 <template>
@@ -168,19 +168,19 @@ import { EmojiMotion } from 'native-emoji-motion/vue';
   </div>
 </template>`,
     setup: `<script setup>
-import { EmojiMotion } from 'native-emoji-motion/vue';
+import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 </script>
 
 <!-- Paste <EmojiMotion emoji="👋" /> into your template. -->`
   },
   svelte: {
     inline: `<script>
-  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+  import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
 </script>
 
 <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>`,
     card: `<script>
-  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+  import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
 </script>
 
 <div class="card">
@@ -188,7 +188,7 @@ import { EmojiMotion } from 'native-emoji-motion/vue';
   <EmojiMotion emoji="👋" display="block" />
 </div>`,
     setup: `<script>
-  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+  import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
 </script>
 
 <!-- Paste <EmojiMotion emoji="👋" /> into your component. -->`

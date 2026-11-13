@@ -15,7 +15,7 @@ Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explo
 ## Installation
 
 ```sh
-npm install native-emoji-motion
+npm install @dofy/native-emoji-motion
 ```
 
 The package is ESM and uses the browser Web Animations API. React, Vue and Svelte are optional peers: install the framework used by your application.
@@ -25,7 +25,7 @@ The package is ESM and uses the browser Web Animations API. React, Vue and Svelt
 Use an emoji directly as a component. `display` is `inline` by default and can be set to `block`; all components animate on hover, focus and click and use built in SVG effects when available. Use these imports in a bundled app. React, Vue and Svelte are optional peers, so the core stays framework independent.
 
 ```jsx
-import { EmojiMotion } from 'native-emoji-motion/react';
+import { EmojiMotion } from '@dofy/native-emoji-motion/react';
 
 <p>Hello <EmojiMotion emoji="👋" skinTone="medium" /></p>
 <EmojiMotion emoji="📡" display="block" />
@@ -33,7 +33,7 @@ import { EmojiMotion } from 'native-emoji-motion/react';
 
 ```vue
 <script setup>
-import { EmojiMotion } from 'native-emoji-motion/vue';
+import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 </script>
 <template>
   <p>Hello <EmojiMotion emoji="👋" skin-tone="medium" /></p>
@@ -43,13 +43,13 @@ import { EmojiMotion } from 'native-emoji-motion/vue';
 
 ```svelte
 <script>
-  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+  import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
 </script>
 <p>Hello <EmojiMotion emoji="👋" skinTone="medium" /></p>
 <EmojiMotion emoji="📡" display="block" />
 ```
 
-For plain HTML or other frameworks, import `native-emoji-motion/element` once in a bundled entry module, then use `<emoji-motion emoji="👋" display="block"></emoji-motion>`. The web component can be used with Angular or any other framework that supports custom elements. It registers itself when the module is imported. Its attributes include `emoji`, `skin-tone`, `display`, `label` and `decoration="false"`; assign the `registry` property to use a custom registry.
+For plain HTML or other frameworks, import `@dofy/native-emoji-motion/element` once in a bundled entry module, then use `<emoji-motion emoji="👋" display="block"></emoji-motion>`. The web component can be used with Angular or any other framework that supports custom elements. It registers itself when the module is imported. Its attributes include `emoji`, `skin-tone`, `display`, `label` and `decoration="false"`; assign the `registry` property to use a custom registry.
 
 React, Vue and Svelte components accept `emoji`, `skinTone`, `display`, `decoration`, `label`, `events`, and a custom `registry`. For a custom interaction target, React accepts `triggerRef` and Vue/Svelte accept `trigger`. Components clean up their listeners when updated or unmounted. A global skin tone set on a registry is read when a component renders; to update an already mounted component, update its `skinTone` prop or cause a framework rerender.
 
@@ -58,7 +58,7 @@ React, Vue and Svelte components accept `emoji`, `skinTone`, `display`, `decorat
 Import the package in an ESM application:
 
 ```js
-import { emojiMotion } from 'native-emoji-motion';
+import { emojiMotion } from '@dofy/native-emoji-motion';
 
 // Keep the emoji in its own inline-block element. The card can be the trigger.
 const dispose = emojiMotion.bind(emojiElement, '👋', { trigger: card });
@@ -75,7 +75,7 @@ Motion is skipped when the user prefers reduced motion. `play` returns `null` fo
 The default entry recognizes emoji using data generated from Unicode Emoji 18.0, including fully qualified, minimally qualified, and unqualified sequences. A known emoji is classified by its Unicode group and subgroup and receives a conservative reusable motion; existing handcrafted presets retain their special animations and optional decorations. Exact Unicode sequences, including flags and ZWJ sequences, are used rather than guessing category from a code point range. `resolve()` exposes `source`, `unicodeGroup` and `unicodeSubgroup` where available:
 
 ```js
-import { emojiMotion } from 'native-emoji-motion';
+import { emojiMotion } from '@dofy/native-emoji-motion';
 
 emojiMotion.resolve('🐶'); // source: 'unicode', subgroup: 'animal-mammal', motion: 'bounce'
 emojiMotion.resolve('👩🏽‍🚀').glyph; // 👩🏽‍🚀
@@ -86,7 +86,7 @@ emojiMotion.resolve('hello'); // undefined
 The precedence is: **user emoji and aliases → user subgroup or group classification rule → user group default → handcrafted preset → generated Unicode classification → conservative fallback**. User emoji entries always take precedence over user classification rules. Within user classifications, subgroup rules take precedence over group rules. An explicitly supplied group default overrides handcrafted and automatic motions for that group; a more specific user emoji or classification rule can override it. User-defined motions replace built in motions with the same ID. User classification rules also override matching handcrafted presets.
 
 ```js
-import { createEmojiMotion } from 'native-emoji-motion';
+import { createEmojiMotion } from '@dofy/native-emoji-motion';
 
 const custom = createEmojiMotion({
   classifications: {
@@ -108,11 +108,11 @@ The `defaults: false` setting disables both built in presets and automatic class
 Use the lite entry to omit the Unicode classifier and its data. Unknown emoji do not automatically animate; user-defined entries and handcrafted presets still work. The matching framework entries also omit Unicode data:
 
 ```js
-import { createEmojiMotion } from 'native-emoji-motion/lite';
-import { EmojiMotion as ReactEmoji } from 'native-emoji-motion/react/lite';
-import { EmojiMotion as VueEmoji } from 'native-emoji-motion/vue/lite';
-import 'native-emoji-motion/element/lite';
-// Svelte: import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotionLite.svelte';
+import { createEmojiMotion } from '@dofy/native-emoji-motion/lite';
+import { EmojiMotion as ReactEmoji } from '@dofy/native-emoji-motion/react/lite';
+import { EmojiMotion as VueEmoji } from '@dofy/native-emoji-motion/vue/lite';
+import '@dofy/native-emoji-motion/element/lite';
+// Svelte: import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotionLite.svelte';
 ```
 
 Import either the full or lite web component entry on a page, not both: both register the same `emoji-motion` tag and the first registration wins. To keep a framework bundle small, use its lite entry rather than passing a lite registry to a full component entry, which still imports the full classifier.
@@ -124,7 +124,7 @@ Unicode data is generated with `npm run generate:unicode` from a version-pinned,
 A registry can specify a default and change it later. `resolve` returns the glyph to render; animation never changes your element's text automatically.
 
 ```js
-import { createEmojiMotion } from 'native-emoji-motion';
+import { createEmojiMotion } from '@dofy/native-emoji-motion';
 
 const motion = createEmojiMotion({ defaultSkinTone: 'medium' });
 motion.resolve('👋').glyph; // 👋🏽
@@ -140,7 +140,7 @@ The available values are `default`, `light`, `medium-light`, `medium`, `medium-d
 An isolated registry combines built ins and your definitions; existing IDs can be replaced. Set `defaults: false` to use only your own definitions. Emoji variants are explicit rather than guessed, so skin tone and multi code point sequences remain under your control.
 
 ```js
-import { createEmojiMotion } from 'native-emoji-motion';
+import { createEmojiMotion } from '@dofy/native-emoji-motion';
 
 const motion = createEmojiMotion({
   motions: {
