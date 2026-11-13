@@ -8,4 +8,6 @@ Use this checklist before publishing each version. A version is not reserved unt
 4. Confirm changes are committed, CI passes, and the release commit matches the intended source. Review release notes and verify the package metadata points to the correct public repository.
 5. After an explicit decision to publish, authenticate to npm and use `npm publish --access public`. Verify package version, tarball, links and a clean install from the registry.
 
+The demo and documentation site deploys automatically: Cloudflare Workers Builds runs `npm run build:demo` and `npx wrangler deploy` for every push to `main`. Its check run on the commit is separate from GitHub CI, so confirm both pass. Publishing to npm stays manual.
+
 Do not commit credentials or include generated demo assets, deployment configuration, tests, or local files in the npm tarball.
