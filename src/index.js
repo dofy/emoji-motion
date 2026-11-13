@@ -47,7 +47,15 @@ export function createEmojiMotion(config = {}) {
       Object.assign(decorationRoot.style, { position: 'absolute', pointerEvents: 'none', left: anchor.x, top: anchor.y, width: '100%', height: '100%', transform: `scaleX(${flipX ? -1 : 1}) rotate(${rotate}deg)` });
       container.appendChild(decorationRoot);
       for (const layer of preset.layers) {
-        const node = container.ownerDocument.createElement('span');
+        const node = layer.svg ? container.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'svg') : container.ownerDocument.createElement('span');
+        if (layer.svg) {
+          node.setAttribute('viewBox', layer.svg.viewBox);
+          for (const shape of layer.svg.elements) {
+            const child = container.ownerDocument.createElementNS('http://www.w3.org/2000/svg', shape.tag);
+            for (const [key, value] of Object.entries(shape.attrs)) child.setAttribute(key, value);
+            node.appendChild(child);
+          }
+        }
         Object.assign(node.style, { position: 'absolute', left: '0', top: '0', opacity: '0', ...layer.style });
         decorationRoot.appendChild(node);
         decorationAnimations.push(node.animate(layer.keyframes, layer.options));

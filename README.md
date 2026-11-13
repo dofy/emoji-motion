@@ -8,7 +8,7 @@ Small, expressive animations for native emoji. A framework independent, dependen
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application.
+Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **With effects** to preview all emoji with decorative SVG layers, or choose a semantic group.
 
 ## Use
 
@@ -56,7 +56,7 @@ Groups select a default motion; an emoji entry can override it with `motion`, an
 
 ## Optional decorative effects
 
-Emoji can also reference a decoration preset. The built in 📡 example adds a neutral signal halo around the whole glyph. Decorations are opt in and render inside a container you provide. Make the container `position: relative` and size it to the glyph. Effects do not change the emoji itself.
+Emoji can also reference a decoration preset. The built in 📡 example adds a neutral signal halo around the whole glyph; 🔔 and 🎵 add notes, and ✨ adds sparkles. Decorations are opt in and render inside a container you provide. Make the container `position: relative` and size it to the glyph. Effects do not change the emoji itself.
 
 ```html
 <button id="antenna"><span class="emoji-box"><span id="dish">📡</span></span></button>
@@ -78,7 +78,32 @@ emojiMotion.bind(document.querySelector('#dish'), '📡', {
 
 `anchor` is relative to the container. `flipX` and `rotate` affect the decoration, never the glyph. For asymmetric effects, select explicit settings for the actual font or environment you support; OS detection alone cannot reliably determine the font or its direction. The default signal effect is centered rather than tied to a specific antenna position. When no decoration container is supplied, only the emoji moves. Decoration layers are removed after playback, on replay and on cleanup; reduced motion skips both.
 
-Add custom `decorations` in `createEmojiMotion`: each named preset has an `anchor` and `layers`, each with CSS `style`, Web Animations `keyframes` and `options`. Reference its name using the emoji entry's `decoration` field. Layer styles are trusted application code, and the library does not bundle images or fonts.
+Add custom `decorations` in `createEmojiMotion`: each named preset has an `anchor` and `layers`, each with CSS `style`, Web Animations `keyframes` and `options`. Optionally provide `svg: { viewBox, elements }`, where each element has a `tag` and `attrs`; without `svg`, a styled span is used. Reference its name using the emoji entry's `decoration` field. Layer styles are trusted application code, and the library does not bundle images or fonts.
+
+For example, this adds an SVG sparkle to a custom group:
+
+```js
+const custom = createEmojiMotion({
+  decorations: {
+    star: {
+      anchor: { x: '50%', y: '50%' },
+      layers: [{
+        svg: { viewBox: '0 0 100 100', elements: [
+          { tag: 'circle', attrs: { cx: '50', cy: '20', r: '5', fill: 'gold' } },
+        ] },
+        style: { width: '160%', height: '160%' },
+        keyframes: [
+          { opacity: 1, transform: 'translate(-50%, -50%) scale(.6)' },
+          { opacity: 0, transform: 'translate(-50%, -50%) scale(1.2)' },
+        ],
+        options: { duration: 700 },
+      }],
+    },
+  },
+  emoji: { '🌟': { name: 'Glowing star', group: 'symbols', decoration: 'star' } },
+});
+custom.bind(emojiElement, '🌟', { trigger: card, decoration: { container: emojiBox } });
+```
 
 ## Platform boundaries
 

@@ -1,7 +1,8 @@
 export interface Motion { keyframes: Keyframe[]; options?: KeyframeAnimationOptions; origin?: string }
 export interface Group { label: string; description?: string; motion: string }
 export interface Anchor { x: string; y: string }
-export interface DecorationLayer { style: Partial<CSSStyleDeclaration>; keyframes: Keyframe[]; options?: KeyframeAnimationOptions }
+export interface SvgShape { tag: 'path' | 'circle' | 'ellipse' | 'rect' | 'line' | 'polyline' | 'polygon'; attrs: Record<string, string> }
+export interface DecorationLayer { style: Partial<CSSStyleDeclaration>; keyframes: Keyframe[]; options?: KeyframeAnimationOptions; svg?: { viewBox: string; elements: SvgShape[] } }
 export interface Decoration { anchor: Anchor; layers: DecorationLayer[] }
 export interface EmojiEntry { group: string; name: string; motion?: string; decoration?: string; variants?: string[] }
 export interface Config { defaults?: boolean; motions?: Record<string, Motion>; decorations?: Record<string, Decoration>; groups?: Record<string, Group>; emoji?: Record<string, EmojiEntry> }

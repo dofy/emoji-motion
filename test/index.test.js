@@ -39,7 +39,7 @@ test('bind attaches and cleans listeners and cancels its animation', () => {
 test('optional decorations use configurable positioning and clean up on replay and disposal', async () => {
   const instances = [];
   function node() { return { style: {}, children: [], setAttribute() {}, appendChild(child) { this.children.push(child); }, remove() { this.removed = true; }, animate() { const animation = { finished: new Promise(() => {}), cancel() { this.cancelled = true; } }; instances.push(animation); return animation; } }; }
-  const container = node(); container.ownerDocument = { createElement: node };
+  const container = node(); container.ownerDocument = { createElement: node, createElementNS: node };
   const glyph = node(); const trigger = new EventTarget();
   const cleanup = emojiMotion.bind(glyph, '📡', { trigger, events: ['click'], decoration: { container, anchor: { x: '75%', y: '25%' }, flipX: true, rotate: 15 } });
   trigger.dispatchEvent(new Event('click'));
@@ -58,4 +58,17 @@ test('decorations are validated and skipped when no container or reduced motion 
   emojiMotion.play(el, '📡'); assert.equal(created, 0);
   const old = globalThis.matchMedia; globalThis.matchMedia = () => ({ matches: true });
   try { assert.equal(emojiMotion.play(el, '📡', { decoration: { container } }), null); assert.equal(created, 0); } finally { if (old) globalThis.matchMedia = old; else delete globalThis.matchMedia; }
+});
+
+test('custom SVG decoration creates its declared shapes', () => {
+  const nodes = [];
+  function makeNode(tag) { const value = { tag, style: {}, attrs: {}, children: [], setAttribute(key, val) { this.attrs[key] = val; }, appendChild(child) { this.children.push(child); }, remove() {}, animate() { return { finished: new Promise(() => {}), cancel() {} }; } }; nodes.push(value); return value; }
+  const doc = { createElement: tag => makeNode(tag), createElementNS: (_ns, tag) => makeNode(tag) };
+  const container = makeNode('container'); container.ownerDocument = doc;
+  const custom = createEmojiMotion({ decorations: { star: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 10 10', elements: [{ tag: 'circle', attrs: { r: '4', fill: 'gold' } }] }, style: {}, keyframes: [{ opacity: 1 }, { opacity: 0 }] }] } }, emoji: { '🌟': { name: 'Star', group: 'symbols', decoration: 'star' } } });
+  custom.play(makeNode('glyph'), '🌟', { decoration: { container } });
+  const svg = nodes.find(node => node.tag === 'svg');
+  assert.equal(svg.attrs.viewBox, '0 0 10 10');
+  assert.equal(svg.children[0].tag, 'circle');
+  assert.equal(svg.children[0].attrs.fill, 'gold');
 });

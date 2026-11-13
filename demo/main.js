@@ -8,7 +8,7 @@ let selected = 'all';
 const palette = ['peach', 'lilac', 'yellow', 'mint', 'blue', 'pink'];
 function render() {
   cleanups.forEach(cleanup => cleanup()); cleanups = []; grid.replaceChildren();
-  const shown = all.filter(glyph => selected === 'all' || emojiMotion.resolve(glyph).groupId === selected);
+  const shown = all.filter(glyph => selected === 'all' || (selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected));
   count.textContent = `${String(shown.length).padStart(2, '0')} LITTLE MOVEMENTS`;
   for (const [index, glyph] of shown.entries()) {
     const item = emojiMotion.resolve(glyph);
@@ -28,4 +28,4 @@ function render() {
   }
 }
 function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
-makeFilter('all', 'All emoji'); for (const group of emojiMotion.groups()) makeFilter(group.id, group.label); render();
+makeFilter('all', 'All emoji'); makeFilter('effects', 'With effects ✦'); for (const group of emojiMotion.groups()) makeFilter(group.id, group.label); render();
