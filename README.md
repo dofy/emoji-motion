@@ -1,6 +1,6 @@
 # Emoji Motion
 
-Small, expressive animations for native emoji. A framework independent, dependency free prototype built around semantic groups, reusable motion presets and explicit per emoji overrides.
+Small, expressive animations for native emoji. A framework independent library with Unicode based automatic classification, reusable motion presets and explicit per emoji overrides.
 
 ## Try the demo
 
@@ -10,7 +10,7 @@ Small, expressive animations for native emoji. A framework independent, dependen
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. The gallery starts with a curated selection from across the groups. Choose **All emoji** for the complete list, **With effects** for decorative SVG layers, or select a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
+Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **Try any emoji** to preview automatic classification. The gallery starts with a curated selection from across the groups. Choose **All presets** for the complete handcrafted list, **With effects** for decorative SVG layers, or select a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
 
 ## Components
 
@@ -58,9 +58,58 @@ const dispose = emojiMotion.bind(emojiElement, '👋', { trigger: card });
 dispose();
 ```
 
-Or play once manually: `emojiMotion.play(emojiElement, '❤️')`. `resolve(glyph)` returns the entry, group and selected motion, or `undefined` for unknown emoji. `list()` returns canonical entries; `groups()` lists groups. `bind` listens to `pointerenter` and `focus` by default. Pass `events: ['click']` or any DOM event names to change this. Make the trigger keyboard accessible; a `<button>` is a good default. The element being animated should have `display: inline-block`, and should be dedicated to the emoji because Web Animations controls its transform.
+Or play once manually: `emojiMotion.play(emojiElement, '❤️')`. `resolve(glyph)` returns the entry, group and selected motion, or `undefined` when the input cannot be recognized. `list()` returns canonical entries; `groups()` lists groups. `bind` listens to `pointerenter` and `focus` by default. Pass `events: ['click']` or any DOM event names to change this. Make the trigger keyboard accessible; a `<button>` is a good default. The element being animated should have `display: inline-block`, and should be dedicated to the emoji because Web Animations controls its transform.
 
 Motion is skipped when the user prefers reduced motion. `play` returns `null` for unknown emoji, reduced motion, or an element without Web Animations support; otherwise it returns the browser's `Animation`. A repeated play cancels the previous one on the same element. `ignoreReducedMotion` is an explicit opt out and should only be used with the user's consent.
+
+## Automatic classification
+
+The default entry recognizes emoji using data generated from Unicode Emoji 18.0, including fully qualified, minimally qualified, and unqualified sequences. A known emoji is classified by its Unicode group and subgroup and receives a conservative reusable motion; existing handcrafted presets retain their special animations and optional decorations. Exact Unicode sequences, including flags and ZWJ sequences, are used rather than guessing category from a code point range. `resolve()` exposes `source`, `unicodeGroup` and `unicodeSubgroup` where available:
+
+```js
+import { emojiMotion } from 'native-emoji-motion';
+
+emojiMotion.resolve('🐶'); // source: 'unicode', subgroup: 'animal-mammal', motion: 'bounce'
+emojiMotion.resolve('👩🏽‍🚀').glyph; // 👩🏽‍🚀
+emojiMotion.resolve('📡').source; // 'preset', including its signal decoration
+emojiMotion.resolve('hello'); // undefined
+```
+
+The precedence is: **user emoji and aliases → user subgroup or group classification rule → handcrafted preset → generated Unicode classification → conservative fallback**. User emoji entries always take precedence over user classification rules. Within user classifications, subgroup rules take precedence over group rules. If you override a named `groups` or `motions` preset, it is used wherever that preset applies. User category rules also override matching handcrafted presets.
+
+```js
+import { createEmojiMotion } from 'native-emoji-motion';
+
+const custom = createEmojiMotion({
+  classifications: {
+    groups: { 'Animals & Nature': { group: 'nature', motion: 'float' } },
+    subgroups: { 'animal-bird': { group: 'nature', motion: 'swing' } },
+    fallback: { group: 'other', motion: 'bounce' },
+  },
+  emoji: { '🐶': { group: 'hearts', name: 'My dog', motion: 'pulse' } },
+});
+// 🐶 uses pulse, 🐦 uses swing, and other animals use float.
+```
+
+A generated Unicode name and subgroup are used for uncustomized emoji. `list()` remains the small set of handcrafted and explicitly added entries; it is not a list of the entire Unicode dataset. Generated classifications do not automatically create SVG decorations. Unknown sequences newer than the pinned dataset receive a generic fallback only if the JavaScript engine recognizes them as emoji; otherwise they remain unrecognized. Detection does not guarantee that the system font can render the glyph. Standalone components and arbitrary text are not treated as emoji.
+
+The `defaults: false` setting disables both built in presets and automatic classification unless `autoDetect: true` is explicitly supplied; with no built in groups or motions, the caller must define the groups and motions used by its rules. Set `autoDetect: false` to disable automatic classification while keeping built in presets.
+
+## Smaller preset only entry
+
+Use the lite entry to omit the Unicode classifier and its data. Unknown emoji do not automatically animate; user-defined entries and handcrafted presets still work. The matching framework entries also omit Unicode data:
+
+```js
+import { createEmojiMotion } from 'native-emoji-motion/lite';
+import { EmojiMotion as ReactEmoji } from 'native-emoji-motion/react/lite';
+import { EmojiMotion as VueEmoji } from 'native-emoji-motion/vue/lite';
+import 'native-emoji-motion/element/lite';
+// Svelte: import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotionLite.svelte';
+```
+
+Import either the full or lite web component entry on a page, not both: both register the same `emoji-motion` tag and the first registration wins. To keep a framework bundle small, use its lite entry rather than passing a lite registry to a full component entry, which still imports the full classifier.
+
+Unicode data is generated with `npm run generate:unicode` from a version-pinned, checksum-verified official file. The data is covered by [UNICODE-LICENSE.txt](./UNICODE-LICENSE.txt).
 
 ## Skin tone
 
@@ -76,7 +125,7 @@ motion.setDefaultSkinTone('light');
 motion.resolve('👋').glyph; // 👋🏻
 ```
 
-The available values are `default`, `light`, `medium-light`, `medium`, `medium-dark` and `dark`. Explicitly supplied skin tone variants retain their tone unless a per-call override is supplied. Emoji without a skin tone mapping stay unchanged. When adding custom emoji, supply `skinTones` as an explicit map from the tone names to complete Unicode sequences, including any joiners; the library does not guess modifier placement. If the default tone changes, update rendered text by resolving again.
+The available values are `default`, `light`, `medium-light`, `medium`, `medium-dark` and `dark`. Explicitly supplied skin tone variants retain their tone unless a per-call override is supplied. Automatic skin tones are applied only where an official single-tone variant is unambiguous; mixed-tone sequences stay unchanged rather than being rewritten. Emoji without a skin tone mapping stay unchanged. When adding custom emoji, supply `skinTones` as an explicit map from the tone names to complete Unicode sequences, including any joiners; the library does not guess modifier placement. If the default tone changes, update rendered text by resolving again.
 
 ## Extend
 

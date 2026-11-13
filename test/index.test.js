@@ -8,14 +8,14 @@ test('group defaults, per emoji overrides, and explicit variants resolve', () =>
   assert.equal(emojiMotion.resolve('🔔').motionId, 'swing');
   assert.equal(emojiMotion.resolve('❤️').motionId, 'pulse');
   assert.equal(emojiMotion.resolve('❤').canonical, '❤️');
-  assert.equal(emojiMotion.resolve('🦑'), undefined);
+  assert.equal(emojiMotion.resolve('🦑').source, 'unicode');
 });
 test('custom registries are isolated and validate references', () => {
   const custom = createEmojiMotion({ defaults: false, motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }] } }, groups: { creatures: { label: 'Creatures', motion: 'wiggle' } }, emoji: { '🐙': { name: 'Octopus', group: 'creatures', variants: ['🐙️'] } } });
   assert.equal(custom.resolve('🐙️').motionId, 'wiggle');
-  assert.equal(emojiMotion.resolve('🐙'), undefined);
+  assert.equal(emojiMotion.resolve('🐙').source, 'unicode');
   assert.throws(() => createEmojiMotion({ emoji: { '🐙': { name: 'Octopus', group: 'missing' } } }), /Unknown group/);
-  assert.throws(() => createEmojiMotion({ emoji: { '🐙': { name: 'Octopus', group: 'faces', variants: ['👋'] } } }), /Duplicate emoji variant/);
+  assert.throws(() => createEmojiMotion({ emoji: { '🐙': { name: 'Octopus', group: 'faces', variants: ['🐬'] }, '🐬': { name: 'Dolphin', group: 'nature' } } }), /Duplicate emoji variant/);
 });
 test('play cancels previous animation, respects reduced motion, and preserves host styles', () => {
   const animations = [];

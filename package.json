@@ -29,13 +29,40 @@
       "types": "./src/EmojiMotion.svelte.d.ts",
       "svelte": "./src/EmojiMotion.svelte",
       "default": "./src/EmojiMotion.svelte"
+    },
+    "./lite": {
+      "types": "./src/lite.d.ts",
+      "import": "./src/lite.js",
+      "default": "./src/lite.js"
+    },
+    "./react/lite": {
+      "types": "./src/react.d.ts",
+      "import": "./src/react-lite.js"
+    },
+    "./vue/lite": {
+      "types": "./src/vue.d.ts",
+      "import": "./src/vue-lite.js"
+    },
+    "./svelte/lite": {
+      "types": "./src/svelte.d.ts",
+      "import": "./src/svelte-lite.js"
+    },
+    "./svelte/EmojiMotionLite.svelte": {
+      "types": "./src/EmojiMotion.svelte.d.ts",
+      "svelte": "./src/EmojiMotionLite.svelte",
+      "default": "./src/EmojiMotionLite.svelte"
+    },
+    "./element/lite": {
+      "types": "./src/element.d.ts",
+      "import": "./src/element-lite.js"
     }
   },
   "types": "./src/index.d.ts",
   "files": [
     "src",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "UNICODE-LICENSE.txt"
   ],
   "scripts": {
     "dev": "node demo/server.js",
@@ -43,7 +70,8 @@
     "pack:check": "npm pack --dry-run",
     "build:demo": "node scripts/build-demo.js",
     "prepublishOnly": "npm test && npm run test:types",
-    "test:types": "tsc --noEmit --strict --skipLibCheck false --module nodenext --moduleResolution nodenext --target es2022 type-tests/consumer.mts"
+    "test:types": "tsc --noEmit --strict --skipLibCheck false --module nodenext --moduleResolution nodenext --target es2022 type-tests/consumer.mts",
+    "generate:unicode": "node scripts/generate-unicode.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -59,7 +87,8 @@
     "zero-dependencies"
   ],
   "sideEffects": [
-    "./src/element.js"
+    "./src/element.js",
+    "./src/element-lite.js"
   ],
   "homepage": "https://emoji-motion.phpz.org",
   "repository": {

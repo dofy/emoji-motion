@@ -4,7 +4,7 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(new URL('demo/', dist), { recursive: true });
 await mkdir(new URL('src/', dist), { recursive: true });
 await mkdir(new URL('demo/vendor/', dist), { recursive: true });
-for (const [source, target] of [['demo/index.html', 'index.html'], ['demo/main.js', 'demo/main.js'], ['demo/style.css', 'demo/style.css'], ['src/index.js', 'src/index.js'], ['src/element.js', 'src/element.js'], ['src/presets.js', 'src/presets.js']]) {
+for (const [source, target] of [['demo/index.html', 'index.html'], ['UNICODE-LICENSE.txt', 'UNICODE-LICENSE.txt'], ['demo/main.js', 'demo/main.js'], ['demo/style.css', 'demo/style.css'], ['src/index.js', 'src/index.js'], ['src/registry.js', 'src/registry.js'], ['src/unicode.js', 'src/unicode.js'], ['src/unicode-data.js', 'src/unicode-data.js'], ['src/element.js', 'src/element.js'], ['src/element-core.js', 'src/element-core.js'], ['src/presets.js', 'src/presets.js']]) {
   await copyFile(new URL(`../${source}`, import.meta.url), new URL(target, dist));
 }
 console.log('Built static demo in dist/');

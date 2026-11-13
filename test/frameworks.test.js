@@ -11,7 +11,7 @@ globalThis.SVGElement = dom.window.SVGElement;
 globalThis.Node = dom.window.Node;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 let animations = [];
-dom.window.Element.prototype.animate = function () { const a = { finished: new Promise(() => {}), cancel() { this.cancelled = true; } }; animations.push(a); return a; };
+dom.window.Element.prototype.animate = function (frames) { const a = { frames, finished: new Promise(() => {}), cancel() { this.cancelled = true; } }; animations.push(a); return a; };
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
@@ -79,7 +79,7 @@ test('Svelte component compiles for client and server rendering', async () => {
 
 test('Svelte component mounts and animates in a DOM', async () => {
   const { execFileSync } = await import('node:child_process');
-  execFileSync(process.execPath, ['--conditions=browser', new URL('../scripts/svelte-client-check.mjs', import.meta.url).pathname], { stdio: 'pipe' });
+  for (const args of [[], ['--lite']]) execFileSync(process.execPath, ['--conditions=browser', new URL('../scripts/svelte-client-check.mjs', import.meta.url).pathname, ...args], { stdio: 'pipe' });
 });
 
 test('Svelte 4 compiles the component for browser and SSR', async () => {
@@ -98,4 +98,53 @@ test('React and Vue can animate from an external trigger', async () => {
   const app = Vue.createApp({ setup() { const target = Vue.ref(null); return () => Vue.h('button', { ref: target }, [Vue.h(VueEmoji, { emoji: '👋', trigger: target.value })]); } });
   app.mount(vueEl); await Vue.nextTick(); await Vue.nextTick(); vueEl.querySelector('button').dispatchEvent(new dom.window.Event('click'));
   assert.equal(animations.length, 1); app.unmount(); vueEl.remove();
+});
+
+test('lite framework components retain presets without automatic classification', async () => {
+  const { EmojiMotion: LiteReact } = await import('../src/react-lite.js');
+  const { EmojiMotion: LiteVue } = await import('../src/vue-lite.js');
+  const el = document.createElement('div'); document.body.append(el); animations = [];
+  const root = createRoot(el);
+  await React.act(() => root.render(React.createElement(LiteReact, { emoji: '🐶' })));
+  el.firstChild.dispatchEvent(new dom.window.Event('click')); assert.equal(animations.length, 0);
+  await React.act(() => root.render(React.createElement(LiteReact, { emoji: '👋' })));
+  el.firstChild.dispatchEvent(new dom.window.Event('click')); assert.equal(animations.length, 1);
+  await React.act(() => root.unmount());
+  animations = []; const app = Vue.createApp({ render: () => Vue.h(LiteVue, { emoji: '👋' }) });
+  app.mount(el); await Vue.nextTick(); el.firstChild.dispatchEvent(new dom.window.Event('click')); assert.equal(animations.length, 1); app.unmount(); el.remove();
+});
+
+test('Svelte lite component compiles on Svelte 4 and 5', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const source = await readFile(new URL('../src/EmojiMotionLite.svelte', import.meta.url), 'utf8');
+  const four = await import('svelte4/compiler'); const five = await import('svelte/compiler');
+  assert.ok(four.compile(source, { filename: 'EmojiMotionLite.svelte', generate: 'dom' }).js.code);
+  assert.ok(five.compile(source, { filename: 'EmojiMotionLite.svelte', generate: 'client' }).js.code);
+});
+
+
+test('component skin tone selects the user override for the rendered variant', async () => {
+  const { createEmojiMotion } = await import('../src/index.js');
+  const registry = createEmojiMotion({ emoji: { '👋🏿': { name: 'Custom dark wave', group: 'hearts', motion: 'pulse' } } });
+  const el = document.createElement('div'); document.body.append(el); animations = [];
+  const root = createRoot(el);
+  await React.act(() => root.render(React.createElement(ReactEmoji, { emoji: '👋', skinTone: 'dark', registry })));
+  assert.equal(el.textContent, '👋🏿'); el.firstChild.dispatchEvent(new dom.window.Event('click'));
+  assert.equal(animations[0].frames[1].transform, 'scale(1.25)');
+  await React.act(() => root.unmount()); animations = [];
+  const app = Vue.createApp({ render: () => Vue.h(VueEmoji, { emoji: '👋', skinTone: 'dark', registry }) });
+  app.mount(el); await Vue.nextTick(); el.firstChild.dispatchEvent(new dom.window.Event('click'));
+  assert.equal(animations[0].frames[1].transform, 'scale(1.25)'); app.unmount(); el.remove();
+});
+
+test('web component and Svelte action honor user overrides for a selected skin tone', async () => {
+  const { createEmojiMotion } = await import('../src/index.js');
+  const { animateEmoji } = await import('../src/svelte.js');
+  const registry = createEmojiMotion({ emoji: { '👋🏿': { name: 'Dark wave', group: 'hearts', motion: 'pulse' } } });
+  animations = [];
+  const custom = document.createElement('emoji-motion'); custom.registry = registry; custom.setAttribute('emoji', '👋'); custom.setAttribute('skin-tone', 'dark'); document.body.append(custom);
+  custom.dispatchEvent(new dom.window.Event('click')); assert.equal(animations[0].frames[1].transform, 'scale(1.25)'); custom.remove();
+  animations = []; const glyph = document.createElement('span');
+  const action = animateEmoji(glyph, { emoji: '👋', skinTone: 'dark', registry });
+  glyph.dispatchEvent(new dom.window.Event('click')); assert.equal(animations[0].frames[1].transform, 'scale(1.25)'); action.destroy();
 });

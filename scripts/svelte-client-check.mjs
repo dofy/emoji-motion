@@ -8,8 +8,9 @@ globalThis.requestAnimationFrame = callback => setTimeout(callback, 0);
 globalThis.cancelAnimationFrame = clearTimeout;
 let played = 0;
 dom.window.Element.prototype.animate = () => { played++; return { finished: new Promise(() => {}), cancel() {} }; };
-const source = await readFile(new URL('../src/EmojiMotion.svelte', import.meta.url), 'utf8');
-const code = compile(source, { filename: 'EmojiMotion.svelte', generate: 'client' }).js.code;
+const filename = process.argv.includes('--lite') ? 'EmojiMotionLite.svelte' : 'EmojiMotion.svelte';
+const source = await readFile(new URL(`../src/${filename}`, import.meta.url), 'utf8');
+const code = compile(source, { filename, generate: 'client' }).js.code;
 const file = new URL(`../src/.svelte-test-${process.pid}.mjs`, import.meta.url);
 try {
   await writeFile(file, code);

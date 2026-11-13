@@ -6,7 +6,10 @@ const count = document.querySelector('#count');
 const skinTone = document.querySelector('#skin-tone');
 const framework = document.querySelector('#framework');
 const displayMode = document.querySelector('#display-mode');
-skinTone.addEventListener('change', () => { emojiMotion.setDefaultSkinTone(skinTone.value); render(); });
+const autoInput = document.querySelector('#auto-emoji');
+const autoPreview = document.querySelector('#auto-preview');
+const autoResult = document.querySelector('#auto-result');
+skinTone.addEventListener('change', () => { emojiMotion.setDefaultSkinTone(skinTone.value); render(); updateAutoPreview(); });
 const all = emojiMotion.list();
 // Curated examples live in the demo, not the library's complete registry.
 const featured = ['👋', '😊', '❤️', '🔔', '🌸', '🚀', '✨', '📡', '🔍', '🚲', '🔥', '🎵'];
@@ -41,7 +44,21 @@ function render() {
   }
 }
 function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
-makeFilter('featured', 'Featured'); makeFilter('all', 'All emoji'); makeFilter('effects', 'With effects ✦'); for (const group of emojiMotion.groups()) makeFilter(group.id, group.label); render();
+function updateAutoPreview() {
+  const value = autoInput.value.trim();
+  const result = emojiMotion.resolve(value);
+  autoPreview.hidden = !result;
+  if (!result) { autoResult.textContent = value ? 'Enter one recognized emoji.' : 'Enter an emoji to try it.'; return; }
+  autoPreview.setAttribute('emoji', value);
+  if (skinTone.value === 'default') autoPreview.removeAttribute('skin-tone');
+  else autoPreview.setAttribute('skin-tone', skinTone.value);
+  const category = result.unicodeSubgroup?.replaceAll('-', ' ') ?? result.group.label;
+  const source = result.source === 'preset' ? 'Custom preset' : result.source === 'unicode' ? 'Automatic' : 'Fallback';
+  autoResult.textContent = `${source} · ${category} · ${result.motionId}`;
+}
+autoInput.addEventListener('input', updateAutoPreview);
+updateAutoPreview();
+makeFilter('featured', 'Featured'); makeFilter('all', 'All presets'); makeFilter('effects', 'With effects ✦'); for (const group of emojiMotion.groups()) if (all.some(glyph => emojiMotion.resolve(glyph).groupId === group.id)) makeFilter(group.id, group.label); render();
 
 
 const exampleCode = {

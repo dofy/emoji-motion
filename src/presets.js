@@ -22,7 +22,12 @@ export const groups = {
   objects: { label: 'Objects', motion: 'wobble', description: 'Everyday things, gently brought to life.' },
   nature: { label: 'Nature', motion: 'float', description: 'A light, drifting movement.' },
   travel: { label: 'Travel', motion: 'launch', description: 'Things ready to take off.' },
-  symbols: { label: 'Symbols', motion: 'spin', description: 'A small turn for signs and shapes.' }
+  symbols: { label: 'Symbols', motion: 'spin', description: 'A small turn for signs and shapes.' },
+  people: { label: 'People', motion: 'bounce', description: 'People and activities.' },
+  food: { label: 'Food', motion: 'bounce', description: 'Food and drink.' },
+  activities: { label: 'Activities', motion: 'bounce', description: 'Sports, arts and celebrations.' },
+  flags: { label: 'Flags', motion: 'float', description: 'A gentle flag motion.' },
+  other: { label: 'Other', motion: 'bounce', description: 'A gentle fallback.' }
 };
 
 // Explicit mappings avoid guessing at modifier placement in complex sequences.
