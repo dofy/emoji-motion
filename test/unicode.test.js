@@ -41,7 +41,7 @@ test('reviewed role and walking families preserve official variants and user ove
 });
 
 test('water sports keep their water effects across gender and skin tone variants', () => {
-  for (const [glyph, family, decoration] of [['🏊', 'swimmers', 'ripple'], ['🏊🏽‍♀️', 'swimmers', 'ripple'], ['🏄🏿‍♂️', 'surfers', 'splash'], ['🤽‍♀️', 'waterPolo', 'splash'], ['🚣🏻', 'rowers', 'ripple']]) {
+  for (const [glyph, family, decoration] of [['🏊', 'swimmers', 'ripple'], ['🏊🏽‍♀️', 'swimmers', 'ripple'], ['🏄🏿‍♂️', 'surfers', 'splash'], ['🤽‍♀️', 'waterPolo', 'splash'], ['🚣🏻', 'rowers', 'wake']]) {
     for (const registry of [emojiMotion, lite]) {
       const result = registry.resolve(glyph);
       assert.equal(result.familyId, family, glyph);
@@ -204,10 +204,11 @@ test('expanded families resolve reviewed members in full and lite entries', () =
         assert.equal(result.familyId, id, glyph);
         assert.equal(result.glyph, glyph, glyph);
         assert.equal(result.motionId, families[id].motion, glyph);
-        assert.equal(Boolean(result.decorationPreset), id === 'treats', glyph);
+        assert.equal(Boolean(result.decorationPreset), id === 'treats' || id === 'vessels', glyph);
       }
     }
   }
+  for (const glyph of ['⛵', '🚢']) assert.equal(emojiMotion.resolve(glyph).decoration, 'wake', glyph);
   for (const [variant, canonical] of [['🛥', '🛥️'], ['🛳', '🛳️'], ['⛴', '⛴️']]) {
     assert.equal(lite.resolve(variant).canonical, canonical);
     assert.equal(emojiMotion.resolve(variant).glyph, variant);

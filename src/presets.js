@@ -120,7 +120,7 @@ export const families = {
   handTools: { label: 'Hand tools', group: 'objects', motion: 'toolWiggle', members: ['🔨', '🪓', '🪚', '🪛', '🔧', '🪠', '🔩'] },
   books: { label: 'Books', group: 'objects', motion: 'bookPeek', members: ['📕', '📗', '📘', '📙', '📔', '📓', '📒'] },
   handGestures: { label: 'Hand gestures', group: 'gestures', motion: 'handEmphasis', members: ['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵'], aliases: familyToneAliases(['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵']) },
-  vessels: { label: 'Boats', group: 'travel', motion: 'vesselRock', members: ['🚤', '🛥️', '🛳️', '⛴️', '🛶'], aliases: { '🛥': '🛥️', '🛳': '🛳️', '⛴': '⛴️' } },
+  vessels: { label: 'Boats', group: 'travel', motion: 'vesselRock', members: ['🚤', '🛥️', '🛳️', '⛴️', '🛶'], aliases: { '🛥': '🛥️', '🛳': '🛳️', '⛴': '⛴️' }, decoration: 'wake' },
   treats: { label: 'Sweet treats', group: 'food', motion: 'treatPop', members: ['🍬', '🍭', '🍫', '🍮', '🧁', '🍨'], decoration: 'sparkle' },
   fruit: { label: 'Fruit', group: 'food', motion: 'fruitBounce', members: ['🍊', '🍋', '🍐', '🍑', '🍇', '🫐', '🍒', '🥝', '🍍', '🥭'], decoration: 'sparkle' },
   animalFaces: { label: 'Animal faces', group: 'nature', motion: 'curiousTilt', members: ['🐶', '🦊', '🐹', '🦝', '🐨', '🐯', '🐭', '🐻‍❄️'] },
@@ -137,7 +137,7 @@ export const families = {
   swimmers: { label: 'Swimmers', group: 'people', motion: 'bob', members: gendered('🏊'), aliases: genderedToneAliases(gendered('🏊')), decoration: 'ripple' },
   surfers: { label: 'Surfers', group: 'people', motion: 'ride', members: gendered('🏄'), aliases: genderedToneAliases(gendered('🏄')), decoration: 'splash' },
   waterPolo: { label: 'Water polo', group: 'people', motion: 'bob', members: gendered('🤽'), aliases: genderedToneAliases(gendered('🤽')), decoration: 'splash' },
-  rowers: { label: 'Rowers', group: 'people', motion: 'vesselRock', members: gendered('🚣'), aliases: genderedToneAliases(gendered('🚣')), decoration: 'ripple' },
+  rowers: { label: 'Rowers', group: 'people', motion: 'vesselRock', members: gendered('🚣'), aliases: genderedToneAliases(gendered('🚣')), decoration: 'wake' },
   seaLife: { label: 'Sea life', group: 'nature', motion: 'underwater', members: ['🐠', '🐡', '🦈', '🐋', '🐳', '🦭'], decoration: 'bubbles' },
   bakery: { label: 'Bakery', group: 'food', motion: 'pastryBounce', members: ['🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇'] },
   rail: { label: 'Rail vehicles', group: 'travel', motion: 'railRide', members: ['🚄', '🚅', '🚆', '🚇', '🚈', '🚊', '🚝', '🚞'] },
@@ -172,7 +172,7 @@ export const emoji = {
   '🌸': { group: 'nature', name: 'Blossom', decoration: 'petals' }, '🍃': { group: 'nature', name: 'Leaves' }, '☀️': { group: 'nature', name: 'Sun', motion: 'spin', decoration: 'glow', variants: ['☀'] },
   '🌻': { group: 'nature', name: 'Sunflower', motion: 'leafSway' }, '🌈': { group: 'nature', name: 'Rainbow', motion: 'float' }, '🌙': { group: 'nature', name: 'Crescent moon', motion: 'float' }, '⭐': { group: 'nature', name: 'Star', motion: 'pulse', decoration: 'sparkle' }, '🔥': { group: 'nature', name: 'Fire', motion: 'wobble', decoration: 'flicker' }, '🌊': { group: 'nature', name: 'Water wave', motion: 'float' },
   '🚀': { group: 'travel', name: 'Rocket' }, '✈️': { group: 'travel', name: 'Airplane', motion: 'glide', variants: ['✈'] }, '🚲': { group: 'travel', name: 'Bicycle', motion: 'ride' },
-  '🚗': { group: 'travel', name: 'Car', motion: 'ride' }, '🚂': { group: 'travel', name: 'Locomotive', motion: 'ride' }, '🛸': { group: 'travel', name: 'Flying saucer', motion: 'float' }, '🚢': { group: 'travel', name: 'Ship', motion: 'wobble' },
+  '🚗': { group: 'travel', name: 'Car', motion: 'ride' }, '🚂': { group: 'travel', name: 'Locomotive', motion: 'ride' }, '🛸': { group: 'travel', name: 'Flying saucer', motion: 'float' }, '🚢': { group: 'travel', name: 'Ship', motion: 'vesselRock', decoration: 'wake' },
   '✨': { group: 'symbols', name: 'Sparkles', motion: 'pulse', decoration: 'sparkle' }, '⚙️': { group: 'symbols', name: 'Gear', variants: ['⚙'] }, '🎯': { group: 'symbols', name: 'Target', motion: 'bounce' }, '🎵': { group: 'symbols', name: 'Musical note', motion: 'swing', decoration: 'sound' }, '💤': { group: 'symbols', name: 'Sleeping symbol', motion: 'float' }, '💥': { group: 'symbols', name: 'Collision', motion: 'pulse' }, '❗': { group: 'symbols', name: 'Exclamation mark', motion: 'bounce' }, '❓': { group: 'symbols', name: 'Question mark', motion: 'wobble' }, '✅': { group: 'symbols', name: 'Check mark', motion: 'bounce' },
   '🐰': { group: 'nature', name: 'Rabbit face', motion: 'hop' }, '🦋': { group: 'nature', name: 'Butterfly', motion: 'flutter' }, '🐝': { group: 'nature', name: 'Bee', motion: 'flutter' }, '🌱': { group: 'nature', name: 'Seedling', motion: 'sway' }, '🌧️': { group: 'nature', name: 'Cloud with rain', motion: 'float', decoration: 'rain', variants: ['🌧'] },
   '☕': { group: 'food', name: 'Hot beverage', motion: 'sip', decoration: 'steam' }, '🍵': { group: 'food', name: 'Teacup', motion: 'sip', decoration: 'steam' }, '🍕': { group: 'food', name: 'Pizza', motion: 'bounce' }, '🍦': { group: 'food', name: 'Soft ice cream', motion: 'sway' },
@@ -209,7 +209,7 @@ export const emoji = {
   '💌': { group: 'objects', name: 'Love letter', motion: 'bob', decoration: 'sparkle' }, '🔒': { group: 'objects', name: 'Locked', motion: 'wobble' }, '🔓': { group: 'objects', name: 'Unlocked', motion: 'pop' },
   '🔦': { group: 'objects', name: 'Flashlight', motion: 'nod', decoration: 'flash' }, '🪄': { group: 'objects', name: 'Magic wand', motion: 'twirl', decoration: 'sparkle' }, '🎤': { group: 'objects', name: 'Microphone', motion: 'swing', decoration: 'sound' },
   '🚌': { group: 'travel', name: 'Bus', motion: 'ride' }, '🚕': { group: 'travel', name: 'Taxi', motion: 'ride' }, '🚁': { group: 'travel', name: 'Helicopter', motion: 'bob' },
-  '🎡': { group: 'travel', name: 'Ferris wheel', motion: 'steady' }, '⛵': { group: 'travel', name: 'Sailboat', motion: 'bob' }, '🎠': { group: 'travel', name: 'Carousel horse', motion: 'carousel' },
+  '🎡': { group: 'travel', name: 'Ferris wheel', motion: 'steady' }, '⛵': { group: 'travel', name: 'Sailboat', motion: 'vesselRock', decoration: 'wake' }, '🎠': { group: 'travel', name: 'Carousel horse', motion: 'carousel' },
   // Direction-neutral lighting for other objects that naturally emit or reflect light.
   '📸': { group: 'objects', name: 'Camera with flash', motion: 'bounce', decoration: 'flash' },
   '🪔': { group: 'objects', name: 'Oil lamp', motion: 'sway', decoration: 'flicker' },
@@ -245,9 +245,13 @@ const steamShape = { viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M38 30c-5-5 5-8 0-14M50 27c-5-5 5-8 0-14M62 30c-5-5 5-8 0-14', fill: 'none', stroke: '#a29aa5', 'stroke-width': '2.5', 'stroke-linecap': 'round' } }
 ] };
 // Water effects sit at the waterline below the glyph and spread symmetrically.
-const rippleShape = { viewBox: '0 0 100 100', elements: [
-  { tag: 'ellipse', attrs: { cx: '50', cy: '66', rx: '30', ry: '6', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2.5' } }
-] };
+// y is the waterline in viewBox units: at the body for swimmers, below the hull for boats.
+const rippleRings = y => [0, 320].map(delay => ({
+  svg: { viewBox: '0 0 100 100', elements: [{ tag: 'ellipse', attrs: { cx: '50', cy: String(y), rx: '30', ry: '6', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2.5' } }] },
+  style: { ...centered, transformOrigin: `50% ${y}%` },
+  keyframes: [{ opacity: .8, transform: 'translate(-50%, -50%) scale(.5)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.25)' }],
+  options: { duration: 1100, delay, easing: 'cubic-bezier(.25,.6,.4,1)', fill: 'backwards' }
+}));
 const splashShape = { viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M39 70l-9-8M45 67l-3-10M61 70l9-8M55 67l3-10', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2.5', 'stroke-linecap': 'round' } },
   { tag: 'circle', attrs: { cx: '25', cy: '56', r: '2.6', fill: '#7cafd0' } },
@@ -298,14 +302,8 @@ export const decorations = {
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -55%)' }, { opacity: .9, transform: 'translate(-50%, -50%)', offset: .3 }, { opacity: 0, transform: 'translate(-50%, -40%)' }],
     options: { duration: 950, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
-  ripple: {
-    anchor: { x: '50%', y: '50%' },
-    layers: [0, 320].map(delay => ({
-      svg: rippleShape, style: { ...centered, transformOrigin: '50% 66%' },
-      keyframes: [{ opacity: .8, transform: 'translate(-50%, -50%) scale(.5)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.25)' }],
-      options: { duration: 1100, delay, easing: 'cubic-bezier(.25,.6,.4,1)', fill: 'backwards' }
-    }))
-  },
+  ripple: { anchor: { x: '50%', y: '50%' }, layers: rippleRings(66) },
+  wake: { anchor: { x: '50%', y: '50%' }, layers: rippleRings(75) },
   splash: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: splashShape, style: { ...centered, transformOrigin: '50% 70%' },
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.55)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -54%) scale(1.15)' }],
     options: { duration: 850, easing: curve }
