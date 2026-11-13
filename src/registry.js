@@ -176,7 +176,21 @@ export function createRegistry(config = {}, classifier) {
   function bind(element, glyph, options = {}) {
     const trigger = options.trigger ?? element;
     const events = options.events ?? ['pointerenter', 'focus'];
-    const handler = () => play(element, glyph, options);
+    const cooldown = options.cooldown ?? 260;
+    let lastStart = -Infinity;
+    const handler = event => {
+      // A tap fires pointerenter and click together; let the click play it once.
+      if (event?.type === 'pointerenter' && event.pointerType === 'touch') return;
+      // A mouse click also focuses the trigger; only keyboard focus replays.
+      if ((event?.type === 'focus' || event?.type === 'focusin') && typeof event.target?.matches === 'function') {
+        try { if (!event.target.matches(':focus-visible')) return; } catch { /* Older engines without :focus-visible. */ }
+      }
+      // Quick repeated triggers would restart the motion before it reads.
+      const now = globalThis.performance?.now?.() ?? Date.now();
+      if (now - lastStart < cooldown) return;
+      lastStart = now;
+      play(element, glyph, options);
+    };
     for (const event of events) trigger.addEventListener(event, handler);
     return () => { for (const event of events) trigger.removeEventListener(event, handler); active.get(element)?.dispose(); active.delete(element); };
   }

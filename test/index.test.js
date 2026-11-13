@@ -120,12 +120,28 @@ test('bind attaches and cleans listeners and cancels its animation', () => {
   trigger.dispatchEvent(new Event('focus')); assert.equal(calls, 1);
 });
 
+test('bind ignores touch hover, mouse focus and rapid repeats', () => {
+  const trigger = new EventTarget(); let calls = 0; let now = 1000;
+  const realNow = performance.now; performance.now = () => now;
+  try {
+    const el = { animate() { calls++; return { cancel() {} }; } };
+    const cleanup = emojiMotion.bind(el, '👋', { trigger, events: ['pointerenter', 'focus', 'click'] });
+    const touch = new Event('pointerenter'); touch.pointerType = 'touch'; trigger.dispatchEvent(touch); assert.equal(calls, 0);
+    trigger.dispatchEvent(new Event('click')); assert.equal(calls, 1);
+    now += 100; trigger.dispatchEvent(new Event('click')); assert.equal(calls, 1);
+    now += 300; trigger.dispatchEvent(new Event('click')); assert.equal(calls, 2);
+    now += 300; const focus = new Event('focus'); Object.defineProperty(focus, 'target', { value: { matches: selector => selector !== ':focus-visible' } }); trigger.dispatchEvent(focus); assert.equal(calls, 2);
+    const keyboard = new Event('focus'); Object.defineProperty(keyboard, 'target', { value: { matches: () => true } }); trigger.dispatchEvent(keyboard); assert.equal(calls, 3);
+    cleanup();
+  } finally { performance.now = realNow; }
+});
+
 test('optional decorations use configurable positioning and clean up on replay and disposal', async () => {
   const instances = [];
   function node() { return { style: {}, children: [], setAttribute() {}, appendChild(child) { this.children.push(child); }, remove() { this.removed = true; }, animate() { const animation = { finished: new Promise(() => {}), cancel() { this.cancelled = true; } }; instances.push(animation); return animation; } }; }
   const container = node(); container.ownerDocument = { createElement: node, createElementNS: node };
   const glyph = node(); const trigger = new EventTarget();
-  const cleanup = emojiMotion.bind(glyph, '📡', { trigger, events: ['click'], decoration: { container, anchor: { x: '75%', y: '25%' }, flipX: true, rotate: 15 } });
+  const cleanup = emojiMotion.bind(glyph, '📡', { trigger, events: ['click'], cooldown: 0, decoration: { container, anchor: { x: '75%', y: '25%' }, flipX: true, rotate: 15 } });
   trigger.dispatchEvent(new Event('click'));
   const root = container.children[0];
   assert.equal(root.style.left, '75%'); assert.equal(root.style.top, '25%');
