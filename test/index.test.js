@@ -72,3 +72,18 @@ test('custom SVG decoration creates its declared shapes', () => {
   assert.equal(svg.children[0].tag, 'circle');
   assert.equal(svg.children[0].attrs.fill, 'gold');
 });
+
+test('skin tone defaults, overrides, variants and unsupported glyphs', () => {
+  const motion = createEmojiMotion({ defaultSkinTone: 'medium' });
+  assert.equal(motion.resolve('👋').glyph, '👋🏽');
+  assert.equal(motion.resolve('👋', { skinTone: 'dark' }).glyph, '👋🏿');
+  assert.equal(motion.resolve('👋🏻').glyph, '👋🏻');
+  assert.equal(motion.resolve('👋🏻', { skinTone: 'default' }).glyph, '👋');
+  assert.equal(motion.resolve('😊').glyph, '😊');
+  assert.equal(motion.resolve('❤').glyph, '❤');
+  motion.setDefaultSkinTone('light');
+  assert.equal(motion.getDefaultSkinTone(), 'light');
+  assert.equal(motion.resolve('👍').glyph, '👍🏻');
+  assert.throws(() => motion.setDefaultSkinTone('purple'), /Unknown skin tone/);
+  assert.throws(() => createEmojiMotion({ defaultSkinTone: 'purple' }), /Unknown skin tone/);
+});

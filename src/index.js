@@ -7,28 +7,38 @@ export function createEmojiMotion(config = {}) {
   const groups = { ...(config.defaults === false ? {} : defaultGroups), ...config.groups };
   const entries = { ...(config.defaults === false ? {} : defaultEmoji), ...config.emoji };
   const aliases = new Map();
+  const toneNames = ['default', 'light', 'medium-light', 'medium', 'medium-dark', 'dark'];
+  function validateTone(tone) { if (!toneNames.includes(tone)) throw new Error(`Unknown skin tone "${tone}"`); }
+  let defaultSkinTone = config.defaultSkinTone ?? 'default';
+  validateTone(defaultSkinTone);
   for (const [glyph, entry] of Object.entries(entries)) {
     if (!groups[entry.group]) throw new Error(`Unknown group "${entry.group}" for ${glyph}`);
     const name = entry.motion ?? groups[entry.group].motion;
     if (!motions[name]) throw new Error(`Unknown motion "${name}" for ${glyph}`);
     if (entry.decoration && !decorations[entry.decoration]) throw new Error(`Unknown decoration "${entry.decoration}" for ${glyph}`);
-    for (const alias of entry.variants ?? []) {
+    for (const tone of Object.keys(entry.skinTones ?? {})) { validateTone(tone); if (tone === 'default') throw new Error('Use the canonical glyph for the default skin tone'); }
+    for (const alias of [...(entry.variants ?? []), ...Object.values(entry.skinTones ?? {})]) {
       if (alias in entries || aliases.has(alias)) throw new Error(`Duplicate emoji variant: ${alias}`);
       aliases.set(alias, glyph);
     }
   }
   for (const [id, group] of Object.entries(groups)) if (!motions[group.motion]) throw new Error(`Unknown motion "${group.motion}" for group ${id}`);
   const active = new WeakMap();
-  function resolve(glyph) {
+  function resolve(glyph, options = {}) {
     const canonical = entries[glyph] ? glyph : aliases.get(glyph);
     if (!canonical) return undefined;
     const entry = entries[canonical];
+    if (options.skinTone !== undefined) validateTone(options.skinTone);
+    // An explicitly supplied variant is preserved unless the caller overrides it.
+    const skinTone = options.skinTone ?? (glyph !== canonical ? Object.entries(entry.skinTones ?? {}).find(([, variant]) => variant === glyph)?.[0] : undefined) ?? defaultSkinTone;
+    const isToneVariant = Object.values(entry.skinTones ?? {}).includes(glyph);
+    const renderedGlyph = !entry.skinTones ? glyph : skinTone === 'default' ? canonical : entry.skinTones[skinTone] ?? (isToneVariant ? glyph : canonical);
     const group = groups[entry.group];
     const motionId = entry.motion ?? group.motion;
-    return { glyph, canonical, ...entry, groupId: entry.group, group, motionId, motion: motions[motionId], decorationPreset: entry.decoration ? decorations[entry.decoration] : undefined };
+    return { ...entry, glyph: renderedGlyph, canonical, skinTone, groupId: entry.group, group, motionId, motion: motions[motionId], decorationPreset: entry.decoration ? decorations[entry.decoration] : undefined };
   }
   function play(element, glyph, options = {}) {
-    const result = resolve(glyph);
+    const result = resolve(glyph, { skinTone: options.skinTone });
     if (!result || typeof element?.animate !== 'function') return null;
     if (!options.ignoreReducedMotion && typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
     active.get(element)?.dispose();
@@ -72,7 +82,7 @@ export function createEmojiMotion(config = {}) {
     for (const event of events) trigger.addEventListener(event, handler);
     return () => { for (const event of events) trigger.removeEventListener(event, handler); active.get(element)?.dispose(); active.delete(element); };
   }
-  return { resolve, play, bind, list: () => Object.keys(entries), groups: () => Object.entries(groups).map(([id, group]) => ({ id, ...group })) };
+  return { resolve, play, bind, setDefaultSkinTone(tone) { validateTone(tone); defaultSkinTone = tone; }, getDefaultSkinTone: () => defaultSkinTone, list: () => Object.keys(entries), groups: () => Object.entries(groups).map(([id, group]) => ({ id, ...group })) };
 }
 export { motions, groups, emoji, decorations } from './presets.js';
 export const emojiMotion = createEmojiMotion();

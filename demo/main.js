@@ -2,6 +2,8 @@ import { emojiMotion } from '../src/index.js';
 const grid = document.querySelector('#grid');
 const filters = document.querySelector('#filters');
 const count = document.querySelector('#count');
+const skinTone = document.querySelector('#skin-tone');
+skinTone.addEventListener('change', () => { emojiMotion.setDefaultSkinTone(skinTone.value); render(); });
 const all = emojiMotion.list();
 let cleanups = [];
 let selected = 'all';
@@ -19,7 +21,7 @@ function render() {
     const arrow = document.createElement('span'); arrow.className = 'card-arrow'; arrow.textContent = '↗'; arrow.setAttribute('aria-hidden', 'true');
     const stage = document.createElement('span'); stage.className = 'emoji-stage';
     const visual = document.createElement('span'); visual.className = 'emoji-visual';
-    const glyphEl = document.createElement('span'); glyphEl.className = 'glyph'; glyphEl.textContent = glyph; glyphEl.setAttribute('aria-hidden','true'); visual.append(glyphEl); stage.append(visual);
+    const glyphEl = document.createElement('span'); glyphEl.className = 'glyph'; glyphEl.textContent = item.glyph; glyphEl.setAttribute('aria-hidden','true'); visual.append(glyphEl); stage.append(visual);
     const bottom = document.createElement('span'); bottom.className = 'card-bottom';
     const name = document.createElement('span'); name.textContent = item.name;
     const group = document.createElement('span'); group.textContent = item.group.label;

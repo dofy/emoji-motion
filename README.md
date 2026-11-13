@@ -27,6 +27,20 @@ Or play once manually: `emojiMotion.play(emojiElement, '❤️')`. `resolve(glyp
 
 Motion is skipped when the user prefers reduced motion. `play` returns `null` for unknown emoji, reduced motion, or an element without Web Animations support; otherwise it returns the browser's `Animation`. A repeated play cancels the previous one on the same element. `ignoreReducedMotion` is an explicit opt out and should only be used with the user's consent.
 
+## Skin tone
+
+A registry can specify a default and change it later. `resolve` returns the glyph to render; animation never changes your element's text automatically.
+
+```js
+const motion = createEmojiMotion({ defaultSkinTone: 'medium' });
+motion.resolve('👋').glyph; // 👋🏽
+motion.resolve('👋', { skinTone: 'dark' }).glyph; // 👋🏿
+motion.setDefaultSkinTone('light');
+motion.resolve('👋').glyph; // 👋🏻
+```
+
+The available values are `default`, `light`, `medium-light`, `medium`, `medium-dark` and `dark`. Explicitly supplied skin tone variants retain their tone unless a per-call override is supplied. Emoji without a skin tone mapping stay unchanged. When adding custom emoji, supply `skinTones` as an explicit map from the tone names to complete Unicode sequences, including any joiners; the library does not guess modifier placement. If the default tone changes, update rendered text by resolving again.
+
 ## Extend
 
 An isolated registry combines built ins and your definitions; existing IDs can be replaced. Set `defaults: false` to use only your own definitions. Emoji variants are explicit rather than guessed, so skin tone and multi code point sequences remain under your control.
@@ -111,4 +125,4 @@ The library animates the entire native glyph, not individual parts. Rendering, s
 
 ## Development and release
 
-`npm test` runs the registry and lifecycle tests; `npm run pack:check` previews package contents. The package name is provisional. The npm registry returned no public package under this name during development; check again before publishing. This prototype uses ESM and the browser Web Animations API; it does not require a framework. Before publishing, check the name and license ownership, test the packed package in a real consumer, and verify Windows, Linux and mobile browser rendering. No release has been made.
+`npm test` runs the registry and lifecycle tests; `npm run build:demo` creates the isolated static site in `dist/`; `npm run pack:check` previews package contents. The package name is provisional. The npm registry returned no public package under this name during development; check again before publishing. This prototype uses ESM and the browser Web Animations API; it does not require a framework. Before publishing, check the name and license ownership, test the packed package in a real consumer, and verify Windows, Linux and mobile browser rendering. No release has been made.

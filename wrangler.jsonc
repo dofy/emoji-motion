@@ -1,0 +1,7 @@
+{
+  "name": "emoji-motion-demo",
+  "compatibility_date": "2026-11-13",
+  "assets": { "directory": "./dist" },
+  "workers_dev": false,
+  "routes": [{ "pattern": "emoji-motion.phpz.org", "custom_domain": true }]
+}

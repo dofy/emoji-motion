@@ -25,17 +25,39 @@ export const groups = {
   symbols: { label: 'Symbols', motion: 'spin', description: 'A small turn for signs and shapes.' }
 };
 
+// Explicit mappings avoid guessing at modifier placement in complex sequences.
+const skinTones = glyph => Object.fromEntries(['light', 'medium-light', 'medium', 'medium-dark', 'dark'].map((tone, index) => [tone, glyph + String.fromCodePoint(0x1f3fb + index)]));
 // Variants are explicit: unrelated sequences are never silently normalized.
 export const emoji = {
-  '👋': { group: 'gestures', name: 'Waving hand', variants: ['👋🏻','👋🏼','👋🏽','👋🏾','👋🏿'] },
-  '👍': { group: 'gestures', name: 'Thumbs up', motion: 'bounce', variants: ['👍🏻','👍🏼','👍🏽','👍🏾','👍🏿'] },
-  '👏': { group: 'gestures', name: 'Clapping hands', motion: 'shake', variants: ['👏🏻','👏🏼','👏🏽','👏🏾','👏🏿'] },
+  '👋': { group: 'gestures', name: 'Waving hand', skinTones: skinTones('👋') },
+  '👍': { group: 'gestures', name: 'Thumbs up', motion: 'bounce', skinTones: skinTones('👍') },
+  '👏': { group: 'gestures', name: 'Clapping hands', motion: 'shake', skinTones: skinTones('👏') },
+  '👎': { group: 'gestures', name: 'Thumbs down', motion: 'wobble', skinTones: skinTones('👎') },
+  '✋': { group: 'gestures', name: 'Raised hand', skinTones: skinTones('✋') },
+  '🖐️': { group: 'gestures', name: 'Hand with fingers splayed', skinTones: skinTones('🖐') },
+  '🤚': { group: 'gestures', name: 'Raised back of hand', skinTones: skinTones('🤚') },
+  '🤘': { group: 'gestures', name: 'Sign of the horns', motion: 'bounce', skinTones: skinTones('🤘') },
+  '🤙': { group: 'gestures', name: 'Call me hand', motion: 'wobble', skinTones: skinTones('🤙') },
+  '👌': { group: 'gestures', name: 'OK hand', motion: 'pulse', skinTones: skinTones('👌') },
+  '🤞': { group: 'gestures', name: 'Crossed fingers', motion: 'wobble', skinTones: skinTones('🤞') },
+  '🫶': { group: 'gestures', name: 'Heart hands', motion: 'pulse', skinTones: skinTones('🫶') },
+  '🙌': { group: 'gestures', name: 'Raising hands', motion: 'bounce', skinTones: skinTones('🙌') },
+  '🙏': { group: 'gestures', name: 'Folded hands', motion: 'bounce', skinTones: skinTones('🙏') },
+  '💪': { group: 'gestures', name: 'Flexed biceps', motion: 'pulse', skinTones: skinTones('💪') },
+  '👆': { group: 'gestures', name: 'Pointing up', motion: 'bounce', skinTones: skinTones('👆') },
+  '👇': { group: 'gestures', name: 'Pointing down', motion: 'bounce', skinTones: skinTones('👇') },
+  '👉': { group: 'gestures', name: 'Pointing right', motion: 'wobble', skinTones: skinTones('👉') },
   '😊': { group: 'faces', name: 'Smiling face' }, '😂': { group: 'faces', name: 'Tears of joy', motion: 'shake' }, '🥳': { group: 'faces', name: 'Party face', motion: 'wobble' },
+  '😍': { group: 'faces', name: 'Smiling face with heart eyes', motion: 'pulse' }, '😉': { group: 'faces', name: 'Winking face', motion: 'wobble' }, '😎': { group: 'faces', name: 'Sunglasses face', motion: 'wobble' }, '🤔': { group: 'faces', name: 'Thinking face', motion: 'wobble' }, '😴': { group: 'faces', name: 'Sleeping face', motion: 'float' }, '😭': { group: 'faces', name: 'Loudly crying face', motion: 'shake' },
   '❤️': { group: 'hearts', name: 'Red heart', variants: ['❤'] }, '💛': { group: 'hearts', name: 'Yellow heart' }, '💖': { group: 'hearts', name: 'Sparkling heart' },
+  '💚': { group: 'hearts', name: 'Green heart' }, '💙': { group: 'hearts', name: 'Blue heart' }, '💜': { group: 'hearts', name: 'Purple heart' }, '💔': { group: 'hearts', name: 'Broken heart', motion: 'shake' },
   '🔍': { group: 'objects', name: 'Magnifying glass', motion: 'search' }, '🔔': { group: 'objects', name: 'Bell', motion: 'swing', decoration: 'sound' }, '🎁': { group: 'objects', name: 'Gift', motion: 'shake' }, '📡': { group: 'objects', name: 'Satellite antenna', motion: 'wobble', decoration: 'signal' }, '⏱️': { group: 'objects', name: 'Stopwatch', motion: 'swing', variants: ['⏱'] },
+  '💡': { group: 'objects', name: 'Light bulb', motion: 'pulse' }, '📷': { group: 'objects', name: 'Camera', motion: 'bounce' }, '🔑': { group: 'objects', name: 'Key', motion: 'wobble' }, '📌': { group: 'objects', name: 'Pushpin', motion: 'bounce' }, '📦': { group: 'objects', name: 'Package', motion: 'shake' }, '🧭': { group: 'objects', name: 'Compass', motion: 'spin' },
   '🌸': { group: 'nature', name: 'Blossom' }, '🍃': { group: 'nature', name: 'Leaves' }, '☀️': { group: 'nature', name: 'Sun', motion: 'spin', variants: ['☀'] },
+  '🌻': { group: 'nature', name: 'Sunflower', motion: 'swing' }, '🌈': { group: 'nature', name: 'Rainbow', motion: 'float' }, '🌙': { group: 'nature', name: 'Crescent moon', motion: 'float' }, '⭐': { group: 'nature', name: 'Star', motion: 'pulse', decoration: 'sparkle' }, '🔥': { group: 'nature', name: 'Fire', motion: 'wobble' }, '🌊': { group: 'nature', name: 'Water wave', motion: 'float' },
   '🚀': { group: 'travel', name: 'Rocket' }, '✈️': { group: 'travel', name: 'Airplane', motion: 'glide', variants: ['✈'] }, '🚲': { group: 'travel', name: 'Bicycle', motion: 'ride' },
-  '✨': { group: 'symbols', name: 'Sparkles', motion: 'pulse', decoration: 'sparkle' }, '⚙️': { group: 'symbols', name: 'Gear', variants: ['⚙'] }, '🎯': { group: 'symbols', name: 'Target', motion: 'bounce' }, '🎵': { group: 'symbols', name: 'Musical note', motion: 'swing', decoration: 'sound' }
+  '🚗': { group: 'travel', name: 'Car', motion: 'ride' }, '🚂': { group: 'travel', name: 'Locomotive', motion: 'ride' }, '🛸': { group: 'travel', name: 'Flying saucer', motion: 'float' }, '🚢': { group: 'travel', name: 'Ship', motion: 'wobble' },
+  '✨': { group: 'symbols', name: 'Sparkles', motion: 'pulse', decoration: 'sparkle' }, '⚙️': { group: 'symbols', name: 'Gear', variants: ['⚙'] }, '🎯': { group: 'symbols', name: 'Target', motion: 'bounce' }, '🎵': { group: 'symbols', name: 'Musical note', motion: 'swing', decoration: 'sound' }, '💤': { group: 'symbols', name: 'Sleeping symbol', motion: 'float' }, '💥': { group: 'symbols', name: 'Collision', motion: 'pulse' }, '❗': { group: 'symbols', name: 'Exclamation mark', motion: 'bounce' }, '❓': { group: 'symbols', name: 'Question mark', motion: 'wobble' }, '✅': { group: 'symbols', name: 'Check mark', motion: 'bounce' }
 };
 
 // Declarative SVG layers never alter the native glyph. Anchors are relative to
