@@ -1,6 +1,6 @@
 # Release checklist
 
-This package is not published yet. The name and version are not reserved until publication.
+Use this checklist before publishing each version. A version is not reserved until publication succeeds.
 
 1. Check `npm view native-emoji-motion` and `npm whoami` to confirm name availability and the intended publisher. Check the MIT license and release version.
 2. Run `npm test`, `npm run test:types`, `npm run build:demo`, and `npm pack --dry-run`. Review the package contents and test the tarball in a clean ESM consumer, including TypeScript declarations.

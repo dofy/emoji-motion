@@ -62,7 +62,8 @@
     "src",
     "README.md",
     "LICENSE",
-    "UNICODE-LICENSE.txt"
+    "UNICODE-LICENSE.txt",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "dev": "node demo/server.js",

@@ -12,9 +12,17 @@ npm run dev
 
 Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **Try any emoji** to preview automatic classification. The gallery starts with a curated selection from across the groups. Choose **All presets** for the complete handcrafted list, **With effects** for decorative SVG layers, or select a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
 
+## Installation
+
+```sh
+npm install native-emoji-motion
+```
+
+The package is ESM and uses the browser Web Animations API. React, Vue and Svelte are optional peers: install the framework used by your application.
+
 ## Components
 
-Use an emoji directly as a component. `display` is `inline` by default and can be set to `block`; all components animate on hover, focus and click and use built in SVG effects when available. The package is not published yet; these imports are for a bundled app after installation. React, Vue and Svelte are optional peers, so the core stays framework independent.
+Use an emoji directly as a component. `display` is `inline` by default and can be set to `block`; all components animate on hover, focus and click and use built in SVG effects when available. Use these imports in a bundled app. React, Vue and Svelte are optional peers, so the core stays framework independent.
 
 ```jsx
 import { EmojiMotion } from 'native-emoji-motion/react';
@@ -47,7 +55,7 @@ React, Vue and Svelte components accept `emoji`, `skinTone`, `display`, `decorat
 
 ## Low level API
 
-This project is not published yet. After publication, import the package in an ESM application:
+Import the package in an ESM application:
 
 ```js
 import { emojiMotion } from 'native-emoji-motion';
@@ -211,4 +219,4 @@ The library animates the entire native glyph, not individual parts. Rendering, s
 
 ## Development and release
 
-`npm test` runs the registry and lifecycle tests; `npm run build:demo` creates the isolated static site in `dist/`; `npm run pack:check` previews package contents. The package name is provisional. The npm registry returned no public package under this name during development; check again before publishing. This prototype uses ESM and the browser Web Animations API; it does not require a framework. Before publishing, check the name and license ownership, test the packed package in a real consumer, and verify Windows, Linux and mobile browser rendering. No release has been made.
+`npm test` runs the registry and lifecycle tests; `npm run build:demo` creates the isolated static site in `dist/`; `npm run pack:check` previews package contents. The core uses ESM and the browser Web Animations API; it does not require a framework. See [RELEASE.md](https://github.com/dofy/emoji-motion/blob/main/RELEASE.md) for the release checklist.
