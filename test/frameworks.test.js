@@ -58,6 +58,21 @@ test('React and Vue components support block layout and decorations', async () =
   assert.equal(vueEl.querySelectorAll('svg').length, 3); app.unmount(); vueEl.remove();
 });
 
+test('framework components render family animations, composed effects, and tones', async () => {
+  const reactEl = document.createElement('div'); document.body.append(reactEl); const root = createRoot(reactEl);
+  await React.act(() => root.render(React.createElement(ReactEmoji, { emoji: '🥎' })));
+  reactEl.firstChild.dispatchEvent(new dom.window.Event('click')); assert.equal(reactEl.querySelectorAll('svg').length, 2);
+  await React.act(() => root.render(React.createElement(ReactEmoji, { emoji: '🧎', skinTone: 'dark' })));
+  assert.equal(reactEl.textContent, '🧎🏿'); await React.act(() => root.unmount()); reactEl.remove();
+  const vueEl = document.createElement('div'); document.body.append(vueEl);
+  const app = Vue.createApp({ render: () => Vue.h(VueEmoji, { emoji: '🥎' }) }); app.mount(vueEl); await Vue.nextTick();
+  vueEl.firstChild.dispatchEvent(new dom.window.Event('click')); assert.equal(vueEl.querySelectorAll('svg').length, 2); app.unmount(); vueEl.remove();
+  const { animateEmoji } = await import('../src/svelte.js');
+  const holder = document.createElement('span'); const glyph = document.createElement('span'); holder.append(glyph);
+  const action = animateEmoji(glyph, { emoji: '🥎', decoration: true }); glyph.dispatchEvent(new dom.window.Event('click'));
+  assert.equal(holder.querySelectorAll('svg').length, 2); action.destroy();
+});
+
 test('web component registers, updates attributes and disposes decorations', async () => {
   globalThis.customElements = dom.window.customElements;
   await import('../src/element.js');

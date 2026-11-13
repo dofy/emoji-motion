@@ -1,5 +1,6 @@
-import { createEmojiMotion, emojiMotion } from '../src/index.js';
+import { createEmojiMotion, emojiMotion, motions } from '../src/index.js';
 import '../src/element.js';
+import { subgroups } from '../src/unicode-data.js';
 const customRegistry = createEmojiMotion({
   motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(14deg)' }, { transform: 'rotate(-14deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 700, easing: 'ease-out' }, origin: '50% 80%' } },
   groups: { creatures: { label: 'Creatures', motion: 'wiggle' } },
@@ -26,23 +27,53 @@ const displayMode = document.querySelector('#display-mode');
 const autoInput = document.querySelector('#auto-emoji');
 const autoPreview = document.querySelector('#auto-preview');
 const autoResult = document.querySelector('#auto-result');
-skinTone.addEventListener('change', () => { emojiMotion.setDefaultSkinTone(skinTone.value); render(); updateAutoPreview(); });
+const preferenceKey = name => `emoji-motion.${name}`;
+function readPreference(name) { try { return localStorage.getItem(preferenceKey(name)); } catch { return null; } }
+function savePreference(name, value) { try { localStorage.setItem(preferenceKey(name), value); } catch { /* The page still works without storage. */ } }
+function restoreSelect(select, name) {
+  const value = readPreference(name);
+  if ([...select.options].some(option => option.value === value)) select.value = value;
+}
+restoreSelect(skinTone, 'skin-tone');
+restoreSelect(framework, 'framework');
+restoreSelect(displayMode, 'display-mode');
+for (const selector of frameworkSelectors) selector.value = framework.value;
+const savedEmoji = readPreference('auto-emoji');
+if (savedEmoji !== null && savedEmoji.length <= autoInput.maxLength) autoInput.value = savedEmoji;
+emojiMotion.setDefaultSkinTone(skinTone.value);
+skinTone.addEventListener('change', () => { savePreference('skin-tone', skinTone.value); emojiMotion.setDefaultSkinTone(skinTone.value); render(); updateAutoPreview(); });
 const all = emojiMotion.list();
 // Curated examples live in the demo, not the library's complete registry.
-const featured = ['👋', '😊', '❤️', '🔔', '🌸', '🚀', '✨', '📡', '🔍', '🚲', '🔥', '🎵'];
+const featured = ['👋', '😊', '❤️', '🔔', '🌸', '🚀', '✨', '📡', '🐰', '🦋', '🌧️', '☕', '🍦', '🏀', '🎈', '💃', '⏳', '🌱', '🐸', '🍜', '🎸', '🪄', '🧑‍🚀', '🏄', '🥎', '🌷', '🧋', '🦜', '🧎'];
 let cleanups = [];
+const familyGlyphs = [...new Set(emojiMotion.families().flatMap(family => family.members))].filter(glyph => emojiMotion.resolve(glyph)?.source === 'family');
+const galleryGlyphs = [...new Set([...all, ...familyGlyphs])];
+const filterGroups = emojiMotion.groups().filter(group => galleryGlyphs.some(glyph => emojiMotion.resolve(glyph).groupId === group.id));
+const effectCount = galleryGlyphs.filter(glyph => emojiMotion.resolve(glyph).decorationPreset).length;
+const unicodeSequenceCount = subgroups.reduce((total, [, , entries]) => total + entries.split(' ').length, 0);
+const stats = [[all.length, 'handcrafted emoji'], [emojiMotion.families().length, 'motion families'], [filterGroups.length, 'categories'], [Object.keys(motions).length, 'shared motions'], [effectCount, 'with SVG effects'], [unicodeSequenceCount.toLocaleString('en-US'), 'Unicode sequences incl. variants']];
+for (const [value, label] of stats) {
+  const item = document.createElement('span'); item.className = 'collection-stat';
+  const number = document.createElement('strong'); number.textContent = value;
+  item.append(number, document.createTextNode(` ${label}`));
+  document.querySelector('#collection-stats').append(item);
+}
+const filterIds = new Set(['featured', 'all', 'family', 'effects', ...filterGroups.map(group => group.id)]);
 let selected = 'featured';
+const savedFilter = readPreference('gallery-filter');
+if (filterIds.has(savedFilter)) selected = savedFilter;
 const palette = ['peach', 'lilac', 'yellow', 'mint', 'blue', 'pink'];
 function render() {
   cleanups.forEach(cleanup => cleanup()); cleanups = []; grid.replaceChildren();
   const shown = selected === 'featured'
     ? featured.filter(glyph => emojiMotion.resolve(glyph))
-    : all.filter(glyph => selected === 'all' || (selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected));
+    : selected === 'all' ? all : selected === 'family' ? familyGlyphs
+    : galleryGlyphs.filter(glyph => selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected);
   count.textContent = `${String(shown.length).padStart(2, '0')} LITTLE MOVEMENTS`;
   for (const [index, glyph] of shown.entries()) {
     const item = emojiMotion.resolve(glyph);
     const button = document.createElement('button');
-    button.className = `emoji-card ${palette[all.indexOf(glyph) % palette.length]}`;
+    button.className = `emoji-card ${palette[galleryGlyphs.indexOf(glyph) % palette.length]}`;
     button.type = 'button'; button.setAttribute('aria-label', `${item.name}, preview and copy component`);
     const number = document.createElement('span'); number.className = 'card-number'; number.textContent = String(index + 1).padStart(2, '0');
     const arrow = document.createElement('span'); arrow.className = 'card-arrow'; arrow.textContent = '↗'; arrow.setAttribute('aria-hidden', 'true');
@@ -51,17 +82,18 @@ function render() {
     const glyphEl = document.createElement('span'); glyphEl.className = 'glyph'; glyphEl.textContent = item.glyph; glyphEl.setAttribute('aria-hidden','true'); visual.append(glyphEl); stage.append(visual);
     const bottom = document.createElement('span'); bottom.className = 'card-bottom';
     const name = document.createElement('span'); name.textContent = item.name;
-    const group = document.createElement('span'); group.textContent = item.group.label; group.setAttribute('aria-live', 'polite');
+    const groupLabel = item.source === 'family' ? `${item.group.label} · Family` : item.group.label;
+    const group = document.createElement('span'); group.textContent = groupLabel; group.setAttribute('aria-live', 'polite');
     bottom.append(name, group); button.append(number, arrow, stage, bottom); grid.append(button);
     let copiedTimer;
     button.addEventListener('click', async () => {
       const copied = await copyText(markupFor(item), document.querySelector('#copy-status'), document.querySelector('#copy-fallback'), '');
-      if (copied) { clearTimeout(copiedTimer); group.textContent = 'Copied ✓'; group.classList.add('card-copied'); copiedTimer = setTimeout(() => { group.textContent = item.group.label; group.classList.remove('card-copied'); }, 2000); }
+      if (copied) { clearTimeout(copiedTimer); group.textContent = 'Copied ✓'; group.classList.add('card-copied'); copiedTimer = setTimeout(() => { group.textContent = groupLabel; group.classList.remove('card-copied'); }, 2000); }
     });
     cleanups.push(emojiMotion.bind(glyphEl, glyph, { trigger: button, events: ['pointerenter', 'focus', 'click'], ...(item.decorationPreset ? { decoration: { container: visual } } : {}) }));
   }
 }
-function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
+function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
 function updateAutoPreview() {
   const value = autoInput.value.trim();
   const result = emojiMotion.resolve(value);
@@ -71,12 +103,21 @@ function updateAutoPreview() {
   if (skinTone.value === 'default') autoPreview.removeAttribute('skin-tone');
   else autoPreview.setAttribute('skin-tone', skinTone.value);
   const category = result.unicodeSubgroup?.replaceAll('-', ' ') ?? result.group.label;
-  const source = result.source === 'preset' ? 'Custom preset' : result.source === 'unicode' ? 'Automatic' : 'Fallback';
+  const source = result.source === 'preset' ? 'Handcrafted preset' : result.source === 'family' ? `Motion family: ${result.familyId}` : result.source === 'unicode' ? 'Automatic' : 'Fallback';
   autoResult.textContent = `${source} · ${category} · ${result.motionId}`;
 }
-autoInput.addEventListener('input', updateAutoPreview);
+autoInput.addEventListener('input', () => { savePreference('auto-emoji', autoInput.value); updateAutoPreview(); });
 updateAutoPreview();
-makeFilter('featured', 'Featured'); makeFilter('all', 'All presets'); makeFilter('effects', 'With effects ✦'); for (const group of emojiMotion.groups()) if (all.some(glyph => emojiMotion.resolve(glyph).groupId === group.id)) makeFilter(group.id, group.label); render();
+makeFilter('featured', 'Featured'); makeFilter('all', 'All presets'); makeFilter('family', 'Motion families'); makeFilter('effects', 'With effects ✦'); for (const group of filterGroups) makeFilter(group.id, group.label); render();
+function revealSelectedFilter() {
+  const selectedFilter = filters.querySelector('[aria-pressed="true"]');
+  if (!selectedFilter) return;
+  const containerRect = filters.getBoundingClientRect(); const buttonRect = selectedFilter.getBoundingClientRect();
+  if (buttonRect.right > containerRect.right) filters.scrollLeft += buttonRect.right - containerRect.right + 8;
+  else if (buttonRect.left < containerRect.left) filters.scrollLeft += buttonRect.left - containerRect.left - 8;
+}
+// Browsers may restore scroll positions after scripts run; adjust only the filter row.
+window.addEventListener('pageshow', () => requestAnimationFrame(revealSelectedFilter), { once: true });
 const previousFilter = document.querySelector('#filter-prev');
 const nextFilter = document.querySelector('#filter-next');
 function updateFilterControls() {
@@ -274,13 +315,14 @@ function updateCode() {
 }
 for (const selector of frameworkSelectors) selector.addEventListener('change', () => {
   for (const other of frameworkSelectors) other.value = selector.value;
+  savePreference('framework', selector.value);
   updateCode(); document.querySelector('#copy-status').textContent = '';
 });
-displayMode.addEventListener('change', () => { document.querySelector('#copy-status').textContent = ''; });
+displayMode.addEventListener('change', () => { savePreference('display-mode', displayMode.value); document.querySelector('#copy-status').textContent = ''; });
 updateCode();
 document.querySelector('#copy-custom').addEventListener('click', async event => {
   const button = event.currentTarget;
-  if (await copyText(customCode[framework.value], document.querySelector('#custom-copy-status'), document.querySelector('#custom-copy-fallback'), 'Code copied.')) {
+  if (await copyText(customCode[framework.value], document.querySelector('#custom-copy-status'), document.querySelector('#custom-copy-fallback'), '')) {
     button.textContent = 'Copied ✓';
     setTimeout(() => { button.textContent = 'Copy code'; }, 2000);
   }
@@ -288,7 +330,7 @@ document.querySelector('#copy-custom').addEventListener('click', async event => 
 for (const button of document.querySelectorAll('[data-copy-example]')) {
   button.addEventListener('click', async () => {
     const original = button.dataset.copyExample === 'setup' ? 'Copy setup' : 'Copy code';
-    if (await copyText(frameworkCode[framework.value][button.dataset.copyExample], document.querySelector('#example-copy-status'), document.querySelector('#example-copy-fallback'), 'Code copied.')) {
+    if (await copyText(frameworkCode[framework.value][button.dataset.copyExample], document.querySelector('#example-copy-status'), document.querySelector('#example-copy-fallback'), '')) {
       button.textContent = 'Copied ✓'; setTimeout(() => { button.textContent = original; }, 2000);
     }
   });
@@ -300,8 +342,11 @@ function activateTab(tab, focus = false) {
     item.setAttribute('aria-selected', String(active)); item.tabIndex = active ? 0 : -1;
     document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
   }
+  savePreference('example-tab', tab.id);
   if (focus) tab.focus();
 }
+const savedTab = readPreference('example-tab');
+activateTab(tabs.find(tab => tab.id === savedTab) ?? tabs[0]);
 for (const tab of tabs) {
   tab.addEventListener('click', () => activateTab(tab));
   tab.addEventListener('keydown', event => {

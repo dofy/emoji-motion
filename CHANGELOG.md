@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 — 2026-11-13
+
+- Expand the handcrafted collection to 161 emoji and add five reviewed motion families.
+- Add configurable spring and sway motion builders and composable SVG decorations.
+- Support custom families with explicit variant aliases and user-defined priority.
+- Improve the demo with family previews, persistent preferences and clearer examples.
+
 ## 0.1.0 — 2026-11-13
 
 Initial public release.

@@ -1,4 +1,4 @@
-import { createEmojiMotion, emojiMotion, type Resolution, type SkinTone } from '@dofy/native-emoji-motion';
+import { createEmojiMotion, emojiMotion, createSpringMotion, type MotionFamily, type Resolution, type SkinTone } from '@dofy/native-emoji-motion';
 
 const tone: SkinTone = 'medium';
 const registry = createEmojiMotion({ defaultSkinTone: tone });
@@ -43,3 +43,6 @@ const automaticRegistry = createEmojiMotion({
 });
 const classification = automaticRegistry.resolve('🐶');
 if (classification) { const source: string = classification.source; void source; }
+const family: MotionFamily = { label: 'Balls', group: 'activities', motion: 'custom', members: ['🥎'], decorations: ['sparkle', 'impact'] };
+const familyRegistry = createEmojiMotion({ motions: { custom: createSpringMotion({ height: 20, rebounds: 2 }) }, families: { balls: family } });
+familyRegistry.families();

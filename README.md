@@ -2,6 +2,12 @@
 
 Small, expressive animations for native emoji. A framework independent library with Unicode based automatic classification, reusable motion presets and explicit per emoji overrides.
 
+## Collection at a glance
+
+The current repository and demo contain **161 handcrafted emoji presets** and **5 reviewed motion families** with **24 additional base emoji**, across **10 categories**. They use **27 reusable motions**; **24 base emoji** have optional SVG effects. Skin tones and other variants are additional sequences, and similar emoji may share the same motion.
+
+The default entry also recognizes **5,235 Unicode Emoji 18.0 sequences**, including qualified forms and variants, and applies a category based fallback when there is no handcrafted preset or reviewed family match. These collection counts describe version 0.2.0.
+
 ## Try the demo
 
 [Explore the live demo](https://emoji-motion.phpz.org/) or run it locally:
@@ -10,7 +16,7 @@ Small, expressive animations for native emoji. A framework independent library w
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **Try any emoji** to preview automatic classification. The gallery starts with a curated selection from across the groups. Choose **All presets** for the complete handcrafted list, **With effects** for decorative SVG layers, or select a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
+Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **Try any emoji** to preview automatic classification. The gallery starts with a curated selection from across the groups. Choose **All presets** for the handcrafted list, **Motion families** for reviewed family members, **With effects** for decorative SVG layers, or select a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
 
 ## Installation
 
@@ -52,6 +58,8 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 For plain HTML or other frameworks, import `@dofy/native-emoji-motion/element` once in a bundled entry module, then use `<emoji-motion emoji="👋" display="block"></emoji-motion>`. The web component can be used with Angular or any other framework that supports custom elements. It registers itself when the module is imported. Its attributes include `emoji`, `skin-tone`, `display`, `label` and `decoration="false"`; assign the `registry` property to use a custom registry.
 
 React, Vue and Svelte components accept `emoji`, `skinTone`, `display`, `decoration`, `label`, `events`, and a custom `registry`. For a custom interaction target, React accepts `triggerRef` and Vue/Svelte accept `trigger`. Components clean up their listeners when updated or unmounted. A global skin tone set on a registry is read when a component renders; to update an already mounted component, update its `skinTone` prop or cause a framework rerender.
+
+Components do not set a mouse cursor: the emoji follows its surrounding context. Set `cursor: pointer` on a button or other control when the emoji is part of an action.
 
 ## Low level API
 
@@ -161,6 +169,32 @@ motion.bind(emojiElement, '🐙', { trigger: card });
 ```
 
 Groups select a default motion; an emoji entry can override it with `motion`, and `variants` lists exact alternate sequences that inherit its settings. References and duplicate variants are validated when a registry is created. Definitions are ordinary JavaScript objects; do not mutate exported built in data. Create a new registry to change configuration. API types are included.
+
+### Motion families
+
+Families apply a shared motion to explicitly reviewed members. Built in families cover balls, plants, drinks, flying animals and people in poses. They do not assume every emoji in a Unicode subgroup moves alike. `resolve()` reports `source: 'family'` and `familyId` for family matches; `list()` remains the handcrafted emoji list, while `families()` returns family definitions.
+
+Use the configurable spring and sway builders to create reusable motions. A family can adjust Web Animations timing with `animation`, and combine named SVG effects with `decorations`:
+
+```js
+import { createEmojiMotion, createSpringMotion } from '@dofy/native-emoji-motion';
+
+const motion = createEmojiMotion({
+  motions: { smallBounce: createSpringMotion({ height: 14, rebounds: 2, duration: 900 }) },
+  families: {
+    snacks: {
+      label: 'Snacks', group: 'food', motion: 'smallBounce',
+      members: ['🍪', '🍩'],
+      animation: { duration: 800 },
+      decorations: ['impact', 'sparkle'],
+    },
+  },
+});
+```
+
+Pass `motion` as the component's `registry` property to use this configuration. `createSwayMotion({ angle, duration, origin })` provides a direction neutral sway. Effects remain optional and require a decoration container when using the low level API. Each effect keeps its own anchor unless the caller explicitly overrides it.
+
+Custom emoji definitions take priority, followed by custom Unicode classifications and custom families. Built in single emoji presets precede built in families; remaining emoji use automatic classification. A custom group default overrides built in presets and families, while an explicitly defined custom family keeps its chosen motion. A custom family with the same ID replaces the built in family. Unicode variants and unambiguous skin tones are resolved by the full entry; for the lite entry, supply explicit `aliases: { '🧎🏽': '🧎' }` mappings when a family needs variants. Mixed tone sequences are never guessed or rewritten.
 
 ## Optional decorative effects
 

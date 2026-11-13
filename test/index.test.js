@@ -1,6 +1,55 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createEmojiMotion, emojiMotion } from '../src/index.js';
+import { createEmojiMotion, emojiMotion, createSpringMotion, createSwayMotion } from '../src/index.js';
+import { emojiMotion as liteMotion } from '../src/lite.js';
+
+test('motion families resolve reviewed members and preserve user priority', () => {
+  for (const [glyph, family] of [['🥎', 'balls'], ['🌷', 'plants'], ['🧋', 'drinks'], ['🦜', 'flying'], ['🧎', 'poses']]) {
+    assert.equal(emojiMotion.resolve(glyph).source, 'family');
+    assert.equal(emojiMotion.resolve(glyph).familyId, family);
+    assert.equal(liteMotion.resolve(glyph).familyId, family);
+  }
+  assert.equal(emojiMotion.resolve('🏀').source, 'preset');
+  assert.equal(emojiMotion.resolve('🥎').motion.options.duration, 900);
+  assert.ok(emojiMotion.resolve('🥎').decorationPreset);
+  assert.equal(emojiMotion.resolve('🧎', { skinTone: 'dark' }).glyph, '🧎🏿');
+  assert.equal(liteMotion.resolve('🧎🏽').familyId, 'poses');
+  assert.equal(liteMotion.resolve('🧎', { skinTone: 'light' }).glyph, '🧎🏻');
+  const custom = createEmojiMotion({ families: { mine: { label: 'Mine', group: 'hearts', motion: 'pulse', members: ['🥎', '🏀'] } } });
+  assert.equal(custom.resolve('🥎').familyId, 'mine');
+  assert.equal(custom.resolve('🏀').familyId, 'mine');
+  assert.equal(createEmojiMotion({ ...{ families: { mine: { label: 'Mine', group: 'hearts', motion: 'pulse', members: ['🥎'] } } }, emoji: { '🥎': { name: 'Mine', group: 'faces', motion: 'shake' } } }).resolve('🥎').source, 'user');
+  assert.equal(createEmojiMotion({ classifications: { subgroups: { sport: { group: 'hearts', motion: 'pulse' } } } }).resolve('🥎').source, 'user-classification');
+  assert.equal(createEmojiMotion({ groups: { activities: { label: 'Activities', motion: 'spin' } } }).resolve('🥎').motionId, 'spin');
+  assert.equal(createEmojiMotion({ groups: { hearts: { label: 'Hearts', motion: 'spin' } }, families: { mine: { label: 'Mine', group: 'hearts', motion: 'pulse', members: ['🥎'] } } }).resolve('🥎').motionId, 'pulse');
+  assert.equal(createEmojiMotion({ families: { balls: { label: 'My balls', group: 'activities', motion: 'spin', members: ['🏀'] } } }).resolve('🥎').source, 'unicode');
+  assert.throws(() => createEmojiMotion({ families: { invalid: { label: 'Bad', group: 'nature', motion: 'missing', members: ['🐙'] } } }), /Unknown motion/);
+  assert.throws(() => createEmojiMotion({ families: { invalid: { label: 'Bad', group: 'nature', motion: 'bounce', members: ['🐙'], aliases: { '🐙️': '🐬' } } } }), /Unknown family member/);
+});
+test('motion builders apply bounded parameters and can power custom families', () => {
+  const spring = createSpringMotion({ height: 35, rebounds: 2, duration: 1100 });
+  assert.ok(spring.keyframes.some(frame => frame.transform.includes('-35%')));
+  assert.equal(spring.options.duration, 1100);
+  const sway = createSwayMotion({ angle: 12 });
+  assert.ok(sway.keyframes.some(frame => frame.transform === 'rotate(12deg)'));
+  assert.throws(() => createSpringMotion({ height: 100 }), RangeError);
+  assert.throws(() => createSpringMotion({ rebounds: 1.5 }), RangeError);
+  assert.throws(() => createSwayMotion({ angle: NaN }), RangeError);
+  const registry = createEmojiMotion({ motions: { mySpring: spring }, families: { mine: { label: 'Mine', group: 'nature', motion: 'mySpring', members: ['🦑'], animation: { duration: 700 } } } });
+  assert.equal(registry.resolve('🦑').motion.options.duration, 700);
+  assert.ok(registry.resolve('🦑').motion.keyframes.some(frame => frame.transform.includes('-35%')));
+});
+test('composed family effects retain their own anchors and clean up', () => {
+  function node() { return { style: {}, children: [], setAttribute() {}, appendChild(child) { this.children.push(child); }, remove() { this.removed = true; }, animate() { return { finished: new Promise(() => {}), cancel() {} }; } }; }
+  const effect = x => ({ anchor: { x, y: '50%' }, layers: [{ style: {}, keyframes: [{ opacity: 0 }, { opacity: 1 }] }] });
+  const custom = createEmojiMotion({ decorations: { first: effect('20%'), second: effect('80%') }, families: { mine: { label: 'Mine', group: 'nature', motion: 'bounce', members: ['🦑'], decorations: ['first', 'second'] } } });
+  const container = node(); container.ownerDocument = { createElement: node, createElementNS: node };
+  const trigger = new EventTarget(); const cleanup = custom.bind(node(), '🦑', { trigger, events: ['click'], decoration: { container } });
+  trigger.dispatchEvent(new Event('click'));
+  assert.deepEqual(container.children.map(root => root.style.left), ['20%', '80%']);
+  cleanup(); assert.ok(container.children.every(root => root.removed));
+  assert.throws(() => createEmojiMotion({ families: { bad: { label: 'Bad', group: 'nature', motion: 'bounce', members: ['🦑'], decorations: ['unknown'] } } }), /Unknown decoration/);
+});
 
 test('group defaults, per emoji overrides, and explicit variants resolve', () => {
   assert.equal(emojiMotion.resolve('👋🏽').motionId, 'wave');
@@ -10,10 +59,21 @@ test('group defaults, per emoji overrides, and explicit variants resolve', () =>
   assert.equal(emojiMotion.resolve('❤').canonical, '❤️');
   assert.equal(emojiMotion.resolve('🦑').source, 'unicode');
 });
+test('new diverse presets expose their motion, effects, variants, and skin tones', () => {
+  for (const [glyph, group, motion] of [['🐰', 'nature', 'hop'], ['🦋', 'nature', 'flutter'], ['🌱', 'nature', 'sway'], ['☕', 'food', 'sip'], ['🏀', 'activities', 'hop'], ['💃', 'people', 'twirl'], ['⏳', 'objects', 'flip']]) {
+    const result = emojiMotion.resolve(glyph);
+    assert.equal(result.source, 'preset'); assert.equal(result.groupId, group); assert.equal(result.motionId, motion);
+  }
+  assert.ok(emojiMotion.resolve('☕').decorationPreset);
+  assert.equal(emojiMotion.resolve('🌧').canonical, '🌧️');
+  assert.ok(emojiMotion.resolve('🌧️').decorationPreset);
+  assert.equal(emojiMotion.resolve('💃', { skinTone: 'dark' }).glyph, '💃🏿');
+  assert.equal(emojiMotion.resolve('🕺🏽').motionId, 'twirl');
+});
 test('custom registries are isolated and validate references', () => {
   const custom = createEmojiMotion({ defaults: false, motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }] } }, groups: { creatures: { label: 'Creatures', motion: 'wiggle' } }, emoji: { '🐙': { name: 'Octopus', group: 'creatures', variants: ['🐙️'] } } });
   assert.equal(custom.resolve('🐙️').motionId, 'wiggle');
-  assert.equal(emojiMotion.resolve('🐙').source, 'unicode');
+  assert.equal(emojiMotion.resolve('🐙').motionId, 'twirl');
   assert.throws(() => createEmojiMotion({ emoji: { '🐙': { name: 'Octopus', group: 'missing' } } }), /Unknown group/);
   assert.throws(() => createEmojiMotion({ emoji: { '🐙': { name: 'Octopus', group: 'faces', variants: ['🐬'] }, '🐬': { name: 'Dolphin', group: 'nature' } } }), /Duplicate emoji variant/);
 });

@@ -8,6 +8,15 @@ await mkdir(new URL('demo/vendor/', dist), { recursive: true });
 for (const [source, target] of [['demo/index.html', 'index.html'], ['UNICODE-LICENSE.txt', 'UNICODE-LICENSE.txt'], ['demo/main.js', 'demo/main.js'], ['demo/style.css', 'demo/style.css'], ['src/index.js', 'src/index.js'], ['src/registry.js', 'src/registry.js'], ['src/unicode.js', 'src/unicode.js'], ['src/unicode-data.js', 'src/unicode-data.js'], ['src/element.js', 'src/element.js'], ['src/element-core.js', 'src/element-core.js'], ['src/presets.js', 'src/presets.js']]) {
   await copyFile(new URL(`../${source}`, import.meta.url), new URL(target, dist));
 }
+// Version relative imports as well as entry points: preset changes must reach
+// browsers even when a CDN has cached the previous module graph.
+const modules = ['demo/main.js', 'src/index.js', 'src/registry.js', 'src/unicode.js', 'src/unicode-data.js', 'src/element.js', 'src/element-core.js', 'src/presets.js'];
+const sources = await Promise.all(modules.map(path => readFile(new URL(path, dist), 'utf8')));
+const moduleVersion = createHash('sha256').update(sources.join('\0')).digest('hex').slice(0, 12);
+for (const [index, path] of modules.entries()) {
+  const versioned = sources[index].replace(/((?:\bfrom\s*|\bimport\s*)['"])(\.\.?\/[^'"]+\.js)(['"])/g, `$1$2?v=${moduleVersion}$3`);
+  await writeFile(new URL(path, dist), versioned);
+}
 // Content-address the demo assets so an edge cache cannot serve an older UI.
 let html = await readFile(new URL('index.html', dist), 'utf8');
 for (const path of ['demo/style.css', 'demo/main.js']) {

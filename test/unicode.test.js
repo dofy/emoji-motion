@@ -3,6 +3,32 @@ import assert from 'node:assert/strict';
 import { emojiMotion, createEmojiMotion, unicodeVersion } from '../src/index.js';
 import { emojiMotion as lite, createEmojiMotion as createLite } from '../src/lite.js';
 import { subgroups } from '../src/unicode-data.js';
+import { lookupUnicode } from '../src/unicode.js';
+import { emoji as presets, families } from '../src/presets.js';
+
+test('family members and declared skin tone aliases match Unicode', () => {
+  for (const [id, family] of Object.entries(families)) {
+    for (const glyph of family.members) assert.ok(lookupUnicode(glyph), `${id}: ${glyph}`);
+    for (const [variant, base] of Object.entries(family.aliases ?? {})) {
+      assert.equal(lookupUnicode(variant)?.canonical, base, `${id}: ${variant}`);
+      assert.equal(emojiMotion.resolve(variant)?.canonical, base);
+      assert.equal(lite.resolve(variant)?.canonical, base);
+    }
+  }
+});
+
+test('new person and gesture presets use official complete skin tone sequences', () => {
+  const glyphs = ['✌️', '🤟', '👊', '🤜', '🤛', '🫰', '🙋', '🧘', '🏃', '🤸', '🏊', '🏄', '🧑‍🍳', '🧑‍🎨', '🧑‍🚀', '🧑‍💻'];
+  for (const glyph of glyphs) {
+    const entry = presets[glyph];
+    const official = lookupUnicode(glyph);
+    for (const [tone, variant] of Object.entries(entry.skinTones)) {
+      assert.equal(official.skinTones[tone], variant, `${glyph}: ${tone}`);
+      assert.equal(emojiMotion.resolve(glyph, { skinTone: tone }).glyph, variant);
+      assert.equal(lite.resolve(variant)?.canonical, glyph);
+    }
+  }
+});
 
 test('every generated Unicode entry resolves without treating text as emoji', () => {
   let count = 0;
@@ -15,7 +41,7 @@ test('every generated Unicode entry resolves without treating text as emoji', ()
 });
 
 test('unknown emoji choose semantic group and preserve the entire sequence', () => {
-  for (const [glyph, group, subgroup, motion] of [['🐶', 'nature', 'animal-mammal', 'bounce'], ['🍕', 'food', 'food-prepared', 'bounce'], ['🇨🇳', 'flags', 'country-flag', 'float'], ['👩🏽‍🚀', 'people', 'person-role', 'bounce']]) {
+  for (const [glyph, group, subgroup, motion] of [['🐶', 'nature', 'animal-mammal', 'bounce'], ['🍔', 'food', 'food-prepared', 'bounce'], ['🇨🇳', 'flags', 'country-flag', 'float'], ['👩🏽‍🚀', 'people', 'person-role', 'bounce']]) {
     const result = emojiMotion.resolve(glyph);
     assert.equal(result.source, 'unicode'); assert.equal(result.glyph, glyph); assert.equal(result.groupId, group); assert.equal(result.unicodeSubgroup, subgroup); assert.equal(result.motionId, motion);
   }

@@ -1,4 +1,4 @@
-import { motions as defaultMotions, groups as defaultGroups, emoji as defaultEmoji, decorations as defaultDecorations } from './presets.js';
+import { motions as defaultMotions, groups as defaultGroups, emoji as defaultEmoji, decorations as defaultDecorations, families as defaultFamilies } from './presets.js';
 
 const toneNames = ['default', 'light', 'medium-light', 'medium', 'medium-dark', 'dark'];
 function validateTone(tone) { if (!toneNames.includes(tone)) throw new Error(`Unknown skin tone "${tone}"`); }
@@ -25,6 +25,8 @@ export function createRegistry(config = {}, classifier) {
   const builtin = useDefaults ? defaultEmoji : {};
   const user = config.emoji ?? {};
   const entries = { ...builtin, ...user };
+  const userFamilies = config.families ?? {};
+  const builtinFamilies = useDefaults ? Object.fromEntries(Object.entries(defaultFamilies).filter(([id]) => !Object.hasOwn(userFamilies, id))) : {};
   if (config.autoDetect === true && !classifier) throw new Error('Automatic classification is not included in the lite entry');
   const autoDetect = (config.autoDetect ?? useDefaults) && Boolean(classifier);
   const rules = config.classifications ?? {};
@@ -45,6 +47,32 @@ export function createRegistry(config = {}, classifier) {
     return result;
   }
   const builtinAliases = makeAliases(builtin); const userAliases = makeAliases(user);
+  function makeFamilyIndex(definitions) {
+    const index = new Map();
+    for (const [id, family] of Object.entries(definitions)) {
+      if (!groups[family.group]) throw new Error(`Unknown group "${family.group}" for family ${id}`);
+      if (!motions[family.motion]) throw new Error(`Unknown motion "${family.motion}" for family ${id}`);
+      if (family.decoration && !decorations[family.decoration]) throw new Error(`Unknown decoration "${family.decoration}" for family ${id}`);
+      if (family.decorations && !Array.isArray(family.decorations)) throw new Error(`Family ${id} decorations must be an array`);
+      for (const decoration of family.decorations ?? []) if (!decorations[decoration]) throw new Error(`Unknown decoration "${decoration}" for family ${id}`);
+      if (!Array.isArray(family.members) || !family.members.length) throw new Error(`Family ${id} needs members`);
+      const toneMaps = new Map();
+      for (const [alias, base] of Object.entries(family.aliases ?? {})) {
+        if (!family.members.includes(base)) throw new Error(`Unknown family member "${base}" for alias ${alias}`);
+        const modifiers = [...alias].filter(char => { const code = char.codePointAt(0); return code >= 0x1f3fb && code <= 0x1f3ff; });
+        if (modifiers.length === 1) {
+          const map = toneMaps.get(base) ?? {}; map[toneNames[modifiers[0].codePointAt(0) - 0x1f3fb + 1]] = alias; toneMaps.set(base, map);
+        }
+      }
+      for (const [glyph, base] of [...family.members.map(glyph => [glyph, glyph]), ...Object.entries(family.aliases ?? {})]) {
+        if (typeof glyph !== 'string' || !glyph || index.has(glyph)) throw new Error(`Duplicate or invalid family member: ${glyph}`);
+        index.set(glyph, { id, family, base, skinTones: toneMaps.get(base) });
+      }
+    }
+    return index;
+  }
+  const builtinFamilyIndex = makeFamilyIndex(builtinFamilies);
+  const userFamilyIndex = makeFamilyIndex(userFamilies);
   for (const [id, group] of Object.entries(groups)) if (!motions[group.motion]) throw new Error(`Unknown motion "${group.motion}" for group ${id}`);
   for (const rule of [...Object.values(rules.groups ?? {}), ...Object.values(rules.subgroups ?? {}), ...(rules.fallback ? [rules.fallback] : [])]) {
     if (!groups[rule.group]) throw new Error(`Unknown classification group "${rule.group}"`);
@@ -61,11 +89,19 @@ export function createRegistry(config = {}, classifier) {
     let canonical = candidates.find(key => Object.hasOwn(user, key));
     let source = canonical ? 'user' : undefined;
     const userRule = info && (rules.subgroups?.[info.unicodeSubgroup] ?? rules.groups?.[info.unicodeGroup]);
+    const familyKeys = [requestedVariant, glyph, info?.canonical].filter(Boolean);
+    const findFamily = index => familyKeys.map(key => index.get(key)).find(Boolean);
+    const userFamily = !canonical && !userRule ? findFamily(userFamilyIndex) : undefined;
     // A custom emoji wins first, followed by custom classification rules.
-    if (!canonical && !userRule) { canonical = candidates.find(key => Object.hasOwn(builtin, key)); if (canonical) source = 'preset'; }
+    if (!canonical && !userRule && !userFamily) { canonical = candidates.find(key => Object.hasOwn(builtin, key)); if (canonical) source = 'preset'; }
+    const familyMatch = !canonical && !userRule ? (userFamily ?? findFamily(builtinFamilyIndex)) : undefined;
     let entry;
     let autoRule;
-    if (canonical) entry = source === 'user' ? user[canonical] : builtin[canonical];
+    if (familyMatch) {
+      canonical = familyMatch.base; source = 'family';
+      const family = familyMatch.family;
+      entry = { group: family.group, name: info?.name ?? family.label, motion: family.motion, decoration: family.decoration, decorations: family.decorations, skinTones: familyMatch.skinTones, familyId: familyMatch.id, animation: family.animation };
+    } else if (canonical) entry = source === 'user' ? user[canonical] : builtin[canonical];
     else if (info) {
       canonical = info.canonical; source = userRule ? 'user-classification' : 'unicode';
       autoRule = userRule ?? defaultClassification(info);
@@ -80,7 +116,8 @@ export function createRegistry(config = {}, classifier) {
     if (!group) throw new Error(`Unknown classification group "${entry.group}"`);
     // An explicitly supplied group default outranks handcrafted preset motions.
     // A user-defined emoji or classification remains more specific.
-    const motionId = source === 'preset' && Object.hasOwn(config.groups ?? {}, entry.group) ? group.motion : entry.motion ?? group.motion;
+    const groupOverride = (source === 'preset' || (source === 'family' && !userFamily)) && Object.hasOwn(config.groups ?? {}, entry.group);
+    const motionId = groupOverride ? group.motion : entry.motion ?? group.motion;
     if (!motions[motionId]) throw new Error(`Unknown classification motion "${motionId}"`);
     const mappedTones = entry.skinTones ?? info?.skinTones;
     const explicitTone = entry.skinTones ? Object.entries(entry.skinTones).find(([, variant]) => variant === glyph)?.[0] : info?.tone;
@@ -91,7 +128,9 @@ export function createRegistry(config = {}, classifier) {
       if (skinTone !== 'default') renderedGlyph = mappedTones[skinTone] ?? glyph;
       else if (explicitTone) renderedGlyph = canonical;
     }
-    return { ...entry, glyph: renderedGlyph, canonical, skinTone, groupId: entry.group, group, motionId, motion: motions[motionId], decorationPreset: entry.decoration ? decorations[entry.decoration] : undefined, source, ...(info ? { unicodeGroup: info.unicodeGroup, unicodeSubgroup: info.unicodeSubgroup } : {}) };
+    const motion = entry.animation && !groupOverride ? { ...motions[motionId], options: { ...motions[motionId].options, ...entry.animation } } : motions[motionId];
+    const decorationPresets = [entry.decoration, ...(entry.decorations ?? [])].filter(Boolean).map(name => decorations[name]);
+    return { ...entry, glyph: renderedGlyph, canonical, skinTone, groupId: entry.group, group, motionId, motion, decorationPreset: decorationPresets[0], decorationPresets, source, ...(info ? { unicodeGroup: info.unicodeGroup, unicodeSubgroup: info.unicodeSubgroup } : {}) };
   }
   function play(element, glyph, options = {}) {
     const result = resolve(glyph, { skinTone: options.skinTone });
@@ -102,16 +141,17 @@ export function createRegistry(config = {}, classifier) {
     // transformOrigin belongs in keyframes so it never mutates the host element's styles.
     const keyframes = motion.keyframes.map(frame => motion.origin ? { ...frame, transformOrigin: motion.origin } : { ...frame });
     const animation = element.animate(keyframes, { ...motion.options, ...options.animation });
-    let decorationRoot;
+    const decorationRoots = [];
     const decorationAnimations = [];
     const decorationOptions = options.decoration;
-    const preset = result.decorationPreset;
-    if (decorationOptions && preset) {
+    if (decorationOptions) for (const preset of result.decorationPresets) {
       const { container, anchor = preset.anchor, flipX = false, rotate = 0 } = decorationOptions;
-      decorationRoot = container.ownerDocument.createElement('span');
+      const decorationRoot = container.ownerDocument.createElement('span');
+      decorationRoots.push(decorationRoot);
       decorationRoot.setAttribute('aria-hidden', 'true');
       Object.assign(decorationRoot.style, { position: 'absolute', pointerEvents: 'none', left: anchor.x, top: anchor.y, width: '100%', height: '100%', transform: `scaleX(${flipX ? -1 : 1}) rotate(${rotate}deg)` });
       container.appendChild(decorationRoot);
+      const start = decorationAnimations.length;
       for (const layer of preset.layers) {
         const node = layer.svg ? container.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'svg') : container.ownerDocument.createElement('span');
         if (layer.svg) {
@@ -126,9 +166,10 @@ export function createRegistry(config = {}, classifier) {
         decorationRoot.appendChild(node);
         decorationAnimations.push(node.animate(layer.keyframes, layer.options));
       }
-      Promise.allSettled(decorationAnimations.map(item => item.finished)).then(() => decorationRoot.remove());
+      const layerAnimations = decorationAnimations.slice(start);
+      Promise.allSettled(layerAnimations.map(item => item.finished)).then(() => decorationRoot.remove());
     }
-    active.set(element, { dispose() { animation.cancel(); decorationAnimations.forEach(item => item.cancel()); decorationRoot?.remove(); } });
+    active.set(element, { dispose() { animation.cancel(); decorationAnimations.forEach(item => item.cancel()); decorationRoots.forEach(root => root.remove()); } });
     return animation;
   }
   function bind(element, glyph, options = {}) {
@@ -138,5 +179,5 @@ export function createRegistry(config = {}, classifier) {
     for (const event of events) trigger.addEventListener(event, handler);
     return () => { for (const event of events) trigger.removeEventListener(event, handler); active.get(element)?.dispose(); active.delete(element); };
   }
-  return { resolve, play, bind, setDefaultSkinTone(tone) { validateTone(tone); defaultSkinTone = tone; }, getDefaultSkinTone: () => defaultSkinTone, list: () => Object.keys(entries), groups: () => Object.entries(groups).map(([id, group]) => ({ id, ...group })) };
+  return { resolve, play, bind, setDefaultSkinTone(tone) { validateTone(tone); defaultSkinTone = tone; }, getDefaultSkinTone: () => defaultSkinTone, list: () => Object.keys(entries), groups: () => Object.entries(groups).map(([id, group]) => ({ id, ...group })), families: () => Object.entries({ ...builtinFamilies, ...userFamilies }).map(([id, family]) => ({ ...family, id, members: [...family.members], ...(family.aliases ? { aliases: { ...family.aliases } } : {}), ...(family.decorations ? { decorations: [...family.decorations] } : {}), ...(family.animation ? { animation: { ...family.animation } } : {}) })) };
 }
