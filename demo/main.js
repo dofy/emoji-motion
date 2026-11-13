@@ -20,15 +20,47 @@ const brandMark = document.querySelector('.topbar .brand-mark');
 if (brandMark) requestAnimationFrame(() => emojiMotion.play(brandMark, '👋'));
 const heroWave = document.querySelector('.hero-wave');
 const heroGlyph = heroWave.querySelector('.art-main');
+const heroChoices = ['📡', '🔔', '🎵', '💡', '🎉', '✨', '☕', '🌸', '🚀', '🦋', '❤️', '🍊', '📷', '🔦', '🕯️', '🎨', '🎻', '🚄', '🌈', '🐠', '🥐', '🧋', '🦜', '🎲', '🪙', '🌻', '🎠'];
 const heroOptions = { decoration: { container: heroWave } };
-emojiMotion.bind(heroGlyph, '📡', { ...heroOptions, trigger: heroWave, events: ['pointerenter', 'focus', 'click'] });
-// Play once when the artwork enters view, including when it starts below the fold on mobile.
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let heroCurrent = '';
+let heroCleanup = () => {};
+let heroTimer;
+let heroVisible = !('IntersectionObserver' in globalThis);
+let heroHovered = false;
+function pickHero() {
+  const choices = heroChoices.filter(glyph => glyph !== heroCurrent);
+  return choices[Math.floor(Math.random() * choices.length)];
+}
+function changeHero(animate = true) {
+  heroCleanup();
+  heroCurrent = pickHero();
+  heroGlyph.textContent = heroCurrent;
+  heroWave.setAttribute('aria-label', `${t('Play emoji animation')}: ${heroCurrent}`);
+  heroCleanup = emojiMotion.bind(heroGlyph, heroCurrent, { ...heroOptions, trigger: heroWave, events: ['pointerenter', 'focus', 'click'] });
+  if (animate) emojiMotion.play(heroGlyph, heroCurrent, heroOptions);
+}
+function scheduleHero() {
+  clearTimeout(heroTimer);
+  if (heroVisible && !document.hidden && !reducedMotion.matches && !heroHovered && !heroWave.matches(':focus-visible')) {
+    heroTimer = setTimeout(() => { changeHero(); scheduleHero(); }, 3000);
+  }
+}
+changeHero(false);
 if ('IntersectionObserver' in globalThis) {
   const observer = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); emojiMotion.play(heroGlyph, '📡', heroOptions); }
+    const visible = entries.some(entry => entry.isIntersecting);
+    if (visible && !heroVisible) emojiMotion.play(heroGlyph, heroCurrent, heroOptions);
+    heroVisible = visible; scheduleHero();
   }, { threshold: 0.25 });
   observer.observe(heroWave);
-} else emojiMotion.play(heroGlyph, '📡', heroOptions);
+} else { emojiMotion.play(heroGlyph, heroCurrent, heroOptions); scheduleHero(); }
+heroWave.addEventListener('pointerenter', () => { heroHovered = true; scheduleHero(); });
+heroWave.addEventListener('pointerleave', () => { heroHovered = false; scheduleHero(); });
+heroWave.addEventListener('focus', scheduleHero);
+heroWave.addEventListener('blur', scheduleHero);
+document.addEventListener('visibilitychange', scheduleHero);
+reducedMotion.addEventListener?.('change', scheduleHero);
 const grid = document.querySelector('#grid');
 const filters = document.querySelector('#filters');
 const count = document.querySelector('#count');
@@ -86,7 +118,7 @@ let selected = 'featured';
 const savedFilter = readPreference('gallery-filter');
 if (filterIds.has(savedFilter)) selected = savedFilter;
 const palette = ['peach', 'lilac', 'yellow', 'mint', 'blue', 'pink'];
-const pageSize = 12;
+const pageSize = 24;
 const savedPage = Number(readPreference('gallery-page'));
 let page = Number.isSafeInteger(savedPage) && savedPage > 0 ? savedPage : 1;
 let pageCount = 1;
@@ -135,7 +167,8 @@ function render() {
     cleanups.push(emojiMotion.bind(glyphEl, glyph, { trigger: button, events: ['pointerenter', 'focus', 'click'], ...(item.decorationPreset ? { decoration: { container: visual } } : {}) }));
   }
 }
-function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = t(label); button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; page = 1; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
+const filterIcons = { featured: '✨', all: '🗂️', family: '🧩', effects: '💫', gestures: '👋', faces: '😊', hearts: '❤️', objects: '💡', nature: '🌿', travel: '🚀', symbols: '🔣', people: '🧑', food: '🍎', activities: '🎨', flags: '🏳️', other: '🌟' };
+function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = `${filterIcons[id] ?? '✨'} ${t(label)}`; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; page = 1; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
 function changePage(nextPage) {
   if (nextPage < 1 || nextPage > pageCount) return;
   page = nextPage;
@@ -482,4 +515,42 @@ for (const button of document.querySelectorAll('[data-enhance-copy]')) button.ad
     button.textContent = t('Copied ✓');
     setTimeout(() => { button.textContent = t('Copy code'); }, 2000);
   }
+});
+
+// Native selects remain the source of truth for the existing form and persistence logic.
+// The visible control uses the same details menu as the language picker.
+const toneIcons = { default: '🖐️', light: '🖐🏻', 'medium-light': '🖐🏼', medium: '🖐🏽', 'medium-dark': '🖐🏾', dark: '🖐🏿' };
+const selectControls = [];
+for (const select of document.querySelectorAll('select')) {
+  const menu = document.createElement('details'); menu.className = 'custom-select';
+  const trigger = document.createElement('summary'); trigger.className = 'custom-select-trigger';
+  const sourceLabel = select.getAttribute('aria-label') || document.querySelector(`label[for="${select.id}"]`)?.textContent.trim() || document.getElementById(select.getAttribute('aria-labelledby'))?.textContent.trim() || t('Framework');
+  trigger.setAttribute('aria-label', sourceLabel);
+  const current = document.createElement('span'); current.className = 'custom-select-value'; trigger.append(current);
+  const options = document.createElement('div'); options.className = 'language-options custom-select-options';
+  const buttons = [];
+  for (const option of select.options) {
+    const button = document.createElement('button'); button.type = 'button';
+    button.textContent = `${select.id === 'skin-tone' ? `${toneIcons[option.value]} ` : ''}${option.textContent}`;
+    button.addEventListener('click', () => {
+      select.value = option.value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      menu.open = false; trigger.focus();
+    });
+    buttons.push(button); options.append(button);
+  }
+  menu.append(trigger, options); select.after(menu); select.hidden = true;
+  menu.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.open) { menu.open = false; trigger.focus(); } });
+  const sync = () => {
+    const option = select.selectedOptions[0];
+    current.textContent = option ? `${select.id === 'skin-tone' ? `${toneIcons[option.value]} ` : ''}${option.textContent}` : '';
+    trigger.setAttribute('aria-label', `${sourceLabel}: ${option?.textContent ?? ''}`);
+    buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(select.options[index].selected)));
+  };
+  selectControls.push(sync);
+  select.addEventListener('change', () => queueMicrotask(() => selectControls.forEach(update => update())));
+  sync();
+}
+document.addEventListener('click', event => {
+  for (const menu of document.querySelectorAll('.custom-select[open]')) if (!menu.contains(event.target)) menu.open = false;
 });

@@ -10,7 +10,12 @@ const server = createServer(async (req, res) => {
     const vendor = { '/demo/vendor/prism.js': '/node_modules/prismjs/prism.js', '/demo/vendor/prism-jsx.js': '/node_modules/prismjs/components/prism-jsx.min.js' };
     const path = resolve(root, '.' + (vendor[pathname] ?? (pathname === '/' ? '/demo/index.html' : pathname === '/docs' || pathname === '/docs/' ? '/docs/index.html' : pathname)));
     if (!path.startsWith(root + sep)) throw new Error('Invalid path');
-    const data = await readFile(path); res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'application/octet-stream' }); res.end(data);
+    let data = await readFile(path);
+    if (extname(path) === '.html') {
+      const { version } = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+      data = data.toString().replaceAll('__PACKAGE_VERSION__', version);
+    }
+    res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'application/octet-stream' }); res.end(data);
   } catch { res.writeHead(404); res.end('Not found'); }
 });
 server.listen(Number(process.env.PORT || 4173), '127.0.0.1', () => console.log(`Demo: http://127.0.0.1:${server.address().port}`));

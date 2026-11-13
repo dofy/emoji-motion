@@ -900,5 +900,7 @@
   "This guide describes Emoji Motion 0.5.0. Upgrading from 0.3.0? The": "This guide describes Emoji Motion 0.5.0. Upgrading from 0.3.0?的",
   "@This guide describes Emoji Motion 0.5.0. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "本指南介绍 Emoji Motion 0.5.0。从 0.3.0 升级时，请注意 ZZX0XZ 属性已移除；使用块级容器或 CSS 控制布局。",
   "This guide describes Emoji Motion 0.5.1. Upgrading from 0.3.0? The": "This guide describes Emoji Motion 0.5.1. Upgrading from 0.3.0?的",
-  "@This guide describes Emoji Motion 0.5.1. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "本指南介绍 Emoji Motion 0.5.1。从 0.3.0 升级时，请注意 ZZX0XZ 属性已移除；使用块级容器或 CSS 控制布局。"
+  "@This guide describes Emoji Motion 0.5.1. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "本指南介绍 Emoji Motion 0.5.1。从 0.3.0 升级时，请注意 ZZX0XZ 属性已移除；使用块级容器或 CSS 控制布局。",
+  "Play emoji animation": "播放 emoji 动画",
+  "HOVER OR TAP TO PLAY": "悬停或轻触即可播放"
 }

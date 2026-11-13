@@ -65,3 +65,5 @@ img.brand-mark{display:inline-block;vertical-align:middle;background:none;object
 .collection-release-note+.filter-bar{margin-top:24px}
 
 .collection-stat--coverage{white-space:normal}
+/* Give the keyboard focus ring enough room inside the scrolling filter strip. */
+.filters{padding:8px 8px 12px;scroll-padding-inline:8px}

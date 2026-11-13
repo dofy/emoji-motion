@@ -28,7 +28,8 @@ for (const [index, path] of modules.entries()) {
   await writeFile(new URL(path, dist), versioned);
 }
 // Content-address the demo assets so an edge cache cannot serve an older UI.
-let html = await readFile(new URL('index.html', dist), 'utf8');
+const packageVersion = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')).version;
+let html = (await readFile(new URL('index.html', dist), 'utf8')).replaceAll('__PACKAGE_VERSION__', packageVersion);
 for (const path of ['demo/style.css', 'demo/main.js', 'shared/settings.js', 'shared/theme.css']) {
   const digest = createHash('sha256').update(await readFile(new URL(path, dist))).digest('hex').slice(0, 12);
   html = html.replace(`/${path}"`, `/${path}?v=${digest}"`);
@@ -36,7 +37,7 @@ for (const path of ['demo/style.css', 'demo/main.js', 'shared/settings.js', 'sha
 const logoDigest = createHash('sha256').update(await readFile(new URL('assets/logo.svg', dist))).digest('hex').slice(0, 12);
 html = html.replaceAll('/assets/logo.svg"', `/assets/logo.svg?v=${logoDigest}"`);
 await writeFile(new URL('index.html', dist), html);
-let docsHtml = await readFile(new URL('docs/index.html', dist), 'utf8');
+let docsHtml = (await readFile(new URL('docs/index.html', dist), 'utf8')).replaceAll('__PACKAGE_VERSION__', packageVersion);
 for (const path of ['docs/style.css', 'docs/main.js', 'shared/settings.js', 'shared/theme.css']) {
   const digest = createHash('sha256').update(await readFile(new URL(path, dist))).digest('hex').slice(0, 12);
   docsHtml = docsHtml.replaceAll(`/${path}"`, `/${path}?v=${digest}"`);

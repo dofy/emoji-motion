@@ -900,5 +900,7 @@
   "This guide describes Emoji Motion 0.5.0. Upgrading from 0.3.0? The": "このガイドでは Emoji Motion 0.5.0 について説明します。 0.3.0からアップグレードしますか?の",
   "@This guide describes Emoji Motion 0.5.0. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "このガイドは Emoji Motion 0.5.0 を対象としています。0.3.0 からのアップグレードでは ZZX0XZ プロパティが削除されました。ブロック要素または CSS でレイアウトを調整してください。",
   "This guide describes Emoji Motion 0.5.1. Upgrading from 0.3.0? The": "このガイドでは Emoji Motion 0.5.1 について説明します。 0.3.0からアップグレードしますか?の",
-  "@This guide describes Emoji Motion 0.5.1. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "このガイドは Emoji Motion 0.5.1 を対象としています。0.3.0 からのアップグレードでは ZZX0XZ プロパティが削除されました。ブロック要素または CSS でレイアウトを調整してください。"
+  "@This guide describes Emoji Motion 0.5.1. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "このガイドは Emoji Motion 0.5.1 を対象としています。0.3.0 からのアップグレードでは ZZX0XZ プロパティが削除されました。ブロック要素または CSS でレイアウトを調整してください。",
+  "Play emoji animation": "絵文字のアニメーションを再生",
+  "HOVER OR TAP TO PLAY": "ホバーまたはタップで再生"
 }

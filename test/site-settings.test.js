@@ -54,7 +54,7 @@ test('settings expose a dismissible language menu and animated, persistent theme
   assert.equal(document.activeElement, summary);
   const calls = [];
   await window.emojiSite.animateControls({ bind: (element, glyph, options) => calls.push({ element, glyph, options }) });
-  assert.deepEqual(calls.map(call => call.glyph), ['🖥️', '☀️', '🌙']);
+  assert.deepEqual(calls.map(call => call.glyph), ['🌍', '🖥️', '☀️', '🌙']);
   assert.ok(calls.every(call => call.options.events.includes('pointerenter') && call.options.events.includes('click')));
   const light = document.querySelector('.theme-option[data-theme="light"]');
   light.click();

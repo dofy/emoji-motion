@@ -91,7 +91,9 @@
     languageTrigger.className = 'language-trigger';
     languageTrigger.setAttribute('aria-label', t('Language'));
     languageTrigger.title = t('Language');
-    languageTrigger.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.7 2.5 4 5.5 4 9s-1.3 6.5-4 9c-2.7-2.5-4-5.5-4-9s1.3-6.5 4-9Z"/></svg>';
+    const languageGlyph = document.createElement('span');
+    languageGlyph.className = 'language-glyph'; languageGlyph.setAttribute('aria-hidden', 'true'); languageGlyph.textContent = '🌍';
+    languageTrigger.append(languageGlyph);
     const languageOptions = document.createElement('div');
     languageOptions.className = 'language-options';
     languageOptions.setAttribute('aria-label', t('Language'));
@@ -135,6 +137,8 @@
   async function animateControls(registry) {
     const controls = await controlsReady;
     if (!controls) return;
+    const languageGlyph = controls.querySelector('.language-glyph');
+    registry.bind(languageGlyph, '🌍', { trigger: languageGlyph.parentElement, events: ['pointerenter', 'focus', 'click'] });
     for (const button of controls.querySelectorAll('.theme-option')) {
       const glyph = button.querySelector('.theme-glyph');
       registry.bind(glyph, glyph.textContent, { trigger: button, events: ['pointerenter', 'focus', 'click'] });
