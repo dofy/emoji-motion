@@ -17,7 +17,7 @@
 .filter{flex:0 0 auto;white-space:nowrap}
 .filter-arrow{flex:none;width:32px;height:32px;display:grid;place-items:center;border:1px solid #e8e4db;border-radius:50%;background:#fbfaf6;color:#554b45;font-size:20px;line-height:1;cursor:pointer}
 .filter-arrow:hover:not(:disabled){background:#f1eee7}.filter-arrow:disabled{opacity:.35;cursor:default}.filter-arrow[hidden]{display:none}
-@media(hover:none),(pointer:coarse){.filter-arrow{display:none}}.toolbar{margin:24px 0}.repo-link{font-size:14px;font-weight:700;white-space:nowrap}.nav-label-short,.copy-hint-mobile,.framework-picker--examples{display:none}.footer-github{font-size:12px;font-weight:700}
+@media(hover:none),(pointer:coarse){.filter-arrow{display:none}}.toolbar{margin:24px 0}.repo-link{font-size:14px;font-weight:700;white-space:nowrap}.nav-label-short,.copy-hint-mobile{display:none}.framework-picker--examples{display:flex;margin:24px 0 16px}.card-bottom .card-copied{color:#69548d;font-weight:700}.footer-github{font-size:12px;font-weight:700}
 @media(max-width:650px){
   .topbar{gap:12px}.nav-link{white-space:nowrap}.nav-link .nav-label,.nav-link .nav-label-short{margin:0}.nav-label{display:none}.nav-label-short{display:inline}.repo-link{font-size:12px}.nav-link{font-size:12px}
   .filter-bar{margin:32px -24px 0;padding:8px 24px}
@@ -30,3 +30,11 @@
 .hero-wave{position:relative;z-index:1;padding:0;border:0;background:transparent;cursor:pointer;transform:rotate(-14deg);line-height:1}.hero-wave .art-main{display:inline-block;transform:none}.hero-wave:focus-visible{outline:3px solid #825ced;outline-offset:8px;border-radius:12px}
 
 .copyright{font-size:12px;line-height:16px;color:#817a71}@media(max-width:650px){.copyright{order:3;flex-basis:100%}}
+
+.custom-example{min-width:0}.custom-example .framework-picker{margin:0 0 16px}.code-section .example-code pre{margin:0;padding:0 24px 24px;background:transparent;border-radius:0;font:12px/1.7 ui-monospace,monospace;white-space:pre}.custom-preview{margin-top:32px;padding:24px;background:#eee8f5;border-radius:12px}.code-section .custom-preview p{margin:16px 0 8px;color:#302d29;font-size:18px;line-height:28px;font-weight:600}.custom-preview emoji-motion{font-size:32px;vertical-align:middle;cursor:pointer}.custom-preview emoji-motion:focus-visible{outline:3px solid #825ced;outline-offset:4px;border-radius:8px}.custom-preview-hint{font-size:12px;line-height:16px;color:#817a71}@media(max-width:650px){.code-section .example-code pre{padding:0 16px 24px}}
+
+/* Keep the example and framework controls together, including on mobile. */
+.examples-controls{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:32px 0 16px}.examples-controls .example-tabs,.examples-controls .framework-picker--examples{margin:0}.examples-controls .example-tabs{flex:none}.examples-controls .framework-picker--examples{flex:none}
+.examples-note a{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:1px solid #e2dbea;border-radius:8px;background:#f1ecf6;color:#69548d;font-weight:700;text-decoration:none;transition:background .3s cubic-bezier(.22,1,.36,1),border-color .3s cubic-bezier(.22,1,.36,1)}.examples-note a:hover{background:#e9e0f1;border-color:#c8b5d7}.examples-note a:focus-visible{outline:3px solid #825ced;outline-offset:3px}
+@media(max-width:650px){.examples-controls{gap:8px;margin:24px 0 16px}.examples-controls .framework-picker--examples{gap:0}.examples-controls .framework-picker--examples label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.examples-controls .framework-picker--examples select{min-width:0;width:112px;padding:8px 28px 8px 10px;background-position:right 10px center}.examples-controls .example-tabs{gap:6px}.examples-controls .example-tabs button{padding:8px 12px;white-space:nowrap}}
+@media(max-width:360px){.examples-controls{gap:4px}.examples-controls .example-tabs{gap:4px}.examples-controls .example-tabs button{font-size:12px;padding:8px}.examples-controls .framework-picker--examples select{width:100px;font-size:12px}}

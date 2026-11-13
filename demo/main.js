@@ -1,5 +1,11 @@
-import { emojiMotion } from '../src/index.js';
+import { createEmojiMotion, emojiMotion } from '../src/index.js';
 import '../src/element.js';
+const customRegistry = createEmojiMotion({
+  motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(14deg)' }, { transform: 'rotate(-14deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 700, easing: 'ease-out' }, origin: '50% 80%' } },
+  groups: { creatures: { label: 'Creatures', motion: 'wiggle' } },
+  emoji: { '🐙': { name: 'Octopus', group: 'creatures' } }
+});
+document.querySelector('#custom-preview').registry = customRegistry;
 const heroWave = document.querySelector('.hero-wave');
 const heroGlyph = heroWave.querySelector('.art-main');
 emojiMotion.bind(heroGlyph, '👋', { trigger: heroWave, events: ['pointerenter', 'focus', 'click'] });
@@ -45,11 +51,12 @@ function render() {
     const glyphEl = document.createElement('span'); glyphEl.className = 'glyph'; glyphEl.textContent = item.glyph; glyphEl.setAttribute('aria-hidden','true'); visual.append(glyphEl); stage.append(visual);
     const bottom = document.createElement('span'); bottom.className = 'card-bottom';
     const name = document.createElement('span'); name.textContent = item.name;
-    const group = document.createElement('span'); group.textContent = item.group.label;
+    const group = document.createElement('span'); group.textContent = item.group.label; group.setAttribute('aria-live', 'polite');
     bottom.append(name, group); button.append(number, arrow, stage, bottom); grid.append(button);
+    let copiedTimer;
     button.addEventListener('click', async () => {
-      const copied = await copyText(markupFor(item), document.querySelector('#copy-status'), document.querySelector('#copy-fallback'), `${item.name} component copied. Import it using the setup below.`);
-      if (copied) { group.textContent = 'Copied ✓'; setTimeout(() => { group.textContent = item.group.label; }, 2000); }
+      const copied = await copyText(markupFor(item), document.querySelector('#copy-status'), document.querySelector('#copy-fallback'), '');
+      if (copied) { clearTimeout(copiedTimer); group.textContent = 'Copied ✓'; group.classList.add('card-copied'); copiedTimer = setTimeout(() => { group.textContent = item.group.label; group.classList.remove('card-copied'); }, 2000); }
     });
     cleanups.push(emojiMotion.bind(glyphEl, glyph, { trigger: button, events: ['pointerenter', 'focus', 'click'], ...(item.decorationPreset ? { decoration: { container: visual } } : {}) }));
   }
@@ -194,6 +201,60 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 <!-- Paste <EmojiMotion emoji="👋" /> into your component. -->`
   }
 };
+const customDefinition = `const motion = createEmojiMotion({
+  motions: {
+    wiggle: {
+      keyframes: [
+        { transform: 'rotate(0deg)' },
+        { transform: 'rotate(14deg)' },
+        { transform: 'rotate(-14deg)' },
+        { transform: 'rotate(0deg)' },
+      ],
+      options: { duration: 700, easing: 'ease-out' },
+      origin: '50% 80%',
+    },
+  },
+  groups: { creatures: { label: 'Creatures', motion: 'wiggle' } },
+  emoji: { '🐙': { name: 'Octopus', group: 'creatures' } },
+});`;
+const customCode = {
+  react: `import { createEmojiMotion } from '@dofy/native-emoji-motion';
+import { EmojiMotion } from '@dofy/native-emoji-motion/react';
+
+${customDefinition}
+
+export function Message() {
+  return <p>A little <EmojiMotion emoji="🐙" registry={motion} /> goes a long way.</p>;
+}`,
+  vue: `<script setup>
+import { createEmojiMotion } from '@dofy/native-emoji-motion';
+import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
+
+${customDefinition}
+</script>
+
+<template>
+  <p>A little <EmojiMotion emoji="🐙" :registry="motion" /> goes a long way.</p>
+</template>`,
+  svelte: `<script>
+import { createEmojiMotion } from '@dofy/native-emoji-motion';
+import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
+
+${customDefinition}
+</script>
+
+<p>A little <EmojiMotion emoji="🐙" registry={motion} /> goes a long way.</p>`,
+  vanilla: `<p>A little <emoji-motion id="octopus" emoji="🐙"></emoji-motion> goes a long way.</p>
+
+<script type="module">
+import { createEmojiMotion } from '@dofy/native-emoji-motion';
+import '@dofy/native-emoji-motion/element';
+
+${customDefinition}
+
+document.querySelector('#octopus').registry = motion;
+</script>`
+};
 function updateCode() {
   const selected = frameworkCode[framework.value];
   for (const [id, source] of Object.entries(selected)) {
@@ -205,6 +266,11 @@ function updateCode() {
   }
   for (const label of document.querySelectorAll('.example-code-language')) label.textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'HTML + JAVASCRIPT';
   document.querySelector('#setup-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'JAVASCRIPT';
+  const custom = document.querySelector('#code-custom');
+  custom.textContent = customCode[framework.value];
+  custom.className = `language-${framework.value === 'react' ? 'jsx' : 'markup'}`;
+  if (globalThis.Prism) globalThis.Prism.highlightElement(custom);
+  document.querySelector('#custom-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'HTML + JAVASCRIPT';
 }
 for (const selector of frameworkSelectors) selector.addEventListener('change', () => {
   for (const other of frameworkSelectors) other.value = selector.value;
@@ -212,6 +278,13 @@ for (const selector of frameworkSelectors) selector.addEventListener('change', (
 });
 displayMode.addEventListener('change', () => { document.querySelector('#copy-status').textContent = ''; });
 updateCode();
+document.querySelector('#copy-custom').addEventListener('click', async event => {
+  const button = event.currentTarget;
+  if (await copyText(customCode[framework.value], document.querySelector('#custom-copy-status'), document.querySelector('#custom-copy-fallback'), 'Code copied.')) {
+    button.textContent = 'Copied ✓';
+    setTimeout(() => { button.textContent = 'Copy code'; }, 2000);
+  }
+});
 for (const button of document.querySelectorAll('[data-copy-example]')) {
   button.addEventListener('click', async () => {
     const original = button.dataset.copyExample === 'setup' ? 'Copy setup' : 'Copy code';
