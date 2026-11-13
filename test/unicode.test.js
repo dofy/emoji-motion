@@ -52,6 +52,16 @@ test('water sports keep their water effects across gender and skin tone variants
   }
 });
 
+test('water emoji and gear use water effects', () => {
+  for (const [glyph, decoration] of [['🌊', 'splash'], ['🐬', 'splash'], ['🤿', 'bubbles'], ['🛟', 'wake']]) {
+    for (const registry of [emojiMotion, lite]) {
+      const result = registry.resolve(glyph);
+      assert.equal(result.source, 'preset', glyph);
+      assert.equal(result.decoration, decoration, glyph);
+    }
+  }
+});
+
 test('new person and gesture presets use official complete skin tone sequences', () => {
   const glyphs = ['✌️', '🤟', '👊', '🤜', '🤛', '🫰', '🙋', '🧘', '🏃', '🤸', '🧑‍🍳', '🧑‍🎨', '🧑‍🚀', '🧑‍💻'];
   for (const glyph of glyphs) {

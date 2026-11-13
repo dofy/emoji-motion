@@ -170,7 +170,7 @@ export const emoji = {
   '🔍': { group: 'objects', name: 'Magnifying glass', motion: 'search' }, '🔔': { group: 'objects', name: 'Bell', motion: 'swing', decoration: 'sound' }, '🎁': { group: 'objects', name: 'Gift', motion: 'shake' }, '📡': { group: 'objects', name: 'Satellite antenna', motion: 'wobble', decoration: 'signal' }, '⏱️': { group: 'objects', name: 'Stopwatch', motion: 'swing', variants: ['⏱'] },
   '💡': { group: 'objects', name: 'Light bulb', motion: 'breathe', decoration: 'glow' }, '📷': { group: 'objects', name: 'Camera', motion: 'bounce', decoration: 'flash' }, '🔑': { group: 'objects', name: 'Key', motion: 'wobble' }, '📌': { group: 'objects', name: 'Pushpin', motion: 'bounce' }, '📦': { group: 'objects', name: 'Package', motion: 'shake' }, '🧭': { group: 'objects', name: 'Compass', motion: 'wobble' },
   '🌸': { group: 'nature', name: 'Blossom', decoration: 'petals' }, '🍃': { group: 'nature', name: 'Leaves' }, '☀️': { group: 'nature', name: 'Sun', motion: 'spin', decoration: 'glow', variants: ['☀'] },
-  '🌻': { group: 'nature', name: 'Sunflower', motion: 'leafSway' }, '🌈': { group: 'nature', name: 'Rainbow', motion: 'float' }, '🌙': { group: 'nature', name: 'Crescent moon', motion: 'float' }, '⭐': { group: 'nature', name: 'Star', motion: 'pulse', decoration: 'sparkle' }, '🔥': { group: 'nature', name: 'Fire', motion: 'wobble', decoration: 'flicker' }, '🌊': { group: 'nature', name: 'Water wave', motion: 'float' },
+  '🌻': { group: 'nature', name: 'Sunflower', motion: 'leafSway' }, '🌈': { group: 'nature', name: 'Rainbow', motion: 'float' }, '🌙': { group: 'nature', name: 'Crescent moon', motion: 'float' }, '⭐': { group: 'nature', name: 'Star', motion: 'pulse', decoration: 'sparkle' }, '🔥': { group: 'nature', name: 'Fire', motion: 'wobble', decoration: 'flicker' }, '🌊': { group: 'nature', name: 'Water wave', motion: 'float', decoration: 'splash' },
   '🚀': { group: 'travel', name: 'Rocket' }, '✈️': { group: 'travel', name: 'Airplane', motion: 'glide', variants: ['✈'] }, '🚲': { group: 'travel', name: 'Bicycle', motion: 'ride' },
   '🚗': { group: 'travel', name: 'Car', motion: 'ride' }, '🚂': { group: 'travel', name: 'Locomotive', motion: 'ride' }, '🛸': { group: 'travel', name: 'Flying saucer', motion: 'float' }, '🚢': { group: 'travel', name: 'Ship', motion: 'vesselRock', decoration: 'wake' },
   '✨': { group: 'symbols', name: 'Sparkles', motion: 'pulse', decoration: 'sparkle' }, '⚙️': { group: 'symbols', name: 'Gear', variants: ['⚙'] }, '🎯': { group: 'symbols', name: 'Target', motion: 'bounce' }, '🎵': { group: 'symbols', name: 'Musical note', motion: 'swing', decoration: 'sound' }, '💤': { group: 'symbols', name: 'Sleeping symbol', motion: 'float' }, '💥': { group: 'symbols', name: 'Collision', motion: 'pulse' }, '❗': { group: 'symbols', name: 'Exclamation mark', motion: 'bounce' }, '❓': { group: 'symbols', name: 'Question mark', motion: 'wobble' }, '✅': { group: 'symbols', name: 'Check mark', motion: 'bounce' },
@@ -191,7 +191,7 @@ export const emoji = {
   '🫰': { group: 'gestures', name: 'Hand with index finger and thumb crossed', motion: 'pop', skinTones: skinTones('🫰') },
   '🐱': { group: 'nature', name: 'Cat face', motion: 'nod' }, '🐻': { group: 'nature', name: 'Bear', motion: 'nod' }, '🐼': { group: 'nature', name: 'Panda', motion: 'sway' },
   '🐸': { group: 'nature', name: 'Frog', motion: 'hop' }, '🐧': { group: 'nature', name: 'Penguin', motion: 'sway' }, '🐥': { group: 'nature', name: 'Front facing baby chick', motion: 'hop' },
-  '🐢': { group: 'nature', name: 'Turtle', motion: 'bob' }, '🐟': { group: 'nature', name: 'Fish', motion: 'bob' }, '🐬': { group: 'nature', name: 'Dolphin', motion: 'bob' },
+  '🐢': { group: 'nature', name: 'Turtle', motion: 'bob' }, '🐟': { group: 'nature', name: 'Fish', motion: 'bob' }, '🐬': { group: 'nature', name: 'Dolphin', motion: 'hop', decoration: 'splash' },
   '🐙': { group: 'nature', name: 'Octopus', motion: 'twirl' }, '🌵': { group: 'nature', name: 'Cactus', motion: 'sway' }, '🌲': { group: 'nature', name: 'Evergreen tree', motion: 'sway' },
   '🌼': { group: 'nature', name: 'Blossom flower', motion: 'sway', decoration: 'petals' }, '❄️': { group: 'nature', name: 'Snowflake', motion: 'float', variants: ['❄'] }, '☁️': { group: 'nature', name: 'Cloud', motion: 'float', variants: ['☁'] },
   '🍎': { group: 'food', name: 'Red apple', motion: 'nod' }, '🍉': { group: 'food', name: 'Watermelon', motion: 'wobble' }, '🍓': { group: 'food', name: 'Strawberry', motion: 'bounce' },
@@ -225,6 +225,9 @@ export const emoji = {
   '💎': { group: 'objects', name: 'Gem stone', motion: 'pulse', decoration: 'sparkle' },
   '🪩': { group: 'objects', name: 'Mirror ball', motion: 'spin', decoration: 'sparkle' },
   '🌠': { group: 'nature', name: 'Shooting star', motion: 'float', decoration: 'sparkle' },
+  // Water gear borrows the sea life and boat motions with matching water effects.
+  '🤿': { group: 'activities', name: 'Diving mask', motion: 'underwater', decoration: 'bubbles' },
+  '🛟': { group: 'travel', name: 'Ring buoy', motion: 'vesselRock', decoration: 'wake' },
   '🪙': { group: 'objects', name: 'Coin', motion: 'flipHorizontal' },
   '🎲': { group: 'activities', name: 'Game die', motion: 'spin' }
 };
