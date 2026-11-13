@@ -72,3 +72,15 @@ test('all lite entry points exclude Unicode classification modules', async () =>
   for (const file of ['lite.js', 'react-lite.js', 'vue-lite.js', 'svelte-lite.js', 'EmojiMotionLite.svelte', 'element-lite.js']) await visit(fileURLToPath(new URL(`../src/${file}`, import.meta.url)));
   assert.ok([...visited].every(path => !/unicode(?:-data)?\.js$/.test(path)), 'lite must not load Unicode data');
 });
+
+
+test('user group defaults override handcrafted and automatic motions', () => {
+  const registry = createEmojiMotion({
+    groups: { gestures: { label: 'Custom gestures', motion: 'pulse' }, nature: { label: 'Custom nature', motion: 'shake' } },
+    emoji: { '👌': { name: 'Custom OK', group: 'gestures', motion: 'spin' } },
+  });
+  assert.equal(registry.resolve('👍').motionId, 'pulse');
+  assert.equal(registry.resolve('👋').motionId, 'pulse');
+  assert.equal(registry.resolve('🐶').motionId, 'shake');
+  assert.equal(registry.resolve('👌').motionId, 'spin');
+});

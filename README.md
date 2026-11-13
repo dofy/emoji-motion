@@ -75,7 +75,7 @@ emojiMotion.resolve('📡').source; // 'preset', including its signal decoration
 emojiMotion.resolve('hello'); // undefined
 ```
 
-The precedence is: **user emoji and aliases → user subgroup or group classification rule → handcrafted preset → generated Unicode classification → conservative fallback**. User emoji entries always take precedence over user classification rules. Within user classifications, subgroup rules take precedence over group rules. If you override a named `groups` or `motions` preset, it is used wherever that preset applies. User category rules also override matching handcrafted presets.
+The precedence is: **user emoji and aliases → user subgroup or group classification rule → user group default → handcrafted preset → generated Unicode classification → conservative fallback**. User emoji entries always take precedence over user classification rules. Within user classifications, subgroup rules take precedence over group rules. An explicitly supplied group default overrides handcrafted and automatic motions for that group; a more specific user emoji or classification rule can override it. User-defined motions replace built in motions with the same ID. User classification rules also override matching handcrafted presets.
 
 ```js
 import { createEmojiMotion } from 'native-emoji-motion';

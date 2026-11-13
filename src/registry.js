@@ -78,7 +78,9 @@ export function createRegistry(config = {}, classifier) {
     } else return undefined;
     const group = groups[entry.group];
     if (!group) throw new Error(`Unknown classification group "${entry.group}"`);
-    const motionId = entry.motion ?? group.motion;
+    // An explicitly supplied group default outranks handcrafted preset motions.
+    // A user-defined emoji or classification remains more specific.
+    const motionId = source === 'preset' && Object.hasOwn(config.groups ?? {}, entry.group) ? group.motion : entry.motion ?? group.motion;
     if (!motions[motionId]) throw new Error(`Unknown classification motion "${motionId}"`);
     const mappedTones = entry.skinTones ?? info?.skinTones;
     const explicitTone = entry.skinTones ? Object.entries(entry.skinTones).find(([, variant]) => variant === glyph)?.[0] : info?.tone;
