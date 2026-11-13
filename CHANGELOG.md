@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.6.4 — 2026-11-14
 
 - Add ripple, splash and wake effects for water.
 - Add families for swimmers, surfers, water polo players and rowers, covering their gender and skin tone variants.
