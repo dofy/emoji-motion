@@ -44,7 +44,7 @@ emojiMotion.setDefaultSkinTone(skinTone.value);
 skinTone.addEventListener('change', () => { savePreference('skin-tone', skinTone.value); emojiMotion.setDefaultSkinTone(skinTone.value); render(); updateAutoPreview(); });
 const all = emojiMotion.list();
 // Curated examples live in the demo, not the library's complete registry.
-const featured = ['👋', '😊', '❤️', '🔔', '🌸', '🚀', '✨', '📡', '🐰', '🦋', '🌧️', '☕', '🍦', '🏀', '🎈', '💃', '⏳', '🌱', '🐸', '🍜', '🎸', '🪄', '🧑‍🚀', '🏄', '🥎', '🌷', '🧋', '🦜', '🧎'];
+const featured = ['👋', '😊', '❤️', '🔔', '🌸', '🚀', '✨', '📡', '🐰', '🦋', '🌧️', '☕', '💡', '📷', '🔦', '💃', '🕯️', '🌱', '🚨', '🪔', '🎆', '🪄', '🧑‍🚀', '🏄', '🥎', '🌷', '🧋', '🦜', '🧎', '🎡', '🎠', '🪙', '🎲', '⏳', '🧭', '🌻'];
 let cleanups = [];
 const familyGlyphs = [...new Set(emojiMotion.families().flatMap(family => family.members))].filter(glyph => emojiMotion.resolve(glyph)?.source === 'family');
 const galleryGlyphs = [...new Set([...all, ...familyGlyphs])];

@@ -60,7 +60,7 @@ test('group defaults, per emoji overrides, and explicit variants resolve', () =>
   assert.equal(emojiMotion.resolve('🦑').source, 'unicode');
 });
 test('new diverse presets expose their motion, effects, variants, and skin tones', () => {
-  for (const [glyph, group, motion] of [['🐰', 'nature', 'hop'], ['🦋', 'nature', 'flutter'], ['🌱', 'nature', 'sway'], ['☕', 'food', 'sip'], ['🏀', 'activities', 'hop'], ['💃', 'people', 'twirl'], ['⏳', 'objects', 'flip']]) {
+  for (const [glyph, group, motion] of [['🐰', 'nature', 'hop'], ['🦋', 'nature', 'flutter'], ['🌱', 'nature', 'sway'], ['☕', 'food', 'sip'], ['🏀', 'activities', 'hop'], ['💃', 'people', 'twirl'], ['⏳', 'objects', 'hourglassTurn']]) {
     const result = emojiMotion.resolve(glyph);
     assert.equal(result.source, 'preset'); assert.equal(result.groupId, group); assert.equal(result.motionId, motion);
   }
@@ -69,6 +69,30 @@ test('new diverse presets expose their motion, effects, variants, and skin tones
   assert.ok(emojiMotion.resolve('🌧️').decorationPreset);
   assert.equal(emojiMotion.resolve('💃', { skinTone: 'dark' }).glyph, '💃🏿');
   assert.equal(emojiMotion.resolve('🕺🏽').motionId, 'twirl');
+});
+test('light sources use centered effects without depending on glyph direction', () => {
+  for (const [glyph, effect] of [['💡', 'glow'], ['📷', 'flash'], ['🔦', 'flash'], ['🕯️', 'flicker'], ['📸', 'flash'], ['🪔', 'flicker'], ['🚨', 'alertLight'], ['🔅', 'glow'], ['🔆', 'glow'], ['🌞', 'glow'], ['⚡', 'flash'], ['🔥', 'flicker'], ['☀️', 'glow']]) {
+    const result = emojiMotion.resolve(glyph);
+    assert.equal(result.decoration, effect);
+    assert.deepEqual(result.decorationPreset.anchor, { x: '50%', y: '50%' });
+    assert.equal(result.decorationPreset.layers[0].svg.elements[0].tag, 'path');
+  }
+  assert.equal(emojiMotion.resolve('🕯').decoration, 'flicker');
+  assert.equal(emojiMotion.resolve('☀').decoration, 'glow');
+  for (const glyph of ['🌟', '🎆', '🎇', '🔮', '💎', '🪩', '🌠']) assert.equal(emojiMotion.resolve(glyph).decoration, 'sparkle');
+});
+test('rides, dice, and upright objects use appropriate motion', () => {
+  const wheel = emojiMotion.resolve('🎡');
+  assert.equal(wheel.motionId, 'steady');
+  assert.ok(wheel.motion.keyframes.every(frame => !frame.transform.includes('rotate')));
+  assert.ok(emojiMotion.resolve('🎠').motion.keyframes.some(frame => frame.transform.includes('rotateY(')));
+  assert.ok(emojiMotion.resolve('🪙').motion.keyframes.some(frame => frame.transform.includes('rotateY(360deg)')));
+  assert.equal(emojiMotion.resolve('🎲').motionId, 'spin');
+  assert.ok(emojiMotion.resolve('🎲').motion.keyframes.some(frame => frame.transform.includes('rotate(360deg)')));
+  assert.equal(emojiMotion.resolve('🌻').motion.origin, '50% 90%');
+  assert.equal(emojiMotion.resolve('🧭').motionId, 'wobble');
+  assert.equal(emojiMotion.resolve('🕯️').motionId, 'steady');
+  assert.ok(emojiMotion.resolve('⏳').motion.keyframes.some(frame => frame.transform === 'rotate(180deg)'));
 });
 test('custom registries are isolated and validate references', () => {
   const custom = createEmojiMotion({ defaults: false, motions: { wiggle: { keyframes: [{ transform: 'rotate(0deg)' }] } }, groups: { creatures: { label: 'Creatures', motion: 'wiggle' } }, emoji: { '🐙': { name: 'Octopus', group: 'creatures', variants: ['🐙️'] } } });

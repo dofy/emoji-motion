@@ -4,9 +4,9 @@ Small, expressive animations for native emoji. A framework independent library w
 
 ## Collection at a glance
 
-The current repository and demo contain **161 handcrafted emoji presets** and **5 reviewed motion families** with **24 additional base emoji**, across **10 categories**. They use **27 reusable motions**; **24 base emoji** have optional SVG effects. Skin tones and other variants are additional sequences, and similar emoji may share the same motion.
+The current repository and demo contain **177 handcrafted emoji presets** and **5 reviewed motion families** with **24 additional base emoji**, across **10 categories**. They use **32 reusable motions**; **44 base emoji** have optional SVG effects. Skin tones and other variants are additional sequences, and similar emoji may share the same motion.
 
-The default entry also recognizes **5,235 Unicode Emoji 18.0 sequences**, including qualified forms and variants, and applies a category based fallback when there is no handcrafted preset or reviewed family match. These collection counts describe version 0.2.0.
+The default entry also recognizes **5,235 Unicode Emoji 18.0 sequences**, including qualified forms and variants, and applies a category based fallback when there is no handcrafted preset or reviewed family match. These collection counts describe version 0.3.0.
 
 ## Try the demo
 

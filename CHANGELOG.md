@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 — 2026-11-13
+
+- Add lighting and sparkle effects for light sources, reflective objects, and celebrations.
+- Expand the handcrafted collection to 177 emoji, including 44 with optional SVG effects.
+- Refine motions for amusement rides, dice, compass, sunflower, candle, and hourglass.
+- Add reusable 3D carousel and object flip motions.
+
 ## 0.2.0 — 2026-11-13
 
 - Expand the handcrafted collection to 161 emoji and add five reviewed motion families.

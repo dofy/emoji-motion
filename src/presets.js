@@ -46,7 +46,12 @@ export const motions = {
   leafSway: createSwayMotion(),
   hoverFlight: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-15%) rotate(-6deg)', offset: .3 }, { transform: 'translateY(-9%) rotate(6deg)', offset: .6 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   gentleSip: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-7%) rotate(-4deg)', offset: .35 }, { transform: 'translateY(-7%) rotate(4deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 85%' },
-  pose: { keyframes: [{ transform: 'scale(1) translateY(0)' }, { transform: 'scale(1.04,1.06) translateY(-3%)', offset: .45 }, { transform: 'scale(1) translateY(0)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 90%' }
+  pose: { keyframes: [{ transform: 'scale(1) translateY(0)' }, { transform: 'scale(1.04,1.06) translateY(-3%)', offset: .45 }, { transform: 'scale(1) translateY(0)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 90%' },
+  carousel: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg) translateY(0)' }, { transform: 'perspective(500px) rotateY(-35deg) translateY(-8%)', offset: .3 }, { transform: 'perspective(500px) rotateY(35deg) translateY(-4%)', offset: .65 }, { transform: 'perspective(500px) rotateY(0deg) translateY(0)' }], options: { duration: 1200, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 85%' },
+  flipHorizontal: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg)' }, { transform: 'perspective(500px) rotateY(180deg)', offset: .5 }, { transform: 'perspective(500px) rotateY(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
+  flipVertical: { keyframes: [{ transform: 'perspective(500px) rotateX(0deg)' }, { transform: 'perspective(500px) rotateX(180deg)', offset: .5 }, { transform: 'perspective(500px) rotateX(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
+  steady: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.025)', offset: .5 }, { transform: 'scale(1)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 100%' },
+  hourglassTurn: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)', offset: .4 }, { transform: 'rotate(180deg)', offset: .6 }, { transform: 'rotate(0deg)' }], options: { duration: 1300, easing: 'cubic-bezier(.22,1,.36,1)' } }
 };
 
 // Groups describe semantic families; emoji entries may override the group's motion.
@@ -103,9 +108,9 @@ export const emoji = {
   '❤️': { group: 'hearts', name: 'Red heart', variants: ['❤'] }, '💛': { group: 'hearts', name: 'Yellow heart' }, '💖': { group: 'hearts', name: 'Sparkling heart' },
   '💚': { group: 'hearts', name: 'Green heart' }, '💙': { group: 'hearts', name: 'Blue heart' }, '💜': { group: 'hearts', name: 'Purple heart' }, '💔': { group: 'hearts', name: 'Broken heart', motion: 'shake' },
   '🔍': { group: 'objects', name: 'Magnifying glass', motion: 'search' }, '🔔': { group: 'objects', name: 'Bell', motion: 'swing', decoration: 'sound' }, '🎁': { group: 'objects', name: 'Gift', motion: 'shake' }, '📡': { group: 'objects', name: 'Satellite antenna', motion: 'wobble', decoration: 'signal' }, '⏱️': { group: 'objects', name: 'Stopwatch', motion: 'swing', variants: ['⏱'] },
-  '💡': { group: 'objects', name: 'Light bulb', motion: 'pulse' }, '📷': { group: 'objects', name: 'Camera', motion: 'bounce' }, '🔑': { group: 'objects', name: 'Key', motion: 'wobble' }, '📌': { group: 'objects', name: 'Pushpin', motion: 'bounce' }, '📦': { group: 'objects', name: 'Package', motion: 'shake' }, '🧭': { group: 'objects', name: 'Compass', motion: 'spin' },
-  '🌸': { group: 'nature', name: 'Blossom', decoration: 'petals' }, '🍃': { group: 'nature', name: 'Leaves' }, '☀️': { group: 'nature', name: 'Sun', motion: 'spin', variants: ['☀'] },
-  '🌻': { group: 'nature', name: 'Sunflower', motion: 'swing' }, '🌈': { group: 'nature', name: 'Rainbow', motion: 'float' }, '🌙': { group: 'nature', name: 'Crescent moon', motion: 'float' }, '⭐': { group: 'nature', name: 'Star', motion: 'pulse', decoration: 'sparkle' }, '🔥': { group: 'nature', name: 'Fire', motion: 'wobble' }, '🌊': { group: 'nature', name: 'Water wave', motion: 'float' },
+  '💡': { group: 'objects', name: 'Light bulb', motion: 'breathe', decoration: 'glow' }, '📷': { group: 'objects', name: 'Camera', motion: 'bounce', decoration: 'flash' }, '🔑': { group: 'objects', name: 'Key', motion: 'wobble' }, '📌': { group: 'objects', name: 'Pushpin', motion: 'bounce' }, '📦': { group: 'objects', name: 'Package', motion: 'shake' }, '🧭': { group: 'objects', name: 'Compass', motion: 'wobble' },
+  '🌸': { group: 'nature', name: 'Blossom', decoration: 'petals' }, '🍃': { group: 'nature', name: 'Leaves' }, '☀️': { group: 'nature', name: 'Sun', motion: 'spin', decoration: 'glow', variants: ['☀'] },
+  '🌻': { group: 'nature', name: 'Sunflower', motion: 'leafSway' }, '🌈': { group: 'nature', name: 'Rainbow', motion: 'float' }, '🌙': { group: 'nature', name: 'Crescent moon', motion: 'float' }, '⭐': { group: 'nature', name: 'Star', motion: 'pulse', decoration: 'sparkle' }, '🔥': { group: 'nature', name: 'Fire', motion: 'wobble', decoration: 'flicker' }, '🌊': { group: 'nature', name: 'Water wave', motion: 'float' },
   '🚀': { group: 'travel', name: 'Rocket' }, '✈️': { group: 'travel', name: 'Airplane', motion: 'glide', variants: ['✈'] }, '🚲': { group: 'travel', name: 'Bicycle', motion: 'ride' },
   '🚗': { group: 'travel', name: 'Car', motion: 'ride' }, '🚂': { group: 'travel', name: 'Locomotive', motion: 'ride' }, '🛸': { group: 'travel', name: 'Flying saucer', motion: 'float' }, '🚢': { group: 'travel', name: 'Ship', motion: 'wobble' },
   '✨': { group: 'symbols', name: 'Sparkles', motion: 'pulse', decoration: 'sparkle' }, '⚙️': { group: 'symbols', name: 'Gear', variants: ['⚙'] }, '🎯': { group: 'symbols', name: 'Target', motion: 'bounce' }, '🎵': { group: 'symbols', name: 'Musical note', motion: 'swing', decoration: 'sound' }, '💤': { group: 'symbols', name: 'Sleeping symbol', motion: 'float' }, '💥': { group: 'symbols', name: 'Collision', motion: 'pulse' }, '❗': { group: 'symbols', name: 'Exclamation mark', motion: 'bounce' }, '❓': { group: 'symbols', name: 'Question mark', motion: 'wobble' }, '✅': { group: 'symbols', name: 'Check mark', motion: 'bounce' },
@@ -113,7 +118,7 @@ export const emoji = {
   '☕': { group: 'food', name: 'Hot beverage', motion: 'sip', decoration: 'steam' }, '🍵': { group: 'food', name: 'Teacup', motion: 'sip', decoration: 'steam' }, '🍕': { group: 'food', name: 'Pizza', motion: 'bounce' }, '🍦': { group: 'food', name: 'Soft ice cream', motion: 'sway' },
   '🏀': { group: 'activities', name: 'Basketball', motion: 'hop' }, '⚽': { group: 'activities', name: 'Soccer ball', motion: 'hop' }, '🎈': { group: 'activities', name: 'Balloon', motion: 'float' }, '🎉': { group: 'activities', name: 'Party popper', motion: 'bounce', decoration: 'sparkle' },
   '💃': { group: 'people', name: 'Woman dancing', motion: 'twirl', skinTones: skinTones('💃') }, '🕺': { group: 'people', name: 'Man dancing', motion: 'twirl', skinTones: skinTones('🕺') },
-  '⏳': { group: 'objects', name: 'Hourglass', motion: 'flip' }, '⏰': { group: 'objects', name: 'Alarm clock', motion: 'shake' }, '🕯️': { group: 'objects', name: 'Candle', motion: 'sway', variants: ['🕯'] },
+  '⏳': { group: 'objects', name: 'Hourglass', motion: 'hourglassTurn' }, '⏰': { group: 'objects', name: 'Alarm clock', motion: 'shake' }, '🕯️': { group: 'objects', name: 'Candle', motion: 'steady', decoration: 'flicker', variants: ['🕯'] },
 
   // Additional handcrafted entries share motions where their physical action fits.
   '😀': { group: 'faces', name: 'Grinning face', motion: 'bounce' }, '🤣': { group: 'faces', name: 'Rolling on the floor laughing', motion: 'shake' },
@@ -143,9 +148,26 @@ export const emoji = {
   '🧑‍🚀': { group: 'people', name: 'Astronaut', motion: 'float', skinTones: personSkinTones('🚀') }, '🧑‍💻': { group: 'people', name: 'Technologist', motion: 'nod', skinTones: personSkinTones('💻') },
   '📱': { group: 'objects', name: 'Mobile phone', motion: 'shake' }, '📚': { group: 'objects', name: 'Books', motion: 'nod' }, '✉️': { group: 'objects', name: 'Envelope', motion: 'bob', variants: ['✉'] },
   '💌': { group: 'objects', name: 'Love letter', motion: 'bob', decoration: 'sparkle' }, '🔒': { group: 'objects', name: 'Locked', motion: 'wobble' }, '🔓': { group: 'objects', name: 'Unlocked', motion: 'pop' },
-  '🔦': { group: 'objects', name: 'Flashlight', motion: 'nod' }, '🪄': { group: 'objects', name: 'Magic wand', motion: 'twirl', decoration: 'sparkle' }, '🎤': { group: 'objects', name: 'Microphone', motion: 'swing', decoration: 'sound' },
+  '🔦': { group: 'objects', name: 'Flashlight', motion: 'nod', decoration: 'flash' }, '🪄': { group: 'objects', name: 'Magic wand', motion: 'twirl', decoration: 'sparkle' }, '🎤': { group: 'objects', name: 'Microphone', motion: 'swing', decoration: 'sound' },
   '🚌': { group: 'travel', name: 'Bus', motion: 'ride' }, '🚕': { group: 'travel', name: 'Taxi', motion: 'ride' }, '🚁': { group: 'travel', name: 'Helicopter', motion: 'bob' },
-  '🎡': { group: 'travel', name: 'Ferris wheel', motion: 'spin' }, '⛵': { group: 'travel', name: 'Sailboat', motion: 'bob' }, '🎠': { group: 'travel', name: 'Carousel horse', motion: 'hop' }
+  '🎡': { group: 'travel', name: 'Ferris wheel', motion: 'steady' }, '⛵': { group: 'travel', name: 'Sailboat', motion: 'bob' }, '🎠': { group: 'travel', name: 'Carousel horse', motion: 'carousel' },
+  // Direction-neutral lighting for other objects that naturally emit or reflect light.
+  '📸': { group: 'objects', name: 'Camera with flash', motion: 'bounce', decoration: 'flash' },
+  '🪔': { group: 'objects', name: 'Oil lamp', motion: 'sway', decoration: 'flicker' },
+  '🚨': { group: 'objects', name: 'Police car light', motion: 'pulse', decoration: 'alertLight' },
+  '🔅': { group: 'symbols', name: 'Dim button', motion: 'breathe', decoration: 'glow' },
+  '🔆': { group: 'symbols', name: 'Bright button', motion: 'pulse', decoration: 'glow' },
+  '🌞': { group: 'nature', name: 'Sun with face', motion: 'breathe', decoration: 'glow' },
+  '🌟': { group: 'nature', name: 'Glowing star', motion: 'pulse', decoration: 'sparkle' },
+  '⚡': { group: 'nature', name: 'High voltage', motion: 'pop', decoration: 'flash' },
+  '🎆': { group: 'activities', name: 'Fireworks', motion: 'pop', decoration: 'sparkle' },
+  '🎇': { group: 'activities', name: 'Sparkler', motion: 'wobble', decoration: 'sparkle' },
+  '🔮': { group: 'objects', name: 'Crystal ball', motion: 'breathe', decoration: 'sparkle' },
+  '💎': { group: 'objects', name: 'Gem stone', motion: 'pulse', decoration: 'sparkle' },
+  '🪩': { group: 'objects', name: 'Mirror ball', motion: 'spin', decoration: 'sparkle' },
+  '🌠': { group: 'nature', name: 'Shooting star', motion: 'float', decoration: 'sparkle' },
+  '🪙': { group: 'objects', name: 'Coin', motion: 'flipHorizontal' },
+  '🎲': { group: 'activities', name: 'Game die', motion: 'spin' }
 };
 
 // Declarative SVG layers never alter the native glyph. Anchors are relative to
@@ -166,7 +188,27 @@ const steamShape = { viewBox: '0 0 100 100', elements: [
 const rainShape = { viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M30 67v6M50 72v6M70 67v6', fill: 'none', stroke: '#7c9fca', 'stroke-width': '3', 'stroke-linecap': 'round' } }
 ] };
+// Symmetric rays sit around the glyph rather than assuming a bulb, lens or flame position.
+const lightShape = color => ({ viewBox: '0 0 100 100', elements: [
+  { tag: 'path', attrs: { d: 'M50 4v9M50 87v9M4 50h9M87 50h9M17 17l6 6M77 77l6 6M83 17l-6 6M23 77l-6 6', fill: 'none', stroke: color, 'stroke-width': '3', 'stroke-linecap': 'round' } }
+] });
 export const decorations = {
+  alertLight: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#df625e'), style: centered,
+    keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.85)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .3 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.12)' }],
+    options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' }
+  }] },
+  glow: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#e0a63e'), style: centered,
+    keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.85)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.08)' }],
+    options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }
+  }] },
+  flicker: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#df985c'), style: centered,
+    keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.9)' }, { opacity: .7, transform: 'translate(-50%, -50%) scale(1)', offset: .3 }, { opacity: .3, transform: 'translate(-50%, -50%) scale(.95)', offset: .5 }, { opacity: .75, transform: 'translate(-50%, -50%) scale(1.03)', offset: .7 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1)' }],
+    options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }
+  }] },
+  flash: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#a5b7df'), style: centered,
+    keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.75)' }, { opacity: 1, transform: 'translate(-50%, -50%) scale(1)', offset: .18 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.2)', offset: .52 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.2)' }],
+    options: { duration: 800, easing: 'cubic-bezier(.22,1,.36,1)' }
+  }] },
   impact: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [{ tag: 'path', attrs: { d: 'M28 75l-5 4M72 75l5 4M50 79v6', fill: 'none', stroke: '#d49b70', 'stroke-width': '3', 'stroke-linecap': 'round' } }] }, style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.8)' }, { opacity: 0, transform: 'translate(-50%, -50%) scale(.8)', offset: .45 }, { opacity: .85, transform: 'translate(-50%, -50%) scale(1)', offset: .65 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.1)' }], options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' }
   }] },
