@@ -51,7 +51,12 @@ export const motions = {
   flipHorizontal: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg)' }, { transform: 'perspective(500px) rotateY(180deg)', offset: .5 }, { transform: 'perspective(500px) rotateY(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   flipVertical: { keyframes: [{ transform: 'perspective(500px) rotateX(0deg)' }, { transform: 'perspective(500px) rotateX(180deg)', offset: .5 }, { transform: 'perspective(500px) rotateX(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   steady: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.025)', offset: .5 }, { transform: 'scale(1)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 100%' },
-  hourglassTurn: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)', offset: .4 }, { transform: 'rotate(180deg)', offset: .6 }, { transform: 'rotate(0deg)' }], options: { duration: 1300, easing: 'cubic-bezier(.22,1,.36,1)' } }
+  hourglassTurn: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)', offset: .4 }, { transform: 'rotate(180deg)', offset: .6 }, { transform: 'rotate(0deg)' }], options: { duration: 1300, easing: 'cubic-bezier(.22,1,.36,1)' } },
+  underwater: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-9%) rotate(-4deg)', offset: .35 }, { transform: 'translateY(3%) rotate(4deg)', offset: .7 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1200, easing: curve } },
+  pastryBounce: createSpringMotion({ height: 12, rebounds: 1, duration: 850 }),
+  railRide: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-3%) rotate(-2deg)', offset: .25 }, { transform: 'translateY(0) rotate(2deg)', offset: .55 }, { transform: 'translateY(-2%) rotate(-1deg)', offset: .75 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: curve }, origin: '50% 85%' },
+  rhythm: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(5deg)' }, { transform: 'rotate(-3deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 1050, easing: curve }, origin: '50% 80%' },
+  steps: { keyframes: [{ transform: 'translateY(0)' }, { transform: 'translateY(-7%)', offset: .25 }, { transform: 'translateY(0)', offset: .5 }, { transform: 'translateY(-5%)', offset: .75 }, { transform: 'translateY(0)' }], options: { duration: 1000, easing: curve }, origin: '50% 90%' }
 };
 
 // Groups describe semantic families; emoji entries may override the group's motion.
@@ -75,13 +80,29 @@ const skinTones = glyph => Object.fromEntries(['light', 'medium-light', 'medium'
 // A person modifier belongs before the joiner, never at the end of the sequence.
 const personSkinTones = suffix => Object.fromEntries(['light', 'medium-light', 'medium', 'medium-dark', 'dark'].map((tone, index) => [tone, `🧑${String.fromCodePoint(0x1f3fb + index)}‍${suffix}`]));
 const familyToneAliases = glyphs => Object.fromEntries(glyphs.flatMap(glyph => Object.values(skinTones(glyph)).map(variant => [variant, glyph])));
+// These reviewed ZWJ families use explicit suffixes; tests check every sequence against Unicode.
+const rolePeople = ['🧑', '👨', '👩'];
+const roleSuffixes = ['⚕️', '🎓', '🏫', '🌾', '🔧', '🔬', '🚒'];
+const roleMembers = roleSuffixes.flatMap(suffix => rolePeople.map(person => `${person}‍${suffix}`));
+const roleAliases = Object.fromEntries(roleSuffixes.flatMap(suffix => rolePeople.flatMap(person => Object.values(skinTones(person)).map(variant => [`${variant}‍${suffix}`, `${person}‍${suffix}`]))));
+const walkerMembers = ['🚶', '🚶‍♂️', '🚶‍♀️', '🏃‍♂️', '🏃‍♀️'];
+const walkerAliases = Object.fromEntries(walkerMembers.flatMap(glyph => {
+  const [person, suffix = ''] = glyph.split('‍');
+  return Object.values(skinTones(person)).map(variant => [suffix ? `${variant}‍${suffix}` : variant, glyph]);
+}));
 // Members are reviewed explicitly; no entire Unicode subgroup is assumed to move alike.
 export const families = {
   balls: { label: 'Balls', group: 'activities', motion: 'spring', members: ['⚾', '🥎', '🎱', '🎳'], animation: { duration: 900 }, decorations: ['impact', 'sparkle'] },
   plants: { label: 'Plants', group: 'nature', motion: 'leafSway', members: ['🌷', '🌹', '🌺', '🪻', '🌴', '🌿', '🍀'] },
   drinks: { label: 'Drinks', group: 'food', motion: 'gentleSip', members: ['🥤', '🧃', '🧋', '🍹', '🍸'] },
   flying: { label: 'Flying animals', group: 'nature', motion: 'hoverFlight', members: ['🦜', '🦉', '🦅', '🪰', '🦟'] },
-  poses: { label: 'People in poses', group: 'people', motion: 'pose', members: ['🧎', '🧍', '🙇'], aliases: familyToneAliases(['🧎', '🧍', '🙇']) }
+  poses: { label: 'People in poses', group: 'people', motion: 'pose', members: ['🧎', '🧍', '🙇'], aliases: familyToneAliases(['🧎', '🧍', '🙇']) },
+  professionals: { label: 'Professionals', group: 'people', motion: 'pose', members: roleMembers, aliases: roleAliases },
+  walkers: { label: 'Walking and running', group: 'people', motion: 'steps', members: walkerMembers, aliases: walkerAliases },
+  seaLife: { label: 'Sea life', group: 'nature', motion: 'underwater', members: ['🐠', '🐡', '🦈', '🐋', '🐳', '🦭'], decoration: 'bubbles' },
+  bakery: { label: 'Bakery', group: 'food', motion: 'pastryBounce', members: ['🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇'] },
+  rail: { label: 'Rail vehicles', group: 'travel', motion: 'railRide', members: ['🚄', '🚅', '🚆', '🚇', '🚈', '🚊', '🚝', '🚞'] },
+  instruments: { label: 'Instruments', group: 'activities', motion: 'rhythm', members: ['🎹', '🎷', '🎺', '🪕', '🪗', '🎻', '🪈'], decoration: 'sound' }
 };
 // Variants are explicit: unrelated sequences are never silently normalized.
 export const emoji = {
@@ -193,6 +214,11 @@ const lightShape = color => ({ viewBox: '0 0 100 100', elements: [
   { tag: 'path', attrs: { d: 'M50 4v9M50 87v9M4 50h9M87 50h9M17 17l6 6M77 77l6 6M83 17l-6 6M23 77l-6 6', fill: 'none', stroke: color, 'stroke-width': '3', 'stroke-linecap': 'round' } }
 ] });
 export const decorations = {
+  bubbles: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: { viewBox: '0 0 100 100', elements: [
+    { tag: 'circle', attrs: { cx: '21', cy: '46', r: '3', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2' } },
+    { tag: 'circle', attrs: { cx: '76', cy: '38', r: '4', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2' } },
+    { tag: 'circle', attrs: { cx: '80', cy: '60', r: '2', fill: 'none', stroke: '#7cafd0', 'stroke-width': '2' } }
+  ] }, style: centered, keyframes: [{ opacity: 0, transform: 'translate(-50%, -43%)' }, { opacity: .85, transform: 'translate(-50%, -50%)', offset: .35 }, { opacity: 0, transform: 'translate(-50%, -64%)' }], options: { duration: 1100, easing: curve } }] },
   alertLight: { anchor: { x: '50%', y: '50%' }, layers: [{ svg: lightShape('#df625e'), style: centered,
     keyframes: [{ opacity: 0, transform: 'translate(-50%, -50%) scale(.85)' }, { opacity: .9, transform: 'translate(-50%, -50%) scale(1)', offset: .3 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(1.12)' }],
     options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' }

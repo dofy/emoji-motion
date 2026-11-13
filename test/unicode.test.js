@@ -17,6 +17,29 @@ test('family members and declared skin tone aliases match Unicode', () => {
   }
 });
 
+test('reviewed role and walking families preserve official variants and user overrides', () => {
+  for (const id of ['professionals', 'walkers']) {
+    const family = families[id];
+    for (const base of family.members) {
+      const official = lookupUnicode(base);
+      assert.equal(emojiMotion.resolve(base).familyId, id);
+      assert.equal(lite.resolve(base).familyId, id);
+      for (const [tone, variant] of Object.entries(official.skinTones)) {
+        assert.equal(emojiMotion.resolve(base, { skinTone: tone }).glyph, variant, `${base}: ${tone}`);
+        assert.equal(lite.resolve(base, { skinTone: tone }).glyph, variant, `${base}: ${tone} lite`);
+        assert.equal(lite.resolve(variant, { skinTone: 'default' }).glyph, base);
+      }
+    }
+  }
+  const override = createEmojiMotion({
+    classifications: { subgroups: { 'person-role': { group: 'hearts', motion: 'pulse' } } },
+    emoji: { '👩‍⚕️': { name: 'My doctor', group: 'faces', motion: 'spin' } }
+  });
+  assert.equal(override.resolve('👩🏽‍⚕️').source, 'user');
+  assert.equal(override.resolve('👨🏽‍⚕️').source, 'user-classification');
+  assert.equal(override.resolve('👩🏽‍⚕️').glyph, '👩🏽‍⚕️');
+});
+
 test('new person and gesture presets use official complete skin tone sequences', () => {
   const glyphs = ['✌️', '🤟', '👊', '🤜', '🤛', '🫰', '🙋', '🧘', '🏃', '🤸', '🏊', '🏄', '🧑‍🍳', '🧑‍🎨', '🧑‍🚀', '🧑‍💻'];
   for (const glyph of glyphs) {

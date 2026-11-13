@@ -60,6 +60,7 @@
   "types": "./src/index.d.ts",
   "files": [
     "src",
+    "assets/logo.svg",
     "README.md",
     "LICENSE",
     "UNICODE-LICENSE.txt",
