@@ -531,7 +531,11 @@ for (const select of document.querySelectorAll('select')) {
   const buttons = [];
   for (const option of select.options) {
     const button = document.createElement('button'); button.type = 'button';
-    button.textContent = `${select.id === 'skin-tone' ? `${toneIcons[option.value]} ` : ''}${option.textContent}`;
+    if (select.id === 'skin-tone') {
+      button.textContent = toneIcons[option.value];
+      button.setAttribute('aria-label', option.textContent);
+      button.title = option.textContent;
+    } else button.textContent = option.textContent;
     button.addEventListener('click', () => {
       select.value = option.value;
       select.dispatchEvent(new Event('change', { bubbles: true }));
@@ -543,7 +547,7 @@ for (const select of document.querySelectorAll('select')) {
   menu.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.open) { menu.open = false; trigger.focus(); } });
   const sync = () => {
     const option = select.selectedOptions[0];
-    current.textContent = option ? `${select.id === 'skin-tone' ? `${toneIcons[option.value]} ` : ''}${option.textContent}` : '';
+    current.textContent = option ? (select.id === 'skin-tone' ? toneIcons[option.value] : option.textContent) : '';
     trigger.setAttribute('aria-label', `${sourceLabel}: ${option?.textContent ?? ''}`);
     buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(select.options[index].selected)));
   };

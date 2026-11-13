@@ -24,3 +24,9 @@ html[data-theme="dark"] .custom-select-trigger{background:#272522;color:#f0ebe4;
 .topbar .brand,.docs-header .brand{display:inline-flex;align-items:center;gap:8px;font-size:20px;letter-spacing:-.04em}
 .topbar .brand-mark,.docs-header .brand-emoji{display:inline-block;margin:0;font-size:24px;line-height:1}
 @media(max-width:360px){.topbar .brand,.docs-header .brand{font-size:16px}.topbar .brand-mark,.docs-header .brand-emoji{font-size:22px}}
+/* The hand itself communicates skin tone; keep the text label for assistive technology. */
+#skin-tone-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.tone-control .custom-select-trigger{min-width:0;gap:8px;padding:6px 12px;font-size:26px;line-height:32px}
+.tone-control .custom-select-options{display:grid;grid-template-columns:repeat(3,48px);gap:4px;min-width:0}
+.tone-control .custom-select-options button{position:relative;display:grid;place-items:center;width:48px;height:48px;padding:0;font-size:26px;line-height:1}
+.tone-control .custom-select-options button[aria-pressed="true"]::after{position:absolute;right:3px;bottom:2px;margin:0;font:700 11px/1 Manrope,system-ui,sans-serif}
