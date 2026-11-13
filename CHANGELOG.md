@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 — 2026-11-13
 
 - Add reviewed motion families for fruit, animal faces, clouds, celestial bodies and writing tools.
 - Add judges, pilots and singers with their official skin tone variants.

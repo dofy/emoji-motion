@@ -897,5 +897,7 @@
   "@Add custom ZZX0XZ in ZZX1XZ : each named preset has an ZZX2XZ and ZZX3XZ , each with CSS ZZX4XZ , Web Animations ZZX5XZ and ZZX6XZ . Optionally provide ZZX7XZ , where each element has a ZZX8XZ and ZZX9XZ ; without ZZX10XZ , a styled span is used. Reference its name using the emoji entry's ZZX11XZ field. Layer styles are trusted application code, and the library does not bundle images or fonts.": "在 ZZX1XZ 中新增自訂 ZZX0XZ：每個命名預設都有一個 ZZX2XZ 和 ZZX3XZ，每個預設都有 CSS ZZX4XZ、Web 動畫 ZZX5XZ 和 ZZX6XZ。可以選擇提供 ZZX7XZ ，其中每個元素都有一個 ZZX8XZ 和 ZZX9XZ ；如果沒有 ZZX10XZ ，則使用樣式跨度。使用表情符號條目的 ZZX11XZ 欄位引用其名稱。圖層樣式是受信任的應用程式程式碼，並且該庫不捆綁圖像或字體。",
   "@For example, this adds an SVG sparkle to a custom group:": "例如，這將 SVG 閃光新增至自訂群組：",
   "@Explore the collection ZZX0XZ": "瀏覽動效 ZZX0XZ",
-  "☕": "☕"
+  "☕": "☕",
+  "This guide describes Emoji Motion 0.5.0. Upgrading from 0.3.0? The": "本指南介紹 Emoji Motion 0.5.0。從0.3.0升級？的",
+  "@This guide describes Emoji Motion 0.5.0. Upgrading from 0.3.0? The ZZX0XZ prop was removed; use a block container or CSS to control layout.": "本指南介紹 Emoji Motion 0.5.0。從 0.3.0 升級時，請注意 ZZX0XZ 屬性已移除；使用區塊容器或 CSS 控制版面配置。"
 }
