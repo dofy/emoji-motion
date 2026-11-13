@@ -4,6 +4,8 @@ Small, expressive animations for native emoji. A framework independent, dependen
 
 ## Try the demo
 
+[Explore the live demo](https://emoji-motion.phpz.org/) or run it locally:
+
 ```sh
 npm run dev
 ```
@@ -32,6 +34,8 @@ Motion is skipped when the user prefers reduced motion. `play` returns `null` fo
 A registry can specify a default and change it later. `resolve` returns the glyph to render; animation never changes your element's text automatically.
 
 ```js
+import { createEmojiMotion } from 'native-emoji-motion';
+
 const motion = createEmojiMotion({ defaultSkinTone: 'medium' });
 motion.resolve('👋').glyph; // 👋🏽
 motion.resolve('👋', { skinTone: 'dark' }).glyph; // 👋🏿

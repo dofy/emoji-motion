@@ -1,7 +1,7 @@
 {
   "name": "native-emoji-motion",
   "version": "0.1.0",
-  "description": "Playful, extensible motion for native emoji",
+  "description": "Expressive, extensible animations for native emoji with optional SVG effects",
   "type": "module",
   "exports": {
     ".": {
@@ -20,7 +20,9 @@
     "dev": "node demo/server.js",
     "test": "node --test",
     "pack:check": "npm pack --dry-run",
-    "build:demo": "node scripts/build-demo.js"
+    "build:demo": "node scripts/build-demo.js",
+    "prepublishOnly": "npm test && npm run test:types",
+    "test:types": "tsc --noEmit --strict --skipLibCheck false --module nodenext --moduleResolution nodenext --target es2022 type-tests/consumer.mts"
   },
   "engines": {
     "node": ">=18"
@@ -28,9 +30,23 @@
   "license": "MIT",
   "keywords": [
     "emoji",
+    "emoji-animation",
     "animation",
     "web-animations",
-    "interaction"
+    "svg",
+    "skin-tone",
+    "zero-dependencies"
   ],
-  "sideEffects": false
+  "sideEffects": false,
+  "homepage": "https://emoji-motion.phpz.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dofy/emoji-motion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dofy/emoji-motion/issues"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
 }

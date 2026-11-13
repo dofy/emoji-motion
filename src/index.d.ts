@@ -9,7 +9,7 @@ export interface EmojiEntry { group: string; name: string; motion?: string; deco
 export interface Config { defaults?: boolean; defaultSkinTone?: SkinTone; motions?: Record<string, Motion>; decorations?: Record<string, Decoration>; groups?: Record<string, Group>; emoji?: Record<string, EmojiEntry> }
 export interface PlayOptions { ignoreReducedMotion?: boolean; skinTone?: SkinTone; animation?: KeyframeAnimationOptions; decoration?: { container: HTMLElement; anchor?: Anchor; flipX?: boolean; rotate?: number } }
 export interface BindOptions extends PlayOptions { trigger?: EventTarget; events?: string[] }
-export interface Resolution extends EmojiEntry { glyph: string; canonical: string; skinTone: SkinTone; groupId: string; group: Group; motionId: string; motion: Motion; decorationPreset?: Decoration }
+export interface Resolution extends Omit<EmojiEntry, 'group' | 'motion'> { glyph: string; canonical: string; skinTone: SkinTone; groupId: string; group: Group; motionId: string; motion: Motion; decorationPreset?: Decoration }
 export interface EmojiMotion { resolve(glyph: string, options?: { skinTone?: SkinTone }): Resolution | undefined; setDefaultSkinTone(tone: SkinTone): void; getDefaultSkinTone(): SkinTone; play(element: Element, glyph: string, options?: PlayOptions): Animation | null; bind(element: Element, glyph: string, options?: BindOptions): () => void; list(): string[]; groups(): (Group & { id: string })[] }
 export declare function createEmojiMotion(config?: Config): EmojiMotion;
 export declare const motions: Record<string, Motion>;
