@@ -5,7 +5,6 @@ export interface EmojiMotionProps extends Omit<HTMLAttributes<HTMLSpanElement>, 
   skinTone?: SkinTone;
   registry?: Registry;
   decoration?: boolean;
-  display?: 'inline' | 'block';
   events?: string[];
   label?: string;
   triggerRef?: RefObject<HTMLElement | null>;

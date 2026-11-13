@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Documentation for Emoji Motion: components, automatic enhancement, customization, and skin tones."><title>Documentation — Emoji Motion</title><link rel="icon" type="image/svg+xml" href="/assets/logo.svg"><link rel="stylesheet" href="/docs/style.css"></head>
+<body><a class="skip" href="#content">Skip to documentation</a><header class="docs-header"><a class="brand" href="/"><img src="/assets/logo.svg" alt=""> <span>Emoji Motion<span class="brand-dot">.</span></span></a><nav aria-label="Main navigation"><a href="/">Demo</a><a href="https://github.com/dofy/emoji-motion">GitHub ↗</a></nav></header><div class="docs-layout"><aside class="docs-sidebar"><span class="sidebar-label">DOCUMENTATION</span><nav aria-label="On this page"><ul><li><a href="#installation">📦 Installation</a></li><li><a href="#components">🚀 Components</a></li><li><a href="#enhance-existing-text">📝 Enhance existing text</a></li><li><a href="#low-level-api">Low level API</a></li><li><a href="#automatic-classification">🌍 Automatic classification</a></li><li><a href="#smaller-preset-only-entry">Smaller preset only entry</a></li><li><a href="#skin-tone">🎨 Skin tone</a></li><li><a href="#extend">🛠️ Extend</a></li><li><a href="#optional-decorative-effects">✨ Optional decorative effects</a></li><li><a href="#platform-boundaries">Platform boundaries</a></li><li><a href="#development-and-release">Development and release</a></li></ul></nav></aside><main id="content" class="docs-content"><div class="eyebrow">THE GUIDE</div><h1>Make emoji move<span class="brand-dot">.</span></h1><p class="docs-intro">Everything you need to bring native emoji to life, from your first component to a custom motion.</p><p class="release-note">This guide describes Emoji Motion 0.4.0. Upgrading from 0.3.0? The <code>display</code> prop was removed; use a block container or CSS to control layout.</p><nav class="mobile-contents" aria-label="On this page"><details><summary>On this page</summary><ul><li><a href="#installation">📦 Installation</a></li><li><a href="#components">🚀 Components</a></li><li><a href="#enhance-existing-text">📝 Enhance existing text</a></li><li><a href="#low-level-api">Low level API</a></li><li><a href="#automatic-classification">🌍 Automatic classification</a></li><li><a href="#smaller-preset-only-entry">Smaller preset only entry</a></li><li><a href="#skin-tone">🎨 Skin tone</a></li><li><a href="#extend">🛠️ Extend</a></li><li><a href="#optional-decorative-effects">✨ Optional decorative effects</a></li><li><a href="#platform-boundaries">Platform boundaries</a></li><li><a href="#development-and-release">Development and release</a></li></ul></details></nav><h2 id="installation">📦 Installation</h2>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-none">npm install @dofy/native-emoji-motion</code></pre></div>
+<p>The package is ESM and uses the browser Web Animations API. React, Vue and Svelte are optional peers: install the framework used by your application.</p>
+<h2 id="components">🚀 Components</h2>
+<p>Use an emoji directly as a component. Components are inline by default; all components animate on hover, focus and click and use built in SVG effects when available. Use these imports in a bundled app. React, Vue and Svelte are optional peers, so the core stays framework independent.</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-jsx">import { EmojiMotion } from &#x27;@dofy/native-emoji-motion/react&#x27;;
+
+&lt;p&gt;Hello &lt;EmojiMotion emoji=&quot;👋&quot; skinTone=&quot;medium&quot; /&gt;&lt;/p&gt;
+&lt;div&gt;&lt;EmojiMotion emoji=&quot;📡&quot; /&gt;&lt;/div&gt;</code></pre></div>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-markup">&lt;script setup&gt;
+import { EmojiMotion } from &#x27;@dofy/native-emoji-motion/vue&#x27;;
+&lt;/script&gt;
+&lt;template&gt;
+  &lt;p&gt;Hello &lt;EmojiMotion emoji=&quot;👋&quot; skin-tone=&quot;medium&quot; /&gt;&lt;/p&gt;
+  &lt;div&gt;&lt;EmojiMotion emoji=&quot;📡&quot; /&gt;&lt;/div&gt;
+&lt;/template&gt;</code></pre></div>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-markup">&lt;script&gt;
+  import EmojiMotion from &#x27;@dofy/native-emoji-motion/svelte/EmojiMotion.svelte&#x27;;
+&lt;/script&gt;
+&lt;p&gt;Hello &lt;EmojiMotion emoji=&quot;👋&quot; skinTone=&quot;medium&quot; /&gt;&lt;/p&gt;
+&lt;div&gt;&lt;EmojiMotion emoji=&quot;📡&quot; /&gt;&lt;/div&gt;</code></pre></div>
+<p>For plain HTML or other frameworks, import <code>@dofy/native-emoji-motion/element</code> once in a bundled entry module, then use <code>&lt;emoji-motion emoji=&quot;👋&quot;&gt;&lt;/emoji-motion&gt;</code>. The web component can be used with Angular or any other framework that supports custom elements. It registers itself when the module is imported. Its attributes include <code>emoji</code>, <code>skin-tone</code>, <code>label</code> and <code>decoration=&quot;false&quot;</code>; assign the <code>registry</code> property to use a custom registry.</p>
+<p>React, Vue and Svelte components accept <code>emoji</code>, <code>skinTone</code>, <code>decoration</code>, <code>label</code>, <code>events</code>, and a custom <code>registry</code>. For a custom interaction target, React accepts <code>triggerRef</code> and Vue/Svelte accept <code>trigger</code>. Components clean up their listeners when updated or unmounted. A global skin tone set on a registry is read when a component renders; to update an already mounted component, update its <code>skinTone</code> prop or cause a framework rerender.</p>
+<p>For a separate line, wrap the component in a block element; use CSS on the container to position it. The animated glyph itself remains inline-block so transforms work.</p>
+<blockquote><strong>Upgrading from 0.3.0:</strong> <code>display=&quot;block&quot;</code> was removed. Replace it with a block container or your own CSS. Version 0.3.0 still supports the old prop.</blockquote>
+<p>Components do not set a mouse cursor: the emoji follows its surrounding context. Set <code>cursor: pointer</code> on a button or other control when the emoji is part of an action.</p>
+<h2 id="enhance-existing-text">📝 Enhance existing text</h2>
+<p>Animate emoji already written in your page without replacing them with components. The API is available in version 0.4.0 and later.</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-markup">&lt;article id=&quot;article&quot;&gt;
+  &lt;p&gt;Good morning 👋🏽 The coffee is ready ☕&lt;/p&gt;
+&lt;/article&gt;</code></pre></div>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { emojiMotion } from &#x27;@dofy/native-emoji-motion&#x27;;
+
+const enhancer = emojiMotion.enhance({
+  root: &#x27;#article&#x27;,
+  // enabled: false, // Optionally wait until enhancer.enable() to start.
+});
+
+enhancer.disable(); // Temporarily turn off.
+enhancer.enable();  // Turn on again, including any new text.
+enhancer.cleanup(); // Permanently clean up when the area is no longer needed.</code></pre></div>
+<p>Omit <code>root</code> to enhance the document body. Enhancement starts immediately by default; pass <code>enabled: false</code> to create the controller without scanning or observing until <code>enable()</code> is called. It can also be an <code>Element</code>, <code>Document</code> or <code>DocumentFragment</code>. New or changed text inside the root is observed by default; set <code>observe: false</code> for a one-time pass. Use <code>exclude: &#x27;.no-motion&#x27;</code> to skip application-specific areas, or add <code>data-emoji-motion-ignore</code> to an element. Use <code>decoration: true</code> to opt in to SVG effects, and <code>events</code> to customize the trigger events (default: <code>pointerenter</code>, <code>focus</code>, and <code>click</code>). Plain text does not gain a tab stop; keyboard focus works when the emoji itself is focusable.</p>
+<p>The enhancer preserves the original characters and skin tones. It skips the library&#x27;s components and enhanced nodes, as well as inputs, editable content, code, SVG and other non-text areas. The lite registry only recognizes its presets and your own entries. It respects reduced motion and uses the chosen registry&#x27;s custom definitions and precedence. <code>disable()</code> disconnects the observer, cancels active animations and unwraps its emoji within the root. <code>enable()</code> rescans the current content and restarts observation (unless <code>observe: false</code>); both are safe to call repeatedly. <code>cleanup()</code> permanently disposes the enhancer and is safe to call more than once. After cleanup, create a new enhancer instead of calling <code>enable()</code> again. Unwrapping preserves text, but does not restore the original text node identities. Avoid overlapping enhancers on the same area, since another active observer can enhance the restored text again.</p>
+<p>Enhancement changes the DOM by wrapping each emoji in a span. Apply it after hydration and outside framework-managed or frequently reconciled text, such as article or CMS content; framework rerenders can replace those wrappers. It does not traverse shadow roots or iframes: enhance each accessible root separately. Use components when the framework needs full control of the emoji&#x27;s DOM.</p>
+<h2 id="low-level-api">Low level API</h2>
+<p>Import the package in an ESM application:</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { emojiMotion } from &#x27;@dofy/native-emoji-motion&#x27;;
+
+// Keep the emoji in its own inline-block element. The card can be the trigger.
+const dispose = emojiMotion.bind(emojiElement, &#x27;👋&#x27;, { trigger: card });
+// When the component is removed:
+dispose();</code></pre></div>
+<p>Or play once manually: <code>emojiMotion.play(emojiElement, &#x27;❤️&#x27;)</code>. <code>resolve(glyph)</code> returns the entry, group and selected motion, or <code>undefined</code> when the input cannot be recognized. <code>list()</code> returns canonical entries; <code>groups()</code> lists groups. <code>bind</code> listens to <code>pointerenter</code> and <code>focus</code> by default. Pass <code>events: [&#x27;click&#x27;]</code> or any DOM event names to change this. Make the trigger keyboard accessible; a <code>&lt;button&gt;</code> is a good default. The element being animated should have <code>display: inline-block</code>, and should be dedicated to the emoji because Web Animations controls its transform.</p>
+<p>Motion is skipped when the user prefers reduced motion. <code>play</code> returns <code>null</code> for unknown emoji, reduced motion, or an element without Web Animations support; otherwise it returns the browser&#x27;s <code>Animation</code>. A repeated play cancels the previous one on the same element. <code>ignoreReducedMotion</code> is an explicit opt out and should only be used with the user&#x27;s consent.</p>
+<h2 id="automatic-classification">🌍 Automatic classification</h2>
+<p>The default entry recognizes emoji using data generated from Unicode Emoji 18.0, including fully qualified, minimally qualified, and unqualified sequences. A known emoji is classified by its Unicode group and subgroup and receives a conservative reusable motion; existing handcrafted presets retain their special animations and optional decorations. Exact Unicode sequences, including flags and ZWJ sequences, are used rather than guessing category from a code point range. <code>resolve()</code> exposes <code>source</code>, <code>unicodeGroup</code> and <code>unicodeSubgroup</code> where available:</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { emojiMotion } from &#x27;@dofy/native-emoji-motion&#x27;;
+
+emojiMotion.resolve(&#x27;🐶&#x27;); // source: &#x27;unicode&#x27;, subgroup: &#x27;animal-mammal&#x27;, motion: &#x27;bounce&#x27;
+emojiMotion.resolve(&#x27;👩🏽‍🚀&#x27;).glyph; // 👩🏽‍🚀
+emojiMotion.resolve(&#x27;📡&#x27;).source; // &#x27;preset&#x27;, including its signal decoration
+emojiMotion.resolve(&#x27;hello&#x27;); // undefined</code></pre></div>
+<p>The precedence is: <strong>user emoji and aliases → user subgroup or group classification rule → user group default → handcrafted preset → generated Unicode classification → conservative fallback</strong>. User emoji entries always take precedence over user classification rules. Within user classifications, subgroup rules take precedence over group rules. An explicitly supplied group default overrides handcrafted and automatic motions for that group; a more specific user emoji or classification rule can override it. User-defined motions replace built in motions with the same ID. User classification rules also override matching handcrafted presets.</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { createEmojiMotion } from &#x27;@dofy/native-emoji-motion&#x27;;
+
+const custom = createEmojiMotion({
+  classifications: {
+    groups: { &#x27;Animals &amp; Nature&#x27;: { group: &#x27;nature&#x27;, motion: &#x27;float&#x27; } },
+    subgroups: { &#x27;animal-bird&#x27;: { group: &#x27;nature&#x27;, motion: &#x27;swing&#x27; } },
+    fallback: { group: &#x27;other&#x27;, motion: &#x27;bounce&#x27; },
+  },
+  emoji: { &#x27;🐶&#x27;: { group: &#x27;hearts&#x27;, name: &#x27;My dog&#x27;, motion: &#x27;pulse&#x27; } },
+});
+// 🐶 uses pulse, 🐦 uses swing, and other animals use float.</code></pre></div>
+<p>A generated Unicode name and subgroup are used for uncustomized emoji. <code>list()</code> remains the small set of handcrafted and explicitly added entries; it is not a list of the entire Unicode dataset. Generated classifications do not automatically create SVG decorations. Unknown sequences newer than the pinned dataset receive a generic fallback only if the JavaScript engine recognizes them as emoji; otherwise they remain unrecognized. Detection does not guarantee that the system font can render the glyph. Standalone components and arbitrary text are not treated as emoji.</p>
+<p>The <code>defaults: false</code> setting disables both built in presets and automatic classification unless <code>autoDetect: true</code> is explicitly supplied; with no built in groups or motions, the caller must define the groups and motions used by its rules. Set <code>autoDetect: false</code> to disable automatic classification while keeping built in presets.</p>
+<h2 id="smaller-preset-only-entry">Smaller preset only entry</h2>
+<p>Use the lite entry to omit the Unicode classifier and its data. Unknown emoji do not automatically animate; user-defined entries and handcrafted presets still work. The matching framework entries also omit Unicode data:</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { createEmojiMotion } from &#x27;@dofy/native-emoji-motion/lite&#x27;;
+import { EmojiMotion as ReactEmoji } from &#x27;@dofy/native-emoji-motion/react/lite&#x27;;
+import { EmojiMotion as VueEmoji } from &#x27;@dofy/native-emoji-motion/vue/lite&#x27;;
+import &#x27;@dofy/native-emoji-motion/element/lite&#x27;;
+// Svelte: import EmojiMotion from &#x27;@dofy/native-emoji-motion/svelte/EmojiMotionLite.svelte&#x27;;</code></pre></div>
+<p>Import either the full or lite web component entry on a page, not both: both register the same <code>emoji-motion</code> tag and the first registration wins. To keep a framework bundle small, use its lite entry rather than passing a lite registry to a full component entry, which still imports the full classifier.</p>
+<p>Unicode data is generated with <code>npm run generate:unicode</code> from a version-pinned, checksum-verified official file. The data is covered by <a href="https://github.com/dofy/emoji-motion/blob/main/UNICODE-LICENSE.txt">UNICODE-LICENSE.txt</a>.</p>
+<h2 id="skin-tone">🎨 Skin tone</h2>
+<p>A registry can specify a default and change it later. <code>resolve</code> returns the glyph to render; animation never changes your element&#x27;s text automatically.</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { createEmojiMotion } from &#x27;@dofy/native-emoji-motion&#x27;;
+
+const motion = createEmojiMotion({ defaultSkinTone: &#x27;medium&#x27; });
+motion.resolve(&#x27;👋&#x27;).glyph; // 👋🏽
+motion.resolve(&#x27;👋&#x27;, { skinTone: &#x27;dark&#x27; }).glyph; // 👋🏿
+motion.setDefaultSkinTone(&#x27;light&#x27;);
+motion.resolve(&#x27;👋&#x27;).glyph; // 👋🏻</code></pre></div>
+<p>The available values are <code>default</code>, <code>light</code>, <code>medium-light</code>, <code>medium</code>, <code>medium-dark</code> and <code>dark</code>. Explicitly supplied skin tone variants retain their tone unless a per-call override is supplied. Automatic skin tones are applied only where an official single-tone variant is unambiguous; mixed-tone sequences stay unchanged rather than being rewritten. Emoji without a skin tone mapping stay unchanged. When adding custom emoji, supply <code>skinTones</code> as an explicit map from the tone names to complete Unicode sequences, including any joiners; the library does not guess modifier placement. If the default tone changes, update rendered text by resolving again.</p>
+<h2 id="extend">🛠️ Extend</h2>
+<p>An isolated registry combines built ins and your definitions; existing IDs can be replaced. Set <code>defaults: false</code> to use only your own definitions. Emoji variants are explicit rather than guessed, so skin tone and multi code point sequences remain under your control.</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { createEmojiMotion } from &#x27;@dofy/native-emoji-motion&#x27;;
+
+const motion = createEmojiMotion({
+  motions: {
+    wiggle: {
+      keyframes: [
+        { transform: &#x27;rotate(0deg)&#x27; },
+        { transform: &#x27;rotate(12deg)&#x27; },
+        { transform: &#x27;rotate(0deg)&#x27; },
+      ],
+      options: { duration: 600, easing: &#x27;ease-out&#x27; },
+      origin: &#x27;50% 80%&#x27;,
+    },
+  },
+  groups: { creatures: { label: &#x27;Creatures&#x27;, motion: &#x27;wiggle&#x27; } },
+  emoji: { &#x27;🐙&#x27;: { name: &#x27;Octopus&#x27;, group: &#x27;creatures&#x27; } },
+});
+motion.bind(emojiElement, &#x27;🐙&#x27;, { trigger: card });</code></pre></div>
+<p>Groups select a default motion; an emoji entry can override it with <code>motion</code>, and <code>variants</code> lists exact alternate sequences that inherit its settings. References and duplicate variants are validated when a registry is created. Definitions are ordinary JavaScript objects; do not mutate exported built in data. Create a new registry to change configuration. API types are included.</p>
+<h3 id="motion-families">Motion families</h3>
+<p>Families apply a shared motion to explicitly reviewed members. Built in families include balls, plants, drinks, flying animals, people, sea life, bakery, rail vehicles and instruments. They do not assume every emoji in a Unicode subgroup moves alike. <code>resolve()</code> reports <code>source: &#x27;family&#x27;</code> and <code>familyId</code> for family matches; <code>list()</code> remains the handcrafted emoji list, while <code>families()</code> returns family definitions.</p>
+<p>Use the configurable spring and sway builders to create reusable motions. A family can adjust Web Animations timing with <code>animation</code>, and combine named SVG effects with <code>decorations</code>:</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">import { createEmojiMotion, createSpringMotion } from &#x27;@dofy/native-emoji-motion&#x27;;
+
+const motion = createEmojiMotion({
+  motions: { smallBounce: createSpringMotion({ height: 14, rebounds: 2, duration: 900 }) },
+  families: {
+    snacks: {
+      label: &#x27;Snacks&#x27;, group: &#x27;food&#x27;, motion: &#x27;smallBounce&#x27;,
+      members: [&#x27;🍪&#x27;, &#x27;🍩&#x27;],
+      animation: { duration: 800 },
+      decorations: [&#x27;impact&#x27;, &#x27;sparkle&#x27;],
+    },
+  },
+});</code></pre></div>
+<p>Pass <code>motion</code> as the component&#x27;s <code>registry</code> property to use this configuration. <code>createSwayMotion({ angle, duration, origin })</code> provides a direction neutral sway. Effects remain optional and require a decoration container when using the low level API. Each effect keeps its own anchor unless the caller explicitly overrides it.</p>
+<p>Custom emoji definitions take priority, followed by custom Unicode classifications and custom families. Built in single emoji presets precede built in families; remaining emoji use automatic classification. A custom group default overrides built in presets and families, while an explicitly defined custom family keeps its chosen motion. A custom family with the same ID replaces the built in family. Unicode variants and unambiguous skin tones are resolved by the full entry; for the lite entry, supply explicit <code>aliases: { &#x27;🧎🏽&#x27;: &#x27;🧎&#x27; }</code> mappings when a family needs variants. Mixed tone sequences are never guessed or rewritten.</p>
+<h2 id="optional-decorative-effects">✨ Optional decorative effects</h2>
+<p>Emoji can also reference a decoration preset. The built in 📡 example adds a neutral signal halo around the whole glyph; 🔔 and 🎵 add notes, and ✨ adds sparkles. Decorations are opt in and render inside a container you provide. Make the container <code>position: relative</code> and size it to the glyph. Effects do not change the emoji itself.</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-markup">&lt;button id=&quot;antenna&quot;&gt;&lt;span class=&quot;emoji-box&quot;&gt;&lt;span id=&quot;dish&quot;&gt;📡&lt;/span&gt;&lt;/span&gt;&lt;/button&gt;
+&lt;style&gt;.emoji-box { position: relative; display: inline-block } #dish { display: inline-block }&lt;/style&gt;</code></pre></div>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">emojiMotion.bind(document.querySelector(&#x27;#dish&#x27;), &#x27;📡&#x27;, {
+  trigger: document.querySelector(&#x27;#antenna&#x27;),
+  decoration: {
+    container: document.querySelector(&#x27;.emoji-box&#x27;),
+    // Optional: adjust for the font actually used by your application.
+    anchor: { x: &#x27;50%&#x27;, y: &#x27;50%&#x27; },
+    flipX: false,
+    rotate: 0,
+  },
+});</code></pre></div>
+<p><code>anchor</code> is relative to the container. <code>flipX</code> and <code>rotate</code> affect the decoration, never the glyph. For asymmetric effects, select explicit settings for the actual font or environment you support; OS detection alone cannot reliably determine the font or its direction. The default signal effect is centered rather than tied to a specific antenna position. When no decoration container is supplied, only the emoji moves. Decoration layers are removed after playback, on replay and on cleanup; reduced motion skips both.</p>
+<p>Add custom <code>decorations</code> in <code>createEmojiMotion</code>: each named preset has an <code>anchor</code> and <code>layers</code>, each with CSS <code>style</code>, Web Animations <code>keyframes</code> and <code>options</code>. Optionally provide <code>svg: { viewBox, elements }</code>, where each element has a <code>tag</code> and <code>attrs</code>; without <code>svg</code>, a styled span is used. Reference its name using the emoji entry&#x27;s <code>decoration</code> field. Layer styles are trusted application code, and the library does not bundle images or fonts.</p>
+<p>For example, this adds an SVG sparkle to a custom group:</p>
+<div class="doc-code"><button type="button" class="doc-copy" aria-label="Copy code">Copy</button><pre><code class="language-javascript">const custom = createEmojiMotion({
+  decorations: {
+    star: {
+      anchor: { x: &#x27;50%&#x27;, y: &#x27;50%&#x27; },
+      layers: [{
+        svg: { viewBox: &#x27;0 0 100 100&#x27;, elements: [
+          { tag: &#x27;circle&#x27;, attrs: { cx: &#x27;50&#x27;, cy: &#x27;20&#x27;, r: &#x27;5&#x27;, fill: &#x27;gold&#x27; } },
+        ] },
+        style: { width: &#x27;160%&#x27;, height: &#x27;160%&#x27; },
+        keyframes: [
+          { opacity: 1, transform: &#x27;translate(-50%, -50%) scale(.6)&#x27; },
+          { opacity: 0, transform: &#x27;translate(-50%, -50%) scale(1.2)&#x27; },
+        ],
+        options: { duration: 700 },
+      }],
+    },
+  },
+  emoji: { &#x27;🌟&#x27;: { name: &#x27;Glowing star&#x27;, group: &#x27;symbols&#x27;, decoration: &#x27;star&#x27; } },
+});
+custom.bind(emojiElement, &#x27;🌟&#x27;, { trigger: card, decoration: { container: emojiBox } });</code></pre></div>
+<h2 id="platform-boundaries">Platform boundaries</h2>
+<p>The library animates the entire native glyph, not individual parts. Rendering, supported emoji, sizes and font fallback vary by operating system, browser and installed fonts. Unsupported sequences may appear as missing glyphs or multiple characters. This library deliberately ships no emoji images or fonts and does not replace unsupported glyphs. Test the target browser, OS and font combinations for your product. Keyframes use relative transforms, but the visual pivot can still vary between fonts.</p>
+<h2 id="development-and-release">Development and release</h2>
+<p><code>npm test</code> runs the registry and lifecycle tests; <code>npm run pack:check</code> previews package contents. The core uses ESM and the browser Web Animations API; it does not require a framework. See <a href="https://github.com/dofy/emoji-motion/blob/main/RELEASE.md">RELEASE.md</a> for the release checklist.</p></main></div><footer><span>© 2026 Emoji Motion contributors</span><a href="/">Explore the demo ↗</a></footer><script defer src="/demo/vendor/prism.js"></script><script defer src="/demo/vendor/prism-jsx.js"></script><script defer src="/docs/main.js"></script></body></html>

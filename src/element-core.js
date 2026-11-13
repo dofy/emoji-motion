@@ -2,7 +2,7 @@ const BaseElement = globalThis.HTMLElement ?? class {};
 /** Framework-independent web component. Import this module to register <emoji-motion>. */
 export function createEmojiMotionElement(emojiMotion) {
  return class EmojiMotionElement extends BaseElement {
-  static observedAttributes = ['emoji', 'skin-tone', 'display', 'decoration', 'label'];
+  static observedAttributes = ['emoji', 'skin-tone', 'decoration', 'label'];
   #registry = emojiMotion;
   #dispose = () => {};
   get registry() { return this.#registry; }
@@ -15,7 +15,6 @@ export function createEmojiMotionElement(emojiMotion) {
     const emoji = this.getAttribute('emoji') ?? '';
     const skinTone = this.getAttribute('skin-tone') ?? undefined;
     const result = this.#registry.resolve(emoji, { skinTone });
-    this.style.display = this.getAttribute('display') === 'block' ? 'block' : 'inline-block';
     this.setAttribute('role', 'img');
     this.setAttribute('aria-label', this.getAttribute('label') ?? result?.name ?? emoji);
     if (!this.hasAttribute('tabindex')) this.tabIndex = 0;

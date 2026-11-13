@@ -26,7 +26,10 @@ import SvelteEmoji from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
 import { EmojiMotionElement } from '@dofy/native-emoji-motion/element';
 void SvelteEmoji;
 void EmojiMotionElement;
-createElement(ReactEmoji, { emoji: '👋', display: 'block' });
+createElement(ReactEmoji, { emoji: '👋', style: { display: 'block' } });
+// @ts-expect-error The display prop was removed; use CSS or a container.
+const removedDisplay: import('@dofy/native-emoji-motion/react').EmojiMotionProps = { emoji: '👋', display: 'block' };
+void removedDisplay;
 import { createEmojiMotion as createLite } from '@dofy/native-emoji-motion/lite';
 import { EmojiMotion as ReactLite } from '@dofy/native-emoji-motion/react/lite';
 import { EmojiMotion as VueLite } from '@dofy/native-emoji-motion/vue/lite';
@@ -46,3 +49,8 @@ if (classification) { const source: string = classification.source; void source;
 const family: MotionFamily = { label: 'Balls', group: 'activities', motion: 'custom', members: ['🥎'], decorations: ['sparkle', 'impact'] };
 const familyRegistry = createEmojiMotion({ motions: { custom: createSpringMotion({ height: 20, rebounds: 2 }) }, families: { balls: family } });
 familyRegistry.families();
+
+const enhancer = emojiMotion.enhance({ root: '#article', exclude: '.skip', enabled: false, observe: true, decoration: true, events: ['click'] });
+enhancer.disable();
+enhancer.enable();
+enhancer.cleanup();

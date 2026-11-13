@@ -48,12 +48,12 @@ test('Svelte action updates glyph and cleans up listeners', async () => {
   glyph.dispatchEvent(new dom.window.Event('click')); assert.equal(animations.length, 2); action.destroy(); assert.equal(animations[1].cancelled, true);
 });
 
-test('React and Vue components support block layout and decorations', async () => {
+test('React and Vue preserve user CSS layout and decorations', async () => {
   const reactEl = document.createElement('div'); document.body.append(reactEl); const root = createRoot(reactEl); animations = [];
-  await React.act(() => root.render(React.createElement(ReactEmoji, { emoji: '📡', display: 'block' })));
+  await React.act(() => root.render(React.createElement(ReactEmoji, { emoji: '📡', style: { display: 'block' } })));
   assert.equal(reactEl.firstChild.style.display, 'block'); reactEl.firstChild.dispatchEvent(new dom.window.Event('click'));
   assert.equal(reactEl.querySelectorAll('svg').length, 3); await React.act(() => root.unmount()); reactEl.remove();
-  const vueEl = document.createElement('div'); document.body.append(vueEl); const app = Vue.createApp({ render: () => Vue.h(VueEmoji, { emoji: '📡', display: 'block' }) });
+  const vueEl = document.createElement('div'); document.body.append(vueEl); const app = Vue.createApp({ render: () => Vue.h(VueEmoji, { emoji: '📡', style: { display: 'block' } }) });
   app.mount(vueEl); await Vue.nextTick(); assert.equal(vueEl.firstChild.style.display, 'block'); vueEl.firstChild.dispatchEvent(new dom.window.Event('click'));
   assert.equal(vueEl.querySelectorAll('svg').length, 3); app.unmount(); vueEl.remove();
 });
@@ -76,10 +76,10 @@ test('framework components render family animations, composed effects, and tones
 test('web component registers, updates attributes and disposes decorations', async () => {
   globalThis.customElements = dom.window.customElements;
   await import('../src/element.js');
-  const el = document.createElement('emoji-motion'); el.setAttribute('emoji', '📡'); el.setAttribute('display', 'block'); document.body.append(el);
-  assert.equal(el.style.display, 'block'); el.dispatchEvent(new dom.window.Event('click')); assert.equal(el.querySelectorAll('svg').length, 3);
+  const el = document.createElement('emoji-motion'); el.setAttribute('emoji', '📡'); document.body.append(el);
+  assert.equal(el.style.display, ''); el.style.display = 'block'; el.dispatchEvent(new dom.window.Event('click')); assert.equal(el.querySelectorAll('svg').length, 3);
   el.setAttribute('emoji', '👋'); el.setAttribute('skin-tone', 'dark'); assert.equal(el.textContent, '👋🏿'); assert.equal(el.querySelectorAll('svg').length, 0);
-  el.setAttribute('display', 'inline'); assert.equal(el.style.display, 'inline-block'); el.remove();
+  assert.equal(el.style.display, 'block'); el.remove();
 });
 
 test('Svelte component compiles for client and server rendering', async () => {
@@ -162,4 +162,27 @@ test('web component and Svelte action honor user overrides for a selected skin t
   animations = []; const glyph = document.createElement('span');
   const action = animateEmoji(glyph, { emoji: '👋', skinTone: 'dark', registry });
   glyph.dispatchEvent(new dom.window.Event('click')); assert.equal(animations[0].frames[1].transform, 'scale(1.25)'); action.destroy();
+});
+
+test('enhancer skips actual framework components and leaves their bindings intact', async () => {
+  const { emojiMotion } = await import('../src/index.js');
+  const container = document.createElement('div'); document.body.append(container);
+  const reactHost = document.createElement('div'); const vueHost = document.createElement('div');
+  container.append(reactHost, vueHost);
+  const reactRoot = createRoot(reactHost);
+  await React.act(() => reactRoot.render(React.createElement(ReactEmoji, { emoji: '👋' })));
+  const vueApp = Vue.createApp({ render: () => Vue.h(VueEmoji, { emoji: '❤️' }) });
+  vueApp.mount(vueHost); await Vue.nextTick();
+  const actionNode = document.createElement('span'); container.append(actionNode);
+  const { animateEmoji } = await import('../src/svelte.js');
+  const action = animateEmoji(actionNode, { emoji: '👋' });
+  const controller = emojiMotion.enhance({ root: container });
+  assert.equal(container.querySelectorAll('[data-emoji-motion="enhanced"]').length, 0);
+  animations = [];
+  reactHost.firstChild.dispatchEvent(new dom.window.Event('click'));
+  vueHost.firstChild.dispatchEvent(new dom.window.Event('click'));
+  actionNode.dispatchEvent(new dom.window.Event('click'));
+  assert.equal(animations.length, 3);
+  controller.cleanup(); action.destroy(); vueApp.unmount();
+  await React.act(() => reactRoot.unmount()); container.remove();
 });

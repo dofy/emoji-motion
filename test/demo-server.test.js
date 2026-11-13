@@ -15,6 +15,11 @@ test('local demo serves syntax highlighter assets', async () => {
       assert.match(response.headers.get('content-type'), /javascript/);
       assert.ok((await response.text()).length > 100);
     }
+    for (const [path, type] of [['/docs/', /text\/html/], ['/docs/style.css', /text\/css/], ['/docs/main.js', /javascript/], ['/assets/logo.svg', /image\/svg/]]) {
+      const response = await fetch(url + path);
+      assert.equal(response.status, 200, `${path} should load`);
+      assert.match(response.headers.get('content-type'), type);
+    }
   } finally {
     server.kill();
     await once(server, 'exit');

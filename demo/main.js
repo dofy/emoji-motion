@@ -23,7 +23,6 @@ const count = document.querySelector('#count');
 const skinTone = document.querySelector('#skin-tone');
 const framework = document.querySelector('#framework');
 const frameworkSelectors = document.querySelectorAll('[data-framework]');
-const displayMode = document.querySelector('#display-mode');
 const autoInput = document.querySelector('#auto-emoji');
 const autoPreview = document.querySelector('#auto-preview');
 const autoResult = document.querySelector('#auto-result');
@@ -36,10 +35,9 @@ function restoreSelect(select, name) {
 }
 restoreSelect(skinTone, 'skin-tone');
 restoreSelect(framework, 'framework');
-restoreSelect(displayMode, 'display-mode');
 for (const selector of frameworkSelectors) selector.value = framework.value;
 const savedEmoji = readPreference('auto-emoji');
-if (savedEmoji !== null && savedEmoji.length <= autoInput.maxLength) autoInput.value = savedEmoji;
+if (savedEmoji !== null && savedEmoji.length <= autoInput.maxLength && emojiMotion.resolve(savedEmoji.trim())) autoInput.value = savedEmoji;
 emojiMotion.setDefaultSkinTone(skinTone.value);
 skinTone.addEventListener('change', () => { savePreference('skin-tone', skinTone.value); emojiMotion.setDefaultSkinTone(skinTone.value); render(); updateAutoPreview(); });
 const all = emojiMotion.list();
@@ -63,6 +61,14 @@ let selected = 'featured';
 const savedFilter = readPreference('gallery-filter');
 if (filterIds.has(savedFilter)) selected = savedFilter;
 const palette = ['peach', 'lilac', 'yellow', 'mint', 'blue', 'pink'];
+const pageSize = 12;
+const savedPage = Number(readPreference('gallery-page'));
+let page = Number.isSafeInteger(savedPage) && savedPage > 0 ? savedPage : 1;
+let pageCount = 1;
+const pagination = document.querySelector('#gallery-pagination');
+const pageLabel = document.querySelector('#gallery-page');
+const pagePrevious = document.querySelector('#gallery-prev');
+const pageNext = document.querySelector('#gallery-next');
 function render() {
   cleanups.forEach(cleanup => cleanup()); cleanups = []; grid.replaceChildren();
   const shown = selected === 'featured'
@@ -70,13 +76,24 @@ function render() {
     : selected === 'all' ? all : selected === 'family' ? familyGlyphs
     : galleryGlyphs.filter(glyph => selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected);
   count.textContent = `${String(shown.length).padStart(2, '0')} LITTLE MOVEMENTS`;
-  for (const [index, glyph] of shown.entries()) {
+  pageCount = Math.max(1, Math.ceil(shown.length / pageSize));
+  page = Math.min(page, pageCount);
+  savePreference('gallery-page', String(page));
+  pagination.hidden = pageCount <= 1;
+  pagePrevious.disabled = page === 1;
+  pageNext.disabled = page === pageCount;
+  pageLabel.textContent = `Page ${page} of ${pageCount}`;
+  const offset = (page - 1) * pageSize;
+  for (const [index, glyph] of shown.slice(offset, offset + pageSize).entries()) {
     const item = emojiMotion.resolve(glyph);
     const button = document.createElement('button');
     button.className = `emoji-card ${palette[galleryGlyphs.indexOf(glyph) % palette.length]}`;
     button.type = 'button'; button.setAttribute('aria-label', `${item.name}, preview and copy component`);
-    const number = document.createElement('span'); number.className = 'card-number'; number.textContent = String(index + 1).padStart(2, '0');
-    const arrow = document.createElement('span'); arrow.className = 'card-arrow'; arrow.textContent = '↗'; arrow.setAttribute('aria-hidden', 'true');
+    const number = document.createElement('span'); number.className = 'card-number'; number.textContent = String(offset + index + 1).padStart(2, '0');
+    const copyIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    copyIcon.classList.add('card-arrow'); copyIcon.setAttribute('viewBox', '0 0 24 24'); copyIcon.setAttribute('fill', 'none'); copyIcon.setAttribute('stroke', 'currentColor'); copyIcon.setAttribute('stroke-width', '1.6'); copyIcon.setAttribute('aria-hidden', 'true');
+    const copyPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    copyPath.setAttribute('d', 'M8 8h10v12H8z M6 16H4V4h10v2'); copyPath.setAttribute('stroke-linecap', 'round'); copyPath.setAttribute('stroke-linejoin', 'round'); copyIcon.append(copyPath);
     const stage = document.createElement('span'); stage.className = 'emoji-stage';
     const visual = document.createElement('span'); visual.className = 'emoji-visual';
     const glyphEl = document.createElement('span'); glyphEl.className = 'glyph'; glyphEl.textContent = item.glyph; glyphEl.setAttribute('aria-hidden','true'); visual.append(glyphEl); stage.append(visual);
@@ -84,7 +101,7 @@ function render() {
     const name = document.createElement('span'); name.textContent = item.name;
     const groupLabel = item.source === 'family' ? `${item.group.label} · Family` : item.group.label;
     const group = document.createElement('span'); group.textContent = groupLabel; group.setAttribute('aria-live', 'polite');
-    bottom.append(name, group); button.append(number, arrow, stage, bottom); grid.append(button);
+    bottom.append(name, group); button.append(number, copyIcon, stage, bottom); grid.append(button);
     let copiedTimer;
     button.addEventListener('click', async () => {
       const copied = await copyText(markupFor(item), document.querySelector('#copy-status'), document.querySelector('#copy-fallback'), '');
@@ -93,7 +110,16 @@ function render() {
     cleanups.push(emojiMotion.bind(glyphEl, glyph, { trigger: button, events: ['pointerenter', 'focus', 'click'], ...(item.decorationPreset ? { decoration: { container: visual } } : {}) }));
   }
 }
-function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
+function makeFilter(id, label) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.className = 'filter'; button.setAttribute('aria-pressed', String(id === selected)); button.addEventListener('click', () => { selected = id; page = 1; savePreference('gallery-filter', id); for (const el of filters.children) el.setAttribute('aria-pressed', String(el === button)); render(); }); filters.append(button); }
+function changePage(nextPage) {
+  if (nextPage < 1 || nextPage > pageCount) return;
+  page = nextPage;
+  render();
+  grid.scrollIntoView({ block: 'start', behavior: 'instant' });
+  grid.focus({ preventScroll: true });
+}
+pagePrevious.addEventListener('click', () => changePage(page - 1));
+pageNext.addEventListener('click', () => changePage(page + 1));
 function updateAutoPreview() {
   const value = autoInput.value.trim();
   const result = emojiMotion.resolve(value);
@@ -148,7 +174,9 @@ const exampleCode = {
 
 <div class="card">
   <strong>Say hello</strong>
-  <emoji-motion emoji="👋" display="block"></emoji-motion>
+  <div style="text-align: right">
+    <emoji-motion emoji="👋"></emoji-motion>
+  </div>
 </div>`,
   setup: `// Import once in your app's entry module.
 import '@dofy/native-emoji-motion/element';
@@ -158,9 +186,8 @@ import '@dofy/native-emoji-motion/element';
 function escapeAttribute(value) { return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
 function markupFor(item) {
   const glyph = escapeAttribute(item.glyph);
-  const display = displayMode.value;
-  if (framework.value === 'vanilla') return `<emoji-motion emoji="${glyph}" display="${display}"></emoji-motion>`;
-  return `<EmojiMotion emoji="${glyph}" display="${display}" />`;
+  if (framework.value === 'vanilla') return `<emoji-motion emoji="${glyph}"></emoji-motion>`;
+  return `<EmojiMotion emoji="${glyph}" />`;
 }
 async function copyText(value, status, fallback, success) {
   fallback.hidden = true;
@@ -189,7 +216,9 @@ export function HelloCard() {
   return (
     <div className="card">
       <strong>Say hello</strong>
-      <EmojiMotion emoji="👋" display="block" />
+      <div style={{ textAlign: 'right' }}>
+        <EmojiMotion emoji="👋" />
+      </div>
     </div>
   );
 }`,
@@ -212,7 +241,9 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 <template>
   <div class="card">
     <strong>Say hello</strong>
-    <EmojiMotion emoji="👋" display="block" />
+    <div style="text-align: right">
+      <EmojiMotion emoji="👋" />
+    </div>
   </div>
 </template>`,
     setup: `<script setup>
@@ -233,7 +264,9 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 
 <div class="card">
   <strong>Say hello</strong>
-  <EmojiMotion emoji="👋" display="block" />
+  <div style="text-align: right">
+    <EmojiMotion emoji="👋" />
+  </div>
 </div>`,
     setup: `<script>
   import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
@@ -318,8 +351,14 @@ for (const selector of frameworkSelectors) selector.addEventListener('change', (
   savePreference('framework', selector.value);
   updateCode(); document.querySelector('#copy-status').textContent = '';
 });
-displayMode.addEventListener('change', () => { savePreference('display-mode', displayMode.value); document.querySelector('#copy-status').textContent = ''; });
 updateCode();
+document.querySelector('#copy-install').addEventListener('click', async event => {
+  const button = event.currentTarget;
+  if (await copyText('npm install @dofy/native-emoji-motion', document.querySelector('#install-copy-status'), document.querySelector('#install-copy-fallback'), '')) {
+    button.textContent = 'Copied ✓';
+    setTimeout(() => { button.textContent = 'Copy'; }, 2000);
+  }
+});
 document.querySelector('#copy-custom').addEventListener('click', async event => {
   const button = event.currentTarget;
   if (await copyText(customCode[framework.value], document.querySelector('#custom-copy-status'), document.querySelector('#custom-copy-fallback'), '')) {
@@ -357,3 +396,60 @@ for (const tab of tabs) {
     activateTab(tabs[next], true);
   });
 }
+
+// Enhance the ordinary text shown in the adjacent original HTML example.
+const enhanceContent = document.querySelector('#enhance-content');
+const enhanceExamples = {
+  html: `<div id="enhance-content">
+  <p>Good morning 👋🏽 The coffee is ready ☕</p>
+  <p>Let’s make something lovely today ✨</p>
+</div>`,
+  js: `import { emojiMotion } from '@dofy/native-emoji-motion';
+
+const enhancer = emojiMotion.enhance({
+  root: '#enhance-content',
+  // enabled: false, // Wait until enable() to start.
+});
+
+// New text is enhanced automatically.
+// enhancer.disable(); // Temporarily turn off.
+// enhancer.enable();  // Turn on and rescan.
+// enhancer.cleanup(); // Permanently clean up.`
+};
+for (const [key, code] of Object.entries(enhanceExamples)) {
+  const element = document.querySelector(`#enhance-${key}`);
+  element.textContent = code;
+  if (globalThis.Prism) globalThis.Prism.highlightElement(element);
+}
+const enhancer = emojiMotion.enhance({ root: enhanceContent });
+let enhanceEnabled = true;
+const demoSentences = [
+  'A little progress is worth celebrating 🎉',
+  'Fresh ideas are starting to bloom 🌱',
+  'Taking a moment to enjoy the sunshine ☀️',
+  'A friendly hello from across the world 🌍',
+  'Every small step can lead somewhere new 🚶🏽',
+  'A good song makes the day brighter 🎵',
+];
+let nextSentence = 0;
+document.querySelector('#enhance-add').addEventListener('click', () => {
+  const additions = enhanceContent.querySelectorAll('[data-demo-sentence]');
+  if (additions.length >= 4) additions[0].remove();
+  const paragraph = document.createElement('p');
+  paragraph.dataset.demoSentence = '';
+  paragraph.textContent = demoSentences[nextSentence];
+  nextSentence = (nextSentence + 1) % demoSentences.length;
+  enhanceContent.append(paragraph);
+});
+document.querySelector('#enhance-toggle').addEventListener('click', event => {
+  if (enhanceEnabled) enhancer.disable();
+  else enhancer.enable();
+  enhanceEnabled = !enhanceEnabled;
+  event.currentTarget.textContent = enhanceEnabled ? 'Turn off animation' : 'Turn on animation';
+});
+for (const button of document.querySelectorAll('[data-enhance-copy]')) button.addEventListener('click', async () => {
+  if (await copyText(enhanceExamples[button.dataset.enhanceCopy], document.querySelector('#enhance-copy-status'), document.querySelector('#enhance-copy-fallback'), '')) {
+    button.textContent = 'Copied ✓';
+    setTimeout(() => { button.textContent = 'Copy code'; }, 2000);
+  }
+});

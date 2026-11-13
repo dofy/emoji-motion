@@ -17,10 +17,10 @@ try {
   const { default: Component } = await import(file.href);
   const { mount, unmount, flushSync } = await import('svelte');
   const root = document.querySelector('main');
-  const component = mount(Component, { target: root, props: { emoji: '👋', skinTone: 'dark', display: 'block' } });
+  const component = mount(Component, { target: root, props: { emoji: '👋', skinTone: 'dark' } });
   flushSync();
   const element = root.firstElementChild;
   element.dispatchEvent(new dom.window.Event('click'));
-  if (element.textContent.trim() !== '👋🏿' || element.style.display !== 'block' || played !== 1) throw new Error('Svelte component failed to render or animate');
+  if (element.textContent.trim() !== '👋🏿' || element.style.display !== '' || played !== 1) throw new Error('Svelte component failed to render or animate');
   await unmount(component);
 } finally { await unlink(file); }

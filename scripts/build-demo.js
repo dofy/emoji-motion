@@ -4,13 +4,15 @@ const dist = new URL('../dist/', import.meta.url);
 await rm(dist, { recursive: true, force: true });
 await mkdir(new URL('demo/', dist), { recursive: true });
 await mkdir(new URL('src/', dist), { recursive: true });
+await mkdir(new URL('assets/', dist), { recursive: true });
+await mkdir(new URL('docs/', dist), { recursive: true });
 await mkdir(new URL('demo/vendor/', dist), { recursive: true });
-for (const [source, target] of [['demo/index.html', 'index.html'], ['UNICODE-LICENSE.txt', 'UNICODE-LICENSE.txt'], ['demo/main.js', 'demo/main.js'], ['demo/style.css', 'demo/style.css'], ['src/index.js', 'src/index.js'], ['src/registry.js', 'src/registry.js'], ['src/unicode.js', 'src/unicode.js'], ['src/unicode-data.js', 'src/unicode-data.js'], ['src/element.js', 'src/element.js'], ['src/element-core.js', 'src/element-core.js'], ['src/presets.js', 'src/presets.js']]) {
+for (const [source, target] of [['demo/index.html', 'index.html'], ['assets/logo.svg', 'assets/logo.svg'], ['docs/index.html', 'docs/index.html'], ['docs/style.css', 'docs/style.css'], ['docs/main.js', 'docs/main.js'], ['UNICODE-LICENSE.txt', 'UNICODE-LICENSE.txt'], ['demo/main.js', 'demo/main.js'], ['demo/style.css', 'demo/style.css'], ['src/index.js', 'src/index.js'], ['src/registry.js', 'src/registry.js'], ['src/enhance.js', 'src/enhance.js'], ['src/unicode.js', 'src/unicode.js'], ['src/unicode-data.js', 'src/unicode-data.js'], ['src/element.js', 'src/element.js'], ['src/element-core.js', 'src/element-core.js'], ['src/presets.js', 'src/presets.js']]) {
   await copyFile(new URL(`../${source}`, import.meta.url), new URL(target, dist));
 }
 // Version relative imports as well as entry points: preset changes must reach
 // browsers even when a CDN has cached the previous module graph.
-const modules = ['demo/main.js', 'src/index.js', 'src/registry.js', 'src/unicode.js', 'src/unicode-data.js', 'src/element.js', 'src/element-core.js', 'src/presets.js'];
+const modules = ['demo/main.js', 'src/index.js', 'src/registry.js', 'src/enhance.js', 'src/unicode.js', 'src/unicode-data.js', 'src/element.js', 'src/element-core.js', 'src/presets.js'];
 const sources = await Promise.all(modules.map(path => readFile(new URL(path, dist), 'utf8')));
 const moduleVersion = createHash('sha256').update(sources.join('\0')).digest('hex').slice(0, 12);
 for (const [index, path] of modules.entries()) {
@@ -23,7 +25,16 @@ for (const path of ['demo/style.css', 'demo/main.js']) {
   const digest = createHash('sha256').update(await readFile(new URL(path, dist))).digest('hex').slice(0, 12);
   html = html.replace(`/${path}"`, `/${path}?v=${digest}"`);
 }
+const logoDigest = createHash('sha256').update(await readFile(new URL('assets/logo.svg', dist))).digest('hex').slice(0, 12);
+html = html.replaceAll('/assets/logo.svg"', `/assets/logo.svg?v=${logoDigest}"`);
 await writeFile(new URL('index.html', dist), html);
+let docsHtml = await readFile(new URL('docs/index.html', dist), 'utf8');
+for (const path of ['docs/style.css', 'docs/main.js']) {
+  const digest = createHash('sha256').update(await readFile(new URL(path, dist))).digest('hex').slice(0, 12);
+  docsHtml = docsHtml.replaceAll(`/${path}"`, `/${path}?v=${digest}"`);
+}
+docsHtml = docsHtml.replaceAll('/assets/logo.svg"', `/assets/logo.svg?v=${logoDigest}"`);
+await writeFile(new URL('docs/index.html', dist), docsHtml);
 console.log('Built static demo in dist/');
 
 await copyFile(new URL('../node_modules/prismjs/prism.js', import.meta.url), new URL('demo/vendor/prism.js', dist));

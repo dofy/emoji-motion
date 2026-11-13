@@ -1,6 +1,6 @@
 {
   "name": "@dofy/native-emoji-motion",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Expressive, extensible animations for native emoji with optional SVG effects",
   "type": "module",
   "exports": {

@@ -5,7 +5,6 @@ export interface EmojiMotionProps {
   skinTone?: SkinTone;
   registry?: Registry;
   decoration?: boolean;
-  display?: 'inline' | 'block';
   trigger?: EventTarget;
   label?: string;
   events?: string[];

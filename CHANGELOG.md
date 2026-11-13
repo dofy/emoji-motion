@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0 — 2026-11-13
+
+- **Breaking:** Remove the component `display` prop and web component attribute. Components use normal inline layout; use a block container or CSS for placement.
+- Add `enhance()` to animate emoji in existing text and observe dynamic content.
+- Expand reviewed motion families and improve the demo.
+
 ## 0.3.0 — 2026-11-13
 
 - Add lighting and sparkle effects for light sources, reflective objects, and celebrations.

@@ -1,3 +1,4 @@
+import { enhance } from './enhance.js';
 import { motions as defaultMotions, groups as defaultGroups, emoji as defaultEmoji, decorations as defaultDecorations, families as defaultFamilies } from './presets.js';
 
 const toneNames = ['default', 'light', 'medium-light', 'medium', 'medium-dark', 'dark'];
@@ -179,5 +180,5 @@ export function createRegistry(config = {}, classifier) {
     for (const event of events) trigger.addEventListener(event, handler);
     return () => { for (const event of events) trigger.removeEventListener(event, handler); active.get(element)?.dispose(); active.delete(element); };
   }
-  return { resolve, play, bind, setDefaultSkinTone(tone) { validateTone(tone); defaultSkinTone = tone; }, getDefaultSkinTone: () => defaultSkinTone, list: () => Object.keys(entries), groups: () => Object.entries(groups).map(([id, group]) => ({ id, ...group })), families: () => Object.entries({ ...builtinFamilies, ...userFamilies }).map(([id, family]) => ({ ...family, id, members: [...family.members], ...(family.aliases ? { aliases: { ...family.aliases } } : {}), ...(family.decorations ? { decorations: [...family.decorations] } : {}), ...(family.animation ? { animation: { ...family.animation } } : {}) })) };
+  return { resolve, play, bind, enhance(options) { return enhance({ resolve, bind }, options); }, setDefaultSkinTone(tone) { validateTone(tone); defaultSkinTone = tone; }, getDefaultSkinTone: () => defaultSkinTone, list: () => Object.keys(entries), groups: () => Object.entries(groups).map(([id, group]) => ({ id, ...group })), families: () => Object.entries({ ...builtinFamilies, ...userFamilies }).map(([id, family]) => ({ ...family, id, members: [...family.members], ...(family.aliases ? { aliases: { ...family.aliases } } : {}), ...(family.decorations ? { decorations: [...family.decorations] } : {}), ...(family.animation ? { animation: { ...family.animation } } : {}) })) };
 }
