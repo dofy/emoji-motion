@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.0 — 2026-11-13
+## 0.6.0 — 2026-11-14
 
 - Add motion families for vegetables, land animals, clothing, tools, books, hand gestures, boats and sweet treats.
 - Support the official skin tone variants for the new hand gestures.
