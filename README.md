@@ -10,9 +10,42 @@ Small, expressive animations for native emoji. A framework independent, dependen
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **With effects** to preview all emoji with decorative SVG layers, or choose a semantic group. Select an emoji to copy its markup, then use the one time setup in the examples section to enable its animation. The examples show how to place an emoji in a sentence or inside a card.
+Open http://127.0.0.1:4173. Hover, focus or tap a card; use the filters to explore the groups. The demo imports the same public entry point as an application. Use **With effects** to preview all emoji with decorative SVG layers, or choose a semantic group. Choose a framework and display mode, then select an emoji to copy its component. The examples show how to place an emoji in a sentence or on its own line.
 
-## Use
+## Components
+
+Use an emoji directly as a component. `display` is `inline` by default and can be set to `block`; all components animate on hover, focus and click and use built in SVG effects when available. The package is not published yet; these imports are for a bundled app after installation. React, Vue and Svelte are optional peers, so the core stays framework independent.
+
+```jsx
+import { EmojiMotion } from 'native-emoji-motion/react';
+
+<p>Hello <EmojiMotion emoji="👋" skinTone="medium" /></p>
+<EmojiMotion emoji="📡" display="block" />
+```
+
+```vue
+<script setup>
+import { EmojiMotion } from 'native-emoji-motion/vue';
+</script>
+<template>
+  <p>Hello <EmojiMotion emoji="👋" skin-tone="medium" /></p>
+  <EmojiMotion emoji="📡" display="block" />
+</template>
+```
+
+```svelte
+<script>
+  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+</script>
+<p>Hello <EmojiMotion emoji="👋" skinTone="medium" /></p>
+<EmojiMotion emoji="📡" display="block" />
+```
+
+For plain HTML or other frameworks, import `native-emoji-motion/element` once in a bundled entry module, then use `<emoji-motion emoji="👋" display="block"></emoji-motion>`. The web component can be used with Angular or any other framework that supports custom elements. It registers itself when the module is imported. Its attributes include `emoji`, `skin-tone`, `display`, `label` and `decoration="false"`; assign the `registry` property to use a custom registry.
+
+React, Vue and Svelte components accept `emoji`, `skinTone`, `display`, `decoration`, `label`, `events`, and a custom `registry`. For a custom interaction target, React accepts `triggerRef` and Vue/Svelte accept `trigger`. Components clean up their listeners when updated or unmounted. A global skin tone set on a registry is read when a component renders; to update an already mounted component, update its `skinTone` prop or cause a framework rerender.
+
+## Low level API
 
 This project is not published yet. After publication, import the package in an ESM application:
 

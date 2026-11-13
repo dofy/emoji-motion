@@ -1,8 +1,11 @@
 import { emojiMotion } from '../src/index.js';
+import '../src/element.js';
 const grid = document.querySelector('#grid');
 const filters = document.querySelector('#filters');
 const count = document.querySelector('#count');
 const skinTone = document.querySelector('#skin-tone');
+const framework = document.querySelector('#framework');
+const displayMode = document.querySelector('#display-mode');
 skinTone.addEventListener('change', () => { emojiMotion.setDefaultSkinTone(skinTone.value); render(); });
 const all = emojiMotion.list();
 let cleanups = [];
@@ -12,11 +15,11 @@ function render() {
   cleanups.forEach(cleanup => cleanup()); cleanups = []; grid.replaceChildren();
   const shown = all.filter(glyph => selected === 'all' || (selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected));
   count.textContent = `${String(shown.length).padStart(2, '0')} LITTLE MOVEMENTS`;
-  for (const [index, glyph] of shown.entries()) {
+  for (const glyph of shown) {
     const item = emojiMotion.resolve(glyph);
     const button = document.createElement('button');
     button.className = `emoji-card ${palette[all.indexOf(glyph) % palette.length]}`;
-    button.type = 'button'; button.setAttribute('aria-label', `${item.name}, preview and copy markup`);
+    button.type = 'button'; button.setAttribute('aria-label', `${item.name}, preview and copy component`);
     const number = document.createElement('span'); number.className = 'card-number'; number.textContent = String(all.indexOf(glyph) + 1).padStart(2, '0');
     const arrow = document.createElement('span'); arrow.className = 'card-arrow'; arrow.textContent = '↗'; arrow.setAttribute('aria-hidden', 'true');
     const stage = document.createElement('span'); stage.className = 'emoji-stage';
@@ -27,7 +30,7 @@ function render() {
     const group = document.createElement('span'); group.textContent = item.group.label;
     bottom.append(name, group); button.append(number, arrow, stage, bottom); grid.append(button);
     button.addEventListener('click', async () => {
-      const copied = await copyText(markupFor(item), document.querySelector('#copy-status'), document.querySelector('#copy-fallback'), `${item.name} markup copied. Paste it into your page and use the setup below.`);
+      const copied = await copyText(markupFor(item), document.querySelector('#copy-status'), document.querySelector('#copy-fallback'), `${item.name} component copied. Import it using the setup below.`);
       if (copied) { group.textContent = 'Copied ✓'; setTimeout(() => { group.textContent = item.group.label; }, 2000); }
     });
     cleanups.push(emojiMotion.bind(glyphEl, glyph, { trigger: button, events: ['pointerenter', 'focus', 'click'], ...(item.decorationPreset ? { decoration: { container: visual } } : {}) }));
@@ -38,54 +41,32 @@ makeFilter('all', 'All emoji'); makeFilter('effects', 'With effects ✦'); for (
 
 
 const exampleCode = {
-  inline: `<!-- Place this wherever the emoji should appear. -->
-<p>
-  Made with a little
-  <span id="heart" role="img" aria-label="Red heart" tabindex="0"
-        style="display: inline-block">❤️</span>
-  and a lot of care.
-</p>
-
+  inline: `<!-- Import once in your app's entry module. -->
 <script type="module">
-  import { emojiMotion } from 'native-emoji-motion';
-  const heart = document.querySelector('#heart');
-  emojiMotion.bind(heart, '❤️', {
-    events: ['pointerenter', 'focus', 'click']
-  });
-</script>`,
-  card: `<!-- Put the emoji inside the element you want to trigger it. -->
-<button type="button" id="hello-card">
-  Say hello
-  <span id="wave" aria-hidden="true"
-        style="display: inline-block">👋</span>
-</button>
+  import 'native-emoji-motion/element';
+</script>
 
+<p>Made with a little <emoji-motion emoji="❤️"></emoji-motion> and a lot of care.</p>`,
+  card: `<!-- Import once in your app's entry module. -->
 <script type="module">
-  import { emojiMotion } from 'native-emoji-motion';
-  const card = document.querySelector('#hello-card');
-  const wave = document.querySelector('#wave');
-  emojiMotion.bind(wave, '👋', {
-    trigger: card,
-    events: ['pointerenter', 'focus', 'click']
-  });
-</script>`,
-  setup: `import { emojiMotion } from 'native-emoji-motion';
+  import 'native-emoji-motion/element';
+</script>
 
-// Run once after adding the copied markup to the page.
-document.querySelectorAll('[data-emoji-motion]').forEach(wrapper => {
-  const emoji = wrapper.querySelector('[data-emoji]');
-  emojiMotion.bind(emoji, emoji.dataset.emoji, {
-    trigger: wrapper,
-    events: ['pointerenter', 'focus', 'click'],
-    decoration: { container: wrapper }
-  });
-});`
+<div class="card">
+  <strong>Say hello</strong>
+  <emoji-motion emoji="👋" display="block"></emoji-motion>
+</div>`,
+  setup: `// Import once in your app's entry module.
+import 'native-emoji-motion/element';
+
+// Paste <emoji-motion emoji="👋"></emoji-motion> into your HTML.`
 };
 function escapeAttribute(value) { return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
 function markupFor(item) {
   const glyph = escapeAttribute(item.glyph);
-  const name = escapeAttribute(item.name);
-  return `<span data-emoji-motion role="img" aria-label="${name}" tabindex="0" style="display: inline-block; position: relative"><span data-emoji="${glyph}" aria-hidden="true" style="display: inline-block">${glyph}</span></span>`;
+  const display = displayMode.value;
+  if (framework.value === 'vanilla') return `<emoji-motion emoji="${glyph}" display="${display}"></emoji-motion>`;
+  return `<EmojiMotion emoji="${glyph}" display="${display}" />`;
 }
 async function copyText(value, status, fallback, success) {
   fallback.hidden = true;
@@ -100,11 +81,92 @@ async function copyText(value, status, fallback, success) {
     return false;
   }
 }
-for (const [id, source] of Object.entries(exampleCode)) document.querySelector(`#code-${id}`).textContent = source;
+const frameworkCode = {
+  vanilla: exampleCode,
+  react: {
+    inline: `import { EmojiMotion } from 'native-emoji-motion/react';
+
+export function Message() {
+  return <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>;
+}`,
+    card: `import { EmojiMotion } from 'native-emoji-motion/react';
+
+export function HelloCard() {
+  return (
+    <div className="card">
+      <strong>Say hello</strong>
+      <EmojiMotion emoji="👋" display="block" />
+    </div>
+  );
+}`,
+    setup: `import { EmojiMotion } from 'native-emoji-motion/react';
+
+// Paste <EmojiMotion emoji="👋" /> into your JSX.`
+  },
+  vue: {
+    inline: `<script setup>
+import { EmojiMotion } from 'native-emoji-motion/vue';
+</script>
+
+<template>
+  <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>
+</template>`,
+    card: `<script setup>
+import { EmojiMotion } from 'native-emoji-motion/vue';
+</script>
+
+<template>
+  <div class="card">
+    <strong>Say hello</strong>
+    <EmojiMotion emoji="👋" display="block" />
+  </div>
+</template>`,
+    setup: `<script setup>
+import { EmojiMotion } from 'native-emoji-motion/vue';
+</script>
+
+<!-- Paste <EmojiMotion emoji="👋" /> into your template. -->`
+  },
+  svelte: {
+    inline: `<script>
+  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+</script>
+
+<p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>`,
+    card: `<script>
+  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+</script>
+
+<div class="card">
+  <strong>Say hello</strong>
+  <EmojiMotion emoji="👋" display="block" />
+</div>`,
+    setup: `<script>
+  import EmojiMotion from 'native-emoji-motion/svelte/EmojiMotion.svelte';
+</script>
+
+<!-- Paste <EmojiMotion emoji="👋" /> into your component. -->`
+  }
+};
+function updateCode() {
+  const selected = frameworkCode[framework.value];
+  for (const [id, source] of Object.entries(selected)) {
+    const element = document.querySelector(`#code-${id}`);
+    element.textContent = source;
+    const language = framework.value === 'react' ? 'jsx' : (id === 'setup' && framework.value === 'vanilla' ? 'javascript' : 'markup');
+    element.className = `language-${language}`;
+    if (globalThis.Prism) globalThis.Prism.highlightElement(element);
+  }
+  for (const label of document.querySelectorAll('.example-code-language')) label.textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'HTML + JAVASCRIPT';
+  document.querySelector('#setup-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'JAVASCRIPT';
+}
+framework.addEventListener('change', () => { updateCode(); document.querySelector('#copy-status').textContent = ''; });
+displayMode.addEventListener('change', () => { document.querySelector('#copy-status').textContent = ''; });
+updateCode();
 for (const button of document.querySelectorAll('[data-copy-example]')) {
   button.addEventListener('click', async () => {
     const original = button.dataset.copyExample === 'setup' ? 'Copy setup' : 'Copy code';
-    if (await copyText(exampleCode[button.dataset.copyExample], document.querySelector('#example-copy-status'), document.querySelector('#example-copy-fallback'), 'Code copied.')) {
+    if (await copyText(frameworkCode[framework.value][button.dataset.copyExample], document.querySelector('#example-copy-status'), document.querySelector('#example-copy-fallback'), 'Code copied.')) {
       button.textContent = 'Copied ✓'; setTimeout(() => { button.textContent = original; }, 2000);
     }
   });
@@ -128,7 +190,3 @@ for (const tab of tabs) {
     activateTab(tabs[next], true);
   });
 }
-const exampleHeart = document.querySelector('[data-example-glyph="❤️"]');
-const exampleWave = document.querySelector('[data-example-glyph="👋"]');
-emojiMotion.bind(exampleHeart, '❤️', { events: ['pointerenter', 'focus', 'click'] });
-emojiMotion.bind(exampleWave, '👋', { trigger: document.querySelector('#example-card'), events: ['pointerenter', 'focus', 'click'] });
