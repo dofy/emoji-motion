@@ -1,20 +1,23 @@
 import { enhance } from './enhance.js';
+import { semanticFamilyFor } from './semantic-motions.js';
+import { presetSemantics, familySemantics } from './semantic-presets.js';
 import { motions as defaultMotions, groups as defaultGroups, emoji as defaultEmoji, decorations as defaultDecorations, families as defaultFamilies } from './presets.js';
 
 const toneNames = ['default', 'light', 'medium-light', 'medium', 'medium-dark', 'dark'];
 function validateTone(tone) { if (!toneNames.includes(tone)) throw new Error(`Unknown skin tone "${tone}"`); }
+// Unicode only supplies a default when no reviewed mapping matched.
 function defaultClassification(info) {
   const group = info.unicodeGroup; const sub = info.unicodeSubgroup;
-  if (group === 'Smileys & Emotion') return { group: sub === 'heart' ? 'hearts' : 'faces' };
-  if (group === 'People & Body') return { group: sub.startsWith('hand') ? 'gestures' : 'people', ...(sub.startsWith('hand') && sub !== 'hand-fingers-open' ? { motion: 'wobble' } : {}) };
-  if (group === 'Animals & Nature') return { group: 'nature', ...(sub.startsWith('animal-') ? { motion: 'bounce' } : {}) };
-  if (group === 'Food & Drink') return { group: 'food' };
-  if (group === 'Travel & Places') return { group: 'travel', motion: sub === 'transport-ground' ? 'ride' : sub === 'transport-air' ? 'glide' : sub === 'transport-water' ? 'wobble' : 'float' };
-  if (group === 'Activities') return { group: 'activities' };
-  if (group === 'Objects') return { group: 'objects' };
-  if (group === 'Symbols') return { group: 'symbols', motion: 'pulse' };
-  if (group === 'Flags') return { group: 'flags' };
-  return { group: 'other' };
+  if (group === 'Smileys & Emotion') return sub === 'heart' ? { group: 'hearts', motion: 'heartBeat' } : { group: 'faces', motion: sub === 'cat-face' || sub === 'monkey-face' ? 'animalCuriosity' : 'joyPop' };
+  if (group === 'People & Body') return sub.startsWith('hand') ? { group: 'gestures', motion: sub === 'hand-fingers-open' ? 'greetingWave' : 'gestureEmphasis' } : { group: 'people', motion: sub === 'person-sport' ? 'celebrationBurst' : sub === 'person-activity' ? 'walkingBeat' : 'bowGesture' };
+  if (group === 'Animals & Nature') return { group: 'nature', motion: sub.startsWith('animal-') ? (['animal-amphibian', 'animal-reptile'].includes(sub) ? 'animalLeap' : 'animalCuriosity') : sub.startsWith('plant-') ? 'plantGrow' : 'cloudDrift' };
+  if (group === 'Food & Drink') return { group: 'food', motion: sub === 'dishware' ? 'weightedLift' : sub === 'drink' ? 'cupLift' : 'softJiggle' };
+  if (group === 'Travel & Places') return { group: 'travel', motion: sub === 'transport-air' ? 'flightLift' : sub === 'transport-water' ? 'seaSwell' : sub === 'transport-ground' ? 'trackBeat' : sub === 'sky & weather' || sub === 'place-geographic' ? 'cloudDrift' : 'weightedLift' };
+  if (group === 'Activities') return { group: 'activities', motion: sub === 'game' ? 'diceToss' : 'celebrationBurst' };
+  if (group === 'Objects') return { group: 'objects', motion: sub === 'light & video' ? 'lightFlash' : ['sound', 'music', 'musical-instrument'].includes(sub) ? 'bellRing' : 'weightedLift' };
+  if (group === 'Symbols') return { group: 'symbols', motion: 'symbolTwinkle' };
+  if (group === 'Flags') return { group: 'flags', motion: 'symbolTwinkle' };
+  return { group: 'other', motion: 'weightedLift' };
 }
 
 /** Build a registry with an optional classifier. User definitions always win. */
@@ -101,17 +104,18 @@ export function createRegistry(config = {}, classifier) {
     if (familyMatch) {
       canonical = familyMatch.base; source = 'family';
       const family = familyMatch.family;
-      entry = { group: family.group, name: info?.name ?? family.label, motion: family.motion, decoration: family.decoration, decorations: family.decorations, skinTones: familyMatch.skinTones, familyId: familyMatch.id, animation: family.animation };
+      entry = { group: family.group, name: info?.name ?? family.label, motion: family.motion, decoration: family.decoration, decorations: family.decorations, skinTones: familyMatch.skinTones, familyId: familyMatch.id, animation: family.animation, semanticFamily: family.semanticFamily };
     } else if (canonical) entry = source === 'user' ? user[canonical] : builtin[canonical];
     else if (info) {
       canonical = info.canonical; source = userRule ? 'user-classification' : 'unicode';
       autoRule = userRule ?? defaultClassification(info);
       // A user-defined group overrides the default automatic motion too.
       if (!userRule && config.groups?.[autoRule.group]) autoRule = { group: autoRule.group };
-      entry = { group: autoRule.group, name: info.name, motion: autoRule.motion };
+      const semanticFamily = autoRule.semanticFamily ?? semanticFamilyFor(autoRule.group, info.unicodeSubgroup);
+      entry = { group: autoRule.group, name: info.name, motion: autoRule.motion, semanticFamily };
     } else if (autoDetect && classifier.looksLikeEmoji(glyph)) {
       canonical = glyph; source = 'fallback'; autoRule = rules.fallback ?? { group: 'other' };
-      entry = { group: autoRule.group, name: 'Emoji', motion: autoRule.motion };
+      entry = { group: autoRule.group, name: 'Emoji', motion: autoRule.motion, semanticFamily: autoRule.semanticFamily };
     } else return undefined;
     const group = groups[entry.group];
     if (!group) throw new Error(`Unknown classification group "${entry.group}"`);
@@ -131,7 +135,9 @@ export function createRegistry(config = {}, classifier) {
     }
     const motion = entry.animation && !groupOverride ? { ...motions[motionId], options: { ...motions[motionId].options, ...entry.animation } } : motions[motionId];
     const decorationPresets = [entry.decoration, ...(entry.decorations ?? [])].filter(Boolean).map(name => decorations[name]);
-    return { ...entry, glyph: renderedGlyph, canonical, skinTone, groupId: entry.group, group, motionId, motion, decorationPreset: decorationPresets[0], decorationPresets, source, ...(info ? { unicodeGroup: info.unicodeGroup, unicodeSubgroup: info.unicodeSubgroup } : {}) };
+    const builtinSemantic = !groupOverride && (source === 'preset' ? presetSemantics[canonical] : source === 'family' && !userFamily ? familySemantics[entry.familyId] : undefined);
+    const semanticFamily = entry.semanticFamily ?? builtinSemantic ?? semanticFamilyFor(entry.group, info?.unicodeSubgroup);
+    return { ...entry, semanticFamily, glyph: renderedGlyph, canonical, skinTone, groupId: entry.group, group, motionId, motion, decorationPreset: decorationPresets[0], decorationPresets, source, ...(info ? { unicodeGroup: info.unicodeGroup, unicodeSubgroup: info.unicodeSubgroup } : {}) };
   }
   function play(element, glyph, options = {}) {
     const result = resolve(glyph, { skinTone: options.skinTone });

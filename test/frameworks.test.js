@@ -141,7 +141,7 @@ test('Svelte lite component compiles on Svelte 4 and 5', async () => {
 
 test('component skin tone selects the user override for the rendered variant', async () => {
   const { createEmojiMotion } = await import('../src/index.js');
-  const registry = createEmojiMotion({ emoji: { '👋🏿': { name: 'Custom dark wave', group: 'hearts', motion: 'pulse' } } });
+  const registry = createEmojiMotion({ motions: { darkPulse: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }], options: { duration: 300 } } }, emoji: { '👋🏿': { name: 'Custom dark wave', group: 'hearts', motion: 'darkPulse' } } });
   const el = document.createElement('div'); document.body.append(el); animations = [];
   const root = createRoot(el);
   await React.act(() => root.render(React.createElement(ReactEmoji, { emoji: '👋', skinTone: 'dark', registry })));
@@ -156,7 +156,7 @@ test('component skin tone selects the user override for the rendered variant', a
 test('web component and Svelte action honor user overrides for a selected skin tone', async () => {
   const { createEmojiMotion } = await import('../src/index.js');
   const { animateEmoji } = await import('../src/svelte.js');
-  const registry = createEmojiMotion({ emoji: { '👋🏿': { name: 'Dark wave', group: 'hearts', motion: 'pulse' } } });
+  const registry = createEmojiMotion({ motions: { darkPulse: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }], options: { duration: 300 } } }, emoji: { '👋🏿': { name: 'Dark wave', group: 'hearts', motion: 'darkPulse' } } });
   animations = [];
   const custom = document.createElement('emoji-motion'); custom.registry = registry; custom.setAttribute('emoji', '👋'); custom.setAttribute('skin-tone', 'dark'); document.body.append(custom);
   custom.dispatchEvent(new dom.window.Event('click')); assert.equal(animations[0].frames[1].transform, 'scale(1.25)'); custom.remove();

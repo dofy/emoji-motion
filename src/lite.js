@@ -3,3 +3,5 @@ import { createRegistry } from './registry.js';
 export function createEmojiMotion(config = {}) { return createRegistry(config); }
 export { motions, groups, emoji, decorations, families, createSpringMotion, createSwayMotion } from './presets.js';
 export const emojiMotion = createEmojiMotion();
+
+export { semanticFamilies } from './semantic-motions.js';

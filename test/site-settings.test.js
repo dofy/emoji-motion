@@ -82,3 +82,11 @@ test('copy icon preserves accessible labels and reports success', async () => {
   assert.ok(button.classList.contains('is-copied'));
   window.close();
 });
+
+test('all built-in family labels are available in each site language', async () => {
+  const { families } = await import('../src/presets.js');
+  for (const locale of ['zh-CN', 'zh-TW', 'ja']) {
+    const translations = JSON.parse(await readFile(new URL(`../i18n/${locale}.json`, import.meta.url), 'utf8'));
+    for (const family of Object.values(families)) assert.ok(translations[family.label], `${locale}: ${family.label}`);
+  }
+});

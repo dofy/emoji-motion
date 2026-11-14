@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>动作对比台 · Emoji Motion</title>
+  <link rel="icon" href="/assets/logo.svg"><link rel="stylesheet" href="/demo/motion-lab.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">👋 <span>Emoji Motion</span></a><span class="topbar-label">动作对比台</span><a class="back" href="/">返回演示页面 ↗</a></header>
+  <main>
+    <section class="intro"><p class="eyebrow">MOTION LAB · 动作预览</p><h1>把节奏<br><span>看清楚。</span></h1><p class="lead">先看看我理解的「活泼 + 节奏感」，再逐个比较库里的通用动作。点击 emoji 播放，告诉我动作名称和你想调整的方向。</p></section>
+    <section class="reference" aria-labelledby="reference-title"><div class="reference-copy"><p class="eyebrow">01 / 节奏示范</p><h2 id="reference-title">同一个 emoji，<br>两种节奏。</h2><p>示范动作先蓄力，再跳起、短暂停留、落地回弹，最后归位。它是用于讨论的实验效果，尚未应用到库中。</p><div class="beats" aria-label="动作节奏"><span>蓄力</span><span>起跳</span><span>停顿</span><span>落地</span><span>回弹</span></div><p class="motion-note" id="reduced-note" hidden>设备开启了减少动态效果，预览不会播放。</p></div><div class="comparison"><button class="compare-card" type="button" data-demo="current"><span class="card-label">当前通用动作 · bounce</span><span class="compare-stage"><span class="compare-glyph">👍</span></span><span class="card-footer">点按播放 <span>↗</span></span></button><button class="compare-card compare-card--reference" type="button" data-demo="rhythm"><span class="card-label">节奏示范 · 提案</span><span class="compare-stage"><span class="compare-glyph">👍</span></span><span class="card-footer">点按播放 <span>↗</span></span></button></div></section>
+    <section class="collection" aria-labelledby="collection-title"><div class="collection-heading"><div><p class="eyebrow">02 / 动作目录</p><h2 id="collection-title">逐个比较现有动作<span>.</span></h2><p>动作按主要运动方式分类；每张卡片代表一个可复用的动作变体，旧名称作为兼容别名保留。点击 emoji 播放，也可以搜索动作名称、分类或 emoji。</p></div><div class="search-wrap"><label for="search">搜索动作、类别或 emoji</label><input id="search" type="search" placeholder="例如 bounce、人物、🐶" autocomplete="off"></div></div><div class="collection-meta"><span id="count" aria-live="polite"></span><span>仅展示动作本身，不叠加 SVG 装饰</span></div><div id="motion-grid"></div><p class="empty" id="empty" hidden>没有找到匹配的动作，换个关键词试试。</p></section>
+  </main><footer>Emoji Motion · 动作对比台</footer><script type="module" src="/demo/motion-lab.js"></script>
+</body></html>

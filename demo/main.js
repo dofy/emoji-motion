@@ -1,6 +1,7 @@
 import { createEmojiMotion, emojiMotion, motions } from '../src/index.js';
 import '../src/element.js';
 import { subgroups } from '../src/unicode-data.js';
+import { motionCategories, motionAliases } from '../src/motion-catalog.js';
 await window.emojiSite.ready;
 window.emojiSite.translate(document.body);
 const t = window.emojiSite.t;
@@ -87,11 +88,12 @@ emojiMotion.setDefaultSkinTone(skinTone.value);
 skinTone.addEventListener('change', () => { savePreference('skin-tone', skinTone.value); emojiMotion.setDefaultSkinTone(skinTone.value); render(); updateAutoPreview(); });
 const all = emojiMotion.list();
 // Curated examples live in the demo, not the library's complete registry.
-const featured = ['🎲', '⏰', '🫣', '🔨', '💻', '🤸', '🕰️', '💧', '🧳', '🥕', '🐘', '👕', '🪛', '📘', '🤏', '🛶', '🧁', '👋', '🍊', '🐶', '🌤️', '🪐', '✏️', '👩‍⚖️', '📡', '🥐', '🎻', '❤️', '🪄', '😊', '🔔', '🌸', '🚀', '✨', '🐠', '🦋', '☕', '💡', '📷', '🔦', '💃', '🕯️', '🚶‍♀️', '🚄', '🧑‍⚕️', '🧑‍🚀', '🏄', '🥎', '🌷', '🧋', '🦜', '🧎', '🎡', '🎠', '🪙', '🎲', '⏳', '🧭', '🌻'];
+const featured = ['👽', '🫠', '🍂', '✈️', '🚆', '🚗', '🚢', '🚀', '🧗', '🤹', '🤷', '🎩', '🧪', '🔬', '🧸', '🧼', '📩', '👟', '🪘', '🍂', '🛩️', '🥄', '🐞', '🦆', '🌮', '🦶', '🚜', '🫣', '🏸', '🕰️', '💧', '🧳', '🥕', '🐘', '👕', '🪛', '📘', '🤏', '🛶', '🧁', '👋', '🍊', '🐶', '🌤️', '🪐', '✏️', '👩‍⚖️', '📡', '🥐', '🎻', '❤️', '🪄', '😊', '🔔', '🌸', '🚀', '✨', '🐠', '🦋', '☕', '💡', '📷', '🔦', '💃', '🕯️', '🚶‍♀️', '🚄', '🧑‍⚕️', '🧑‍🚀', '🏄', '🥎', '🌷', '🧋', '🦜', '🧎', '🎡', '🎠', '🪙', '🎲', '⏳', '🧭', '🌻', '⏰', '🔨', '💻', '🤸'];
 let cleanups = [];
 const familyGlyphs = [...new Set(emojiMotion.families().flatMap(family => family.members))].filter(glyph => emojiMotion.resolve(glyph)?.source === 'family');
 const galleryGlyphs = [...new Set([...all, ...familyGlyphs])];
-const filterGroups = emojiMotion.groups().filter(group => galleryGlyphs.some(glyph => emojiMotion.resolve(glyph).groupId === group.id));
+const motionCategoryFor = motionId => motionCategories.find(category => category.motions.includes(motionAliases[motionId] ?? motionId));
+const filterGroups = motionCategories.filter(category => galleryGlyphs.some(glyph => motionCategoryFor(emojiMotion.resolve(glyph).motionId)?.id === category.id));
 const effectCount = galleryGlyphs.filter(glyph => emojiMotion.resolve(glyph).decorationPreset).length;
 const unicodeSequenceCount = subgroups.reduce((total, [, , entries]) => total + entries.split(' ').length, 0);
 // Count fully qualified sequences, not unique base emoji: skin tones and ZWJ variants are included.
@@ -106,7 +108,7 @@ for (const [, , entries] of subgroups) for (const token of entries.split(' ')) {
 }
 const coverage = `${customizedCount.toLocaleString('en-US')} / ${qualifiedCount.toLocaleString('en-US')}`;
 const percentage = (customizedCount / qualifiedCount * 100).toFixed(1);
-const stats = [[all.length, t('handcrafted emoji')], [emojiMotion.families().length, t('motion families')], [filterGroups.length, t('categories')], [Object.keys(motions).length, t('shared motions')], [effectCount, t('with SVG effects')], [coverage, `${t('fully qualified sequences customized')} (${percentage}%, ${t('including skin tones')})`], [unicodeSequenceCount.toLocaleString('en-US'), t('Unicode sequences incl. variants')]];
+const stats = [[all.length, t('handcrafted emoji')], [emojiMotion.families().length, t('motion families')], [filterGroups.length, t('categories')], [Object.keys(motions).length - Object.keys(motionAliases).length, t('shared motions')], [effectCount, t('with SVG effects')], [coverage, `${t('fully qualified sequences customized')} (${percentage}%, ${t('including skin tones')})`], [unicodeSequenceCount.toLocaleString('en-US'), t('Unicode sequences incl. variants')]];
 for (const [value, label] of stats) {
   const item = document.createElement('span'); item.className = 'collection-stat';
   if (value === coverage) item.classList.add('collection-stat--coverage');
@@ -114,9 +116,10 @@ for (const [value, label] of stats) {
   item.append(number, document.createTextNode(` ${label}`));
   document.querySelector('#collection-stats').append(item);
 }
-const filterIds = new Set(['featured', 'all', 'family', 'effects', ...filterGroups.map(group => group.id)]);
+const filterIds = new Set(['featured', 'all', 'family', 'effects', ...filterGroups.map(group => `motion:${group.id}`)]);
 let selected = 'featured';
 const savedFilter = readPreference('gallery-filter');
+// Old subject filters cannot be translated to a single motion; keep other choices.
 if (filterIds.has(savedFilter)) selected = savedFilter;
 const palette = ['peach', 'lilac', 'yellow', 'mint', 'blue', 'pink'];
 const pageSize = 24;
@@ -130,9 +133,9 @@ const pageNext = document.querySelector('#gallery-next');
 function render() {
   cleanups.forEach(cleanup => cleanup()); cleanups = []; grid.replaceChildren();
   const shown = selected === 'featured'
-    ? featured.filter(glyph => emojiMotion.resolve(glyph))
+    ? [...new Set(featured)].filter(glyph => emojiMotion.resolve(glyph))
     : selected === 'all' ? all : selected === 'family' ? familyGlyphs
-    : galleryGlyphs.filter(glyph => selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : emojiMotion.resolve(glyph).groupId === selected);
+    : galleryGlyphs.filter(glyph => selected === 'effects' ? Boolean(emojiMotion.resolve(glyph).decorationPreset) : `motion:${motionCategoryFor(emojiMotion.resolve(glyph).motionId)?.id}` === selected);
   count.textContent = `${String(shown.length).padStart(2, '0')} ${t('LITTLE MOVEMENTS')}`;
   pageCount = Math.max(1, Math.ceil(shown.length / pageSize));
   page = Math.min(page, pageCount);
@@ -187,14 +190,14 @@ function updateAutoPreview() {
   autoPreview.setAttribute('emoji', value);
   if (skinTone.value === 'default') autoPreview.removeAttribute('skin-tone');
   else autoPreview.setAttribute('skin-tone', skinTone.value);
-  const category = t(result.unicodeSubgroup?.replaceAll('-', ' ') ?? result.group.label);
+  const category = t(motionCategoryFor(result.motionId)?.labelEn ?? result.group.label);
   const familyName = emojiMotion.families().find(family => family.id === result.familyId)?.label ?? result.familyId;
   const source = result.source === 'preset' ? t('Handcrafted preset') : result.source === 'family' ? `${t('Motion family')}: ${t(familyName)}` : result.source === 'unicode' ? t('Automatic') : t('Fallback');
   autoResult.textContent = `${source} · ${category} · ${result.motionId}`;
 }
 autoInput.addEventListener('input', () => { savePreference('auto-emoji', autoInput.value); updateAutoPreview(); });
 updateAutoPreview();
-makeFilter('featured', 'Featured'); makeFilter('all', 'All presets'); makeFilter('family', 'Motion families'); makeFilter('effects', 'With effects ✦'); for (const group of filterGroups) makeFilter(group.id, group.label); render();
+makeFilter('featured', 'Featured'); makeFilter('all', 'All presets'); makeFilter('family', 'Motion families'); makeFilter('effects', 'With effects ✦'); for (const group of filterGroups) { filterIcons[`motion:${group.id}`] = group.icon; makeFilter(`motion:${group.id}`, group.labelEn); } render();
 function revealSelectedFilter() {
   const selectedFilter = filters.querySelector('[aria-pressed="true"]');
   if (!selectedFilter) return;
@@ -226,11 +229,7 @@ const exampleCode = {
   import '@dofy/native-emoji-motion/element';
 </script>
 
-<p>Made with a little <emoji-motion emoji="❤️"></emoji-motion> and a lot of care.</p>`,
-  setup: `// Import once in your app's entry module.
-import '@dofy/native-emoji-motion/element';
-
-// Paste <emoji-motion emoji="👋"></emoji-motion> into your HTML.`
+<p>Made with a little <emoji-motion emoji="❤️"></emoji-motion> and a lot of care.</p>`
 };
 function escapeAttribute(value) { return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
 function markupFor(item) {
@@ -258,10 +257,7 @@ const frameworkCode = {
 
 export function Message() {
   return <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>;
-}`,
-    setup: `import { EmojiMotion } from '@dofy/native-emoji-motion/react';
-
-// Paste <EmojiMotion emoji="👋" /> into your JSX.`
+}`
   },
   vue: {
     inline: `<script setup>
@@ -270,24 +266,14 @@ import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
 
 <template>
   <p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>
-</template>`,
-    setup: `<script setup>
-import { EmojiMotion } from '@dofy/native-emoji-motion/vue';
-</script>
-
-<!-- Paste <EmojiMotion emoji="👋" /> into your template. -->`
+</template>`
   },
   svelte: {
     inline: `<script>
   import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
 </script>
 
-<p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>`,
-    setup: `<script>
-  import EmojiMotion from '@dofy/native-emoji-motion/svelte/EmojiMotion.svelte';
-</script>
-
-<!-- Paste <EmojiMotion emoji="👋" /> into your component. -->`
+<p>Made with a little <EmojiMotion emoji="❤️" /> and a lot of care.</p>`
   }
 };
 const customDefinition = `const motion = createEmojiMotion({
@@ -353,12 +339,11 @@ function updateCode() {
   for (const [id, source] of Object.entries(selected)) {
     const element = document.querySelector(`#code-${id}`);
     element.textContent = localizedExample(source);
-    const language = framework.value === 'react' ? 'jsx' : (id === 'setup' && framework.value === 'vanilla' ? 'javascript' : 'markup');
+    const language = framework.value === 'react' ? 'jsx' : 'markup';
     element.className = `language-${language}`;
     if (globalThis.Prism) globalThis.Prism.highlightElement(element);
   }
   for (const label of document.querySelectorAll('.example-code-language')) label.textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'HTML + JAVASCRIPT';
-  document.querySelector('#setup-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'JAVASCRIPT';
   const custom = document.querySelector('#code-custom');
   custom.textContent = localizedExample(customCode[framework.value]);
   custom.className = `language-${framework.value === 'react' ? 'jsx' : 'markup'}`;
@@ -368,7 +353,7 @@ function updateCode() {
 for (const selector of frameworkSelectors) selector.addEventListener('change', () => {
   for (const other of frameworkSelectors) other.value = selector.value;
   savePreference('framework', selector.value);
-  updateCode(); document.querySelector('#copy-status').textContent = '';
+  updateCode(); updateEnhanceCode(); document.querySelector('#copy-status').textContent = '';
 });
 updateCode();
 document.querySelector('#copy-install').addEventListener('click', async event => {
@@ -390,16 +375,13 @@ for (const button of document.querySelectorAll('[data-copy-example]')) {
     }
   });
 }
-const tabs = [...document.querySelectorAll('[role="tab"]')];
-const examplesFramework = document.querySelector('#examples-framework');
+const tabs = [...document.querySelectorAll('.example-tabs [role="tab"]')];
 function activateTab(tab, focus = false) {
   for (const item of tabs) {
     const active = item === tab;
     item.setAttribute('aria-selected', String(active)); item.tabIndex = active ? 0 : -1;
     document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
   }
-  // Text enhancement is framework independent, so its tab has no framework code.
-  examplesFramework.style.visibility = tab.id === 'tab-text' ? 'hidden' : '';
   savePreference('example-tab', tab.id);
   if (focus) tab.focus();
 }
@@ -418,12 +400,63 @@ for (const tab of tabs) {
 
 // Enhance the ordinary text shown in the adjacent original HTML example.
 const enhanceContent = document.querySelector('#enhance-content');
-const enhanceExamples = {
-  html: `<div id="enhance-content">
-  <p>${t('Good morning 👋🏽 The coffee is ready ☕')}</p>
-  <p>${t('Let’s make something lovely today ✨')}</p>
+// The displayed source follows the preview's plain text, never its animation wrappers.
+function enhanceParagraphs(indent = '  ') {
+  return [...enhanceContent.querySelectorAll(':scope > p')].map(p => `${indent}<p>${escapeAttribute(p.textContent).replaceAll('{', '&#123;').replaceAll('}', '&#125;')}</p>`).join('\n');
+}
+function originalEnhanceHtml() {
+  return `<div id="enhance-content">\n${enhanceParagraphs()}\n</div>`;
+}
+function enhanceSource() {
+  return enhanceFrameworkCode[framework.value].replace('__PARAGRAPHS__', enhanceParagraphs(framework.value === 'react' ? '      ' : framework.value === 'vue' ? '    ' : '  '));
+}
+const enhanceFrameworkCode = {
+  react: `import { useEffect, useRef } from 'react';
+import { emojiMotion } from '@dofy/native-emoji-motion';
+
+export function Message() {
+  const contentRef = useRef(null);
+  useEffect(() => {
+    const enhancer = emojiMotion.enhance({ root: contentRef.current });
+    return () => enhancer.cleanup();
+  }, []);
+
+  return (
+    <div ref={contentRef}>
+__PARAGRAPHS__
+    </div>
+  );
+}`,
+  vue: `<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { emojiMotion } from '@dofy/native-emoji-motion';
+
+const content = ref(null);
+let enhancer;
+onMounted(() => { enhancer = emojiMotion.enhance({ root: content.value }); });
+onBeforeUnmount(() => { enhancer?.cleanup(); });
+</script>
+
+<template>
+  <div ref="content">
+__PARAGRAPHS__
+  </div>
+</template>`,
+  svelte: `<script>
+import { onMount } from 'svelte';
+import { emojiMotion } from '@dofy/native-emoji-motion';
+
+let content;
+onMount(() => {
+  const enhancer = emojiMotion.enhance({ root: content });
+  return () => enhancer.cleanup();
+});
+</script>
+
+<div bind:this={content}>
+__PARAGRAPHS__
 </div>`,
-  js: `import { emojiMotion } from '@dofy/native-emoji-motion';
+  vanilla: `import { emojiMotion } from '@dofy/native-emoji-motion';
 
 const enhancer = emojiMotion.enhance({
   root: '#enhance-content',
@@ -435,11 +468,16 @@ const enhancer = emojiMotion.enhance({
 // enhancer.enable();  // Turn on and rescan.
 // enhancer.cleanup(); // Permanently clean up.`
 };
-for (const [key, code] of Object.entries(enhanceExamples)) {
-  const element = document.querySelector(`#enhance-${key}`);
-  element.textContent = code;
-  if (globalThis.Prism) globalThis.Prism.highlightElement(element);
+function updateEnhanceCode() {
+  const html = document.querySelector('#enhance-html');
+  const code = document.querySelector('#enhance-js');
+  html.textContent = originalEnhanceHtml();
+  code.textContent = enhanceSource();
+  code.className = `language-${framework.value === 'react' ? 'jsx' : framework.value === 'vanilla' ? 'javascript' : 'markup'}`;
+  document.querySelector('#enhance-language').textContent = framework.value === 'react' ? 'REACT / JSX' : framework.value === 'vue' ? 'VUE' : framework.value === 'svelte' ? 'SVELTE' : 'JAVASCRIPT';
+  if (globalThis.Prism) { globalThis.Prism.highlightElement(html); globalThis.Prism.highlightElement(code); }
 }
+updateEnhanceCode();
 const enhancer = emojiMotion.enhance({ root: enhanceContent });
 let enhanceEnabled = true;
 const demoSentences = [
@@ -459,6 +497,7 @@ document.querySelector('#enhance-add').addEventListener('click', () => {
   paragraph.textContent = t(demoSentences[nextSentence]);
   nextSentence = (nextSentence + 1) % demoSentences.length;
   enhanceContent.append(paragraph);
+  updateEnhanceCode();
 });
 document.querySelector('#enhance-toggle').addEventListener('click', event => {
   if (enhanceEnabled) enhancer.disable();
@@ -466,9 +505,33 @@ document.querySelector('#enhance-toggle').addEventListener('click', event => {
   enhanceEnabled = !enhanceEnabled;
   event.currentTarget.textContent = enhanceEnabled ? t('Turn off animation') : t('Turn on animation');
 });
-for (const button of document.querySelectorAll('[data-enhance-copy]')) button.addEventListener('click', async () => {
-  if (await copyText(enhanceExamples[button.dataset.enhanceCopy], document.querySelector('#enhance-copy-status'), document.querySelector('#enhance-copy-fallback'), '')) {
-    window.emojiSite.copyFeedback(button, 'copied');
+const enhanceTabs = [...document.querySelectorAll('.code-tabs [role="tab"]')];
+function activateEnhanceTab(tab, focus = false) {
+  for (const item of enhanceTabs) {
+    const active = item === tab;
+    item.setAttribute('aria-selected', String(active));
+    item.tabIndex = active ? 0 : -1;
+    document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
+  }
+  savePreference('enhance-code-tab', tab.id);
+  if (focus) tab.focus();
+}
+const savedEnhanceTab = readPreference('enhance-code-tab');
+activateEnhanceTab(enhanceTabs.find(tab => tab.id === savedEnhanceTab) ?? enhanceTabs[0]);
+for (const tab of enhanceTabs) {
+  tab.addEventListener('click', () => activateEnhanceTab(tab));
+  tab.addEventListener('keydown', event => {
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const index = enhanceTabs.indexOf(tab);
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? enhanceTabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + enhanceTabs.length) % enhanceTabs.length;
+    activateEnhanceTab(enhanceTabs[next], true);
+  });
+}
+document.querySelector('#copy-enhance').addEventListener('click', async event => {
+  const isHtml = document.querySelector('#enhance-tab-html').getAttribute('aria-selected') === 'true';
+  if (await copyText(isHtml ? originalEnhanceHtml() : enhanceSource(), document.querySelector('#enhance-copy-status'), document.querySelector('#enhance-copy-fallback'), '')) {
+    window.emojiSite.copyFeedback(event.currentTarget, 'copied');
   }
 });
 

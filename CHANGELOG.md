@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.7.1 — 2026-11-14
+
+- Choose reusable motions directly for Unicode fallback, retain semantic metadata for compatibility, and preserve handcrafted overrides and the 22 new motion variants.
+
+- Group motion variants by visible movement and merge seven near-duplicates; legacy motion names remain available and independently overridable.
+
+- Add opacity and scale-driven fade and melt motions and direction-neutral movements for aircraft, trains, road vehicles, boats and rockets.
+
+- Refine shared animations with stronger, varied anticipation, movement and recovery while preserving named motions and custom overrides.
+
+- Add stronger anticipation, pauses and rebounds to steady, pose, steps, pastryBounce, spring and hop; give screens a separate wake-up motion.
+
+- Add motion families for climbing, juggling, body gestures, hats, lab equipment, optics, toys and cleaning supplies, including official gender and skin tone variants.
+
+- Add reviewed families and reusable motions for mail, footwear, percussion, fallen leaves, aircraft and cutlery.
+
+- Add reviewed motions for small creatures, birds, meals, legs and feet, road vehicles, shy faces and sports gear.
+- Refine bounces and sways with more pronounced, rhythmic phases.
+- Give the mantel clock, droplet and luggage dedicated, more visible motions.
+
 ## 0.7.0 — 2026-11-14
 
 - **Behavior change:** emoji that use the bounce, hop or spring motions, including most animals and faces, now move with the new rhythm. The game die, alarm clock, cartwheeling person and turtle use new motions, and the hammer leaves the hand tools family.

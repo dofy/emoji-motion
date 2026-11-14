@@ -1,4 +1,10 @@
+import { semanticMotions } from './semantic-motions.js';
+import { motionAliases } from './motion-aliases.js';
+
 const curve = 'cubic-bezier(.22,1,.36,1)';
+// A more even time curve keeps each beat visible instead of compressing motion at the start.
+const rhythmCurve = 'cubic-bezier(.36,.05,.64,.95)';
+const rhythmic = motion => ({ ...motion, options: { ...motion.options, easing: rhythmCurve } });
 function boundedNumber(name, value, min, max) {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) throw new RangeError(`${name} must be between ${min} and ${max}`);
   return value;
@@ -25,6 +31,21 @@ export function createSpringMotion({ height = 24, rebounds = 1, duration = 900 }
   frames.push({ transform: 'translateY(0) scale(1)', offset: 1 });
   return { keyframes: frames, options: { duration, easing: 'linear' }, origin: '50% 90%' };
 }
+// Internal preset rhythm: anticipation, airborne pause, impact and a smaller second beat.
+// The public createSpringMotion builder retains its existing parameter semantics.
+function rhythmicSpring(height, duration) {
+  return { keyframes: [
+    { transform: 'translateY(0) scale(1)', offset: 0, easing: crouch },
+    { transform: 'translateY(3%) scale(1.12,.88)', offset: .12, easing: rise },
+    { transform: `translateY(-${height}%) scale(.96,1.06)`, offset: .35, easing: 'linear' },
+    { transform: `translateY(-${height * .94}%) scale(1)`, offset: .43, easing: fall },
+    { transform: 'translateY(0) scale(1.14,.86)', offset: .59, easing: rise },
+    { transform: `translateY(-${height * .4}%) scale(.98,1.04)`, offset: .73, easing: fall },
+    { transform: 'translateY(0) scale(1.06,.94)', offset: .85, easing: settle },
+    { transform: 'translateY(-3%) scale(1)', offset: .93, easing: settle },
+    { transform: 'translateY(0) scale(1)', offset: 1 }
+  ], options: { duration, easing: 'linear' }, origin: '50% 90%' };
+}
 /** Build a balanced sway; no assumption about the native glyph's direction. */
 export function createSwayMotion({ angle = 8, duration = 1200, origin = '50% 90%' } = {}) {
   boundedNumber('angle', angle, 0, 30); boundedNumber('duration', duration, 1, 10000);
@@ -35,55 +56,150 @@ export const motions = {
   glide: { keyframes: [{ transform: 'translate(0, 0) rotate(0deg)' }, { transform: 'translate(-12%, 8%) rotate(-9deg)', offset: .25 }, { transform: 'translate(12%, -22%) rotate(9deg)', offset: .6 }, { transform: 'translate(0, 0) rotate(0deg)' }], options: { duration: 1050, easing: 'cubic-bezier(.22,1,.36,1)' } },
   ride: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-15%) rotate(-6deg)', offset: .24 }, { transform: 'translateY(0) rotate(4deg)', offset: .48 }, { transform: 'translateY(-9%) rotate(-4deg)', offset: .68 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 950, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
   wave: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(18deg)' }, { transform: 'rotate(-12deg)' }, { transform: 'rotate(16deg)' }, { transform: 'rotate(-7deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '70% 75%' },
-  bounce: { ...createSpringMotion({ height: 22, rebounds: 0, duration: 700 }), origin: '50% 85%' },
+  bounce: { ...createSpringMotion({ height: 22, rebounds: 1, duration: 850 }), origin: '50% 85%' },
   pulse: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.25)', offset: .28 }, { transform: 'scale(.96)', offset: .5 }, { transform: 'scale(1.16)', offset: .68 }, { transform: 'scale(1)' }], options: { duration: 750, easing: 'cubic-bezier(.22,1,.36,1)' } },
-  wobble: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-13deg)' }, { transform: 'rotate(10deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(3deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 700, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
+  wobble: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-15deg)', offset: .18 }, { transform: 'rotate(13deg)', offset: .39 }, { transform: 'rotate(-9deg)', offset: .58 }, { transform: 'rotate(5deg)', offset: .76 }, { transform: 'rotate(0deg)' }], options: { duration: 850, easing: rhythmCurve }, origin: '50% 80%' },
   spin: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], options: { duration: 800, easing: 'cubic-bezier(.22,1,.36,1)' } },
   launch: { keyframes: [{ transform: 'translate(0,0) rotate(0deg)' }, { transform: 'translate(-5%,5%) rotate(-8deg)', offset: .22 }, { transform: 'translate(18%,-22%) rotate(8deg)', offset: .55 }, { transform: 'translate(0,0) rotate(0deg)' }], options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' } },
   search: { keyframes: [{ transform: 'translate(0,0) rotate(0deg)' }, { transform: 'translate(-12%,-8%) rotate(-12deg)' }, { transform: 'translate(12%,6%) rotate(12deg)' }, { transform: 'translate(0,0) rotate(0deg)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '65% 65%' },
   swing: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(18deg)' }, { transform: 'rotate(-15deg)' }, { transform: 'rotate(9deg)' }, { transform: 'rotate(-4deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 10%' },
   float: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-18%) rotate(-8deg)', offset: .4 }, { transform: 'translateY(-10%) rotate(6deg)', offset: .7 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   shake: { keyframes: [{ transform: 'translateX(0)' }, { transform: 'translateX(-10%) rotate(-8deg)' }, { transform: 'translateX(10%) rotate(8deg)' }, { transform: 'translateX(-6%) rotate(-5deg)' }, { transform: 'translateX(4%) rotate(3deg)' }, { transform: 'translateX(0)' }], options: { duration: 650, easing: 'cubic-bezier(.22,1,.36,1)' } },
-  hop: createSpringMotion({ height: 28, rebounds: 1, duration: 850 }),
+  hop: rhythmicSpring(40, 1000),
   flutter: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-12%) rotate(-8deg)' }, { transform: 'translateY(-21%) rotate(8deg)' }, { transform: 'translateY(-10%) rotate(-5deg)' }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 900, easing: 'cubic-bezier(.22,1,.36,1)' } },
   sway: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-9deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 95%' },
-  flip: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(185deg)', offset: .5 }, { transform: 'rotate(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   sip: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-8%) rotate(-6deg)', offset: .35 }, { transform: 'translateY(-8%) rotate(6deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
   twirl: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-10deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 950, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 80%' },
   nod: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(8deg)', offset: .3 }, { transform: 'rotate(-4deg)', offset: .6 }, { transform: 'rotate(0deg)' }], options: { duration: 850, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 85%' },
   pop: { keyframes: [{ transform: 'scale(1)', easing: crouch }, { transform: 'scale(.84)', offset: .18, easing: rise }, { transform: 'scale(1.2)', offset: .45, easing: 'ease-in-out' }, { transform: 'scale(.95)', offset: .68, easing: settle }, { transform: 'scale(1.04)', offset: .84, easing: settle }, { transform: 'scale(1)' }], options: { duration: 750, easing: 'linear' } },
   bob: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-12%) rotate(-4deg)', offset: .3 }, { transform: 'translateY(4%) rotate(4deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   breathe: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.09,1.05)', offset: .48 }, { transform: 'scale(1)' }], options: { duration: 1200, easing: 'cubic-bezier(.22,1,.36,1)' } },
-  spring: createSpringMotion(),
+  spring: rhythmicSpring(34, 1000),
   leafSway: createSwayMotion(),
   hoverFlight: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-15%) rotate(-6deg)', offset: .3 }, { transform: 'translateY(-9%) rotate(6deg)', offset: .6 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
-  gentleSip: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-7%) rotate(-4deg)', offset: .35 }, { transform: 'translateY(-7%) rotate(4deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 85%' },
-  pose: { keyframes: [{ transform: 'scale(1) translateY(0)' }, { transform: 'scale(1.04,1.06) translateY(-3%)', offset: .45 }, { transform: 'scale(1) translateY(0)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 90%' },
+  gentleSip: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-12%) rotate(-8deg)', offset: .25 }, { transform: 'translateY(-7%) rotate(7deg)', offset: .53 }, { transform: 'translateY(-3%) rotate(-3deg)', offset: .75 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1100, easing: rhythmCurve }, origin: '50% 85%' },
+  pose: { keyframes: [{ transform: 'translateY(0) scale(1)', offset: 0, easing: crouch }, { transform: 'translateY(3%) scale(1.08,.92)', offset: .12, easing: rise }, { transform: 'translateY(-26%) scale(.97,1.04)', offset: .34, easing: 'linear' }, { transform: 'translateY(-24%) scale(1)', offset: .43, easing: fall }, { transform: 'translateY(0) scale(1.1,.9)', offset: .59, easing: rise }, { transform: 'translateY(-10%) scale(.99,1.02)', offset: .74, easing: fall }, { transform: 'translateY(0) scale(1.04,.96)', offset: .86, easing: settle }, { transform: 'translateY(0) scale(1)', offset: 1 }], options: { duration: 1050, easing: 'linear' }, origin: '50% 90%' },
   carousel: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg) translateY(0)' }, { transform: 'perspective(500px) rotateY(-35deg) translateY(-8%)', offset: .3 }, { transform: 'perspective(500px) rotateY(35deg) translateY(-4%)', offset: .65 }, { transform: 'perspective(500px) rotateY(0deg) translateY(0)' }], options: { duration: 1200, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 85%' },
   flipHorizontal: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg)' }, { transform: 'perspective(500px) rotateY(180deg)', offset: .5 }, { transform: 'perspective(500px) rotateY(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
   flipVertical: { keyframes: [{ transform: 'perspective(500px) rotateX(0deg)' }, { transform: 'perspective(500px) rotateX(180deg)', offset: .5 }, { transform: 'perspective(500px) rotateX(360deg)' }], options: { duration: 1000, easing: 'cubic-bezier(.22,1,.36,1)' } },
-  steady: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(1.025)', offset: .5 }, { transform: 'scale(1)' }], options: { duration: 1100, easing: 'cubic-bezier(.22,1,.36,1)' }, origin: '50% 100%' },
+  steady: { keyframes: [{ transform: 'translateY(0) scale(1)', offset: 0, easing: crouch }, { transform: 'translateY(2%) scale(.92)', offset: .16, easing: rise }, { transform: 'translateY(-12%) scale(1.14)', offset: .4, easing: 'linear' }, { transform: 'translateY(-11%) scale(1.14)', offset: .48, easing: fall }, { transform: 'translateY(0) scale(.97)', offset: .68, easing: rise }, { transform: 'translateY(-4%) scale(1.05)', offset: .82, easing: settle }, { transform: 'translateY(0) scale(1)', offset: 1 }], options: { duration: 1050, easing: 'linear' }, origin: '50% 100%' },
   hourglassTurn: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)', offset: .4 }, { transform: 'rotate(180deg)', offset: .6 }, { transform: 'rotate(0deg)' }], options: { duration: 1300, easing: 'cubic-bezier(.22,1,.36,1)' } },
-  underwater: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-9%) rotate(-4deg)', offset: .35 }, { transform: 'translateY(3%) rotate(4deg)', offset: .7 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1200, easing: curve } },
-  pastryBounce: createSpringMotion({ height: 12, rebounds: 1, duration: 850 }),
-  railRide: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-3%) rotate(-2deg)', offset: .25 }, { transform: 'translateY(0) rotate(2deg)', offset: .55 }, { transform: 'translateY(-2%) rotate(-1deg)', offset: .75 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: curve }, origin: '50% 85%' },
-  rhythm: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(5deg)' }, { transform: 'rotate(-3deg)' }, { transform: 'rotate(0deg)' }], options: { duration: 1050, easing: curve }, origin: '50% 80%' },
-  fruitBounce: createSpringMotion({ height: 10, rebounds: 1, duration: 850 }),
-  curiousTilt: { keyframes: [{ transform: 'rotate(0deg) translateY(0)' }, { transform: 'rotate(-7deg) translateY(-3%)', offset: .3 }, { transform: 'rotate(7deg) translateY(-3%)', offset: .62 }, { transform: 'rotate(0deg) translateY(0)' }], options: { duration: 1100, easing: curve }, origin: '50% 85%' },
-  cloudDrift: { keyframes: [{ transform: 'translate(0, 0)' }, { transform: 'translate(-5%, -4%)', offset: .35 }, { transform: 'translate(5%, -4%)', offset: .7 }, { transform: 'translate(0, 0)' }], options: { duration: 1400, easing: curve } },
-  orbitFloat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-9%) scale(1.04)', offset: .45 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1200, easing: curve } },
-  writingTilt: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-5deg)', offset: .3 }, { transform: 'rotate(5deg)', offset: .65 }, { transform: 'rotate(0deg)' }], options: { duration: 1000, easing: curve }, origin: '50% 65%' },
-  gardenBounce: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-6%) rotate(-3deg)', offset: .32 }, { transform: 'translateY(-3%) rotate(3deg)', offset: .65 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1050, easing: curve }, origin: '50% 85%' },
-  animalHop: createSpringMotion({ height: 11, rebounds: 0, duration: 900 }),
-  fabricSway: createSwayMotion({ angle: 6, duration: 1250, origin: '50% 15%' }),
-  toolWiggle: createSwayMotion({ angle: 7, duration: 900, origin: '50% 70%' }),
+  underwater: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-13%) rotate(-7deg)', offset: .26 }, { transform: 'translateY(4%) rotate(6deg)', offset: .53 }, { transform: 'translateY(-6%) rotate(-3deg)', offset: .76 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1250, easing: rhythmCurve } },
+  pastryBounce: rhythmicSpring(25, 1050),
+  railRide: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-9%) rotate(-4deg)', offset: .2 }, { transform: 'translateY(0) rotate(3deg)', offset: .4 }, { transform: 'translateY(-6%) rotate(-2deg)', offset: .62 }, { transform: 'translateY(0) rotate(2deg)', offset: .8 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1100, easing: rhythmCurve }, origin: '50% 85%' },
+  rhythm: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-8%) rotate(-9deg)', offset: .2 }, { transform: 'translateY(0) rotate(8deg)', offset: .4 }, { transform: 'translateY(-5%) rotate(-6deg)', offset: .62 }, { transform: 'translateY(0) rotate(4deg)', offset: .8 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1050, easing: rhythmCurve }, origin: '50% 80%' },
+  curiousTilt: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-8%) rotate(-10deg)', offset: .23 }, { transform: 'translateY(0) rotate(8deg)', offset: .48 }, { transform: 'translateY(-4%) rotate(-5deg)', offset: .72 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1100, easing: rhythmCurve }, origin: '50% 85%' },
+  cloudDrift: { keyframes: [{ transform: 'translate(0,0)' }, { transform: 'translate(-9%,-7%)', offset: .25 }, { transform: 'translate(8%,-11%)', offset: .55 }, { transform: 'translate(-3%,-4%)', offset: .78 }, { transform: 'translate(0,0)' }], options: { duration: 1400, easing: rhythmCurve } },
+  orbitFloat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-14%) scale(1.06)', offset: .3 }, { transform: 'translateY(-5%) scale(.98)', offset: .56 }, { transform: 'translateY(-9%) scale(1.02)', offset: .76 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1250, easing: rhythmCurve } },
+  writingTilt: { keyframes: [{ transform: 'translate(0,0) rotate(0deg)' }, { transform: 'translate(-6%,-5%) rotate(-10deg)', offset: .23 }, { transform: 'translate(7%,0) rotate(8deg)', offset: .48 }, { transform: 'translate(-3%,-3%) rotate(-5deg)', offset: .72 }, { transform: 'translate(0,0) rotate(0deg)' }], options: { duration: 1050, easing: rhythmCurve }, origin: '50% 65%' },
+  gardenBounce: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-11%) rotate(-6deg)', offset: .26 }, { transform: 'translateY(0) rotate(5deg)', offset: .5 }, { transform: 'translateY(-5%) rotate(-3deg)', offset: .74 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1050, easing: rhythmCurve }, origin: '50% 85%' },
+  fabricSway: rhythmic(createSwayMotion({ angle: 10, duration: 1250, origin: '50% 15%' })),
+  toolWiggle: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-7%) rotate(-11deg)', offset: .22 }, { transform: 'translateY(0) rotate(9deg)', offset: .45 }, { transform: 'translateY(-3%) rotate(-6deg)', offset: .67 }, { transform: 'translateY(0) rotate(3deg)', offset: .83 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: rhythmCurve }, origin: '50% 70%' },
   bookPeek: { keyframes: [{ transform: 'perspective(500px) rotateY(0deg) translateY(0)' }, { transform: 'perspective(500px) rotateY(-20deg) translateY(-3%)', offset: .32 }, { transform: 'perspective(500px) rotateY(20deg) translateY(-3%)', offset: .68 }, { transform: 'perspective(500px) rotateY(0deg) translateY(0)' }], options: { duration: 1050, easing: curve } },
-  handEmphasis: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-5%) scale(1.08)', offset: .35 }, { transform: 'translateY(0) scale(.98)', offset: .7 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 800, easing: curve }, origin: '50% 80%' },
-  vesselRock: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-4%) rotate(-4deg)', offset: .3 }, { transform: 'translateY(2%) rotate(4deg)', offset: .68 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1300, easing: curve }, origin: '50% 80%' },
-  treatPop: { keyframes: [{ transform: 'scale(1)' }, { transform: 'scale(.96)', offset: .22 }, { transform: 'scale(1.08)', offset: .5 }, { transform: 'scale(1)' }], options: { duration: 850, easing: curve } },
-  clockTick: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-3deg)', offset: .25 }, { transform: 'rotate(3deg)', offset: .5 }, { transform: 'rotate(-2deg)', offset: .75 }, { transform: 'rotate(0deg)' }], options: { duration: 1200, easing: curve }, origin: '50% 50%' },
-  gentleFall: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(7%) scale(.98,1.02)', offset: .45 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1100, easing: curve } },
-  softSettle: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-5%) scale(1)', offset: .35 }, { transform: 'translateY(0) scale(1.03,.97)', offset: .7 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: curve }, origin: '50% 90%' },
+  handEmphasis: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-12%) scale(1.1)', offset: .25 }, { transform: 'translateY(0) scale(.97)', offset: .5 }, { transform: 'translateY(-5%) scale(1.04)', offset: .72 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: rhythmCurve }, origin: '50% 80%' },
+  vesselRock: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-9%) rotate(-7deg)', offset: .24 }, { transform: 'translateY(3%) rotate(6deg)', offset: .5 }, { transform: 'translateY(-5%) rotate(-4deg)', offset: .74 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1300, easing: rhythmCurve }, origin: '50% 80%' },
+  treatPop: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(0) scale(.94)', offset: .15 }, { transform: 'translateY(-10%) scale(1.13)', offset: .4 }, { transform: 'translateY(0) scale(.97)', offset: .62 }, { transform: 'translateY(-4%) scale(1.04)', offset: .8 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: rhythmCurve }, origin: '50% 85%' },
+  mantelSwing: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-10deg)', offset: .18 }, { transform: 'rotate(9deg)', offset: .38 }, { transform: 'rotate(-6deg)', offset: .58 }, { transform: 'rotate(3deg)', offset: .8 }, { transform: 'rotate(0deg)' }], options: { duration: 1150, easing: rhythmCurve }, origin: '50% 85%' },
+  dropletBounce: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-12%) scale(.97,1.03)', offset: .22 }, { transform: 'translateY(12%) scale(1.08,.92)', offset: .5 }, { transform: 'translateY(-6%) scale(.98,1.02)', offset: .72 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1050, easing: rhythmCurve }, origin: '50% 90%' },
+  clockTick: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-4%) rotate(-8deg)', offset: .2 }, { transform: 'translateY(0) rotate(8deg)', offset: .4 }, { transform: 'translateY(-3%) rotate(-5deg)', offset: .6 }, { transform: 'translateY(0) rotate(3deg)', offset: .8 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1200, easing: rhythmCurve }, origin: '50% 60%' },
+  gentleFall: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-7%) scale(.98,1.02)', offset: .2 }, { transform: 'translateY(12%) scale(1.06,.94)', offset: .48 }, { transform: 'translateY(-5%) scale(.98,1.02)', offset: .72 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1100, easing: rhythmCurve }, origin: '50% 85%' },
+  softSettle: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(0) scale(1.05,.95)', offset: .12 }, { transform: 'translateY(-14%) scale(.98,1.02)', offset: .34 }, { transform: 'translateY(0) scale(1.08,.92)', offset: .57 }, { transform: 'translateY(-5%) scale(.99,1.01)', offset: .76 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1050, easing: rhythmCurve }, origin: '50% 90%' },
+  climbStep: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-10%) rotate(-5deg)', offset: .22 }, { transform: 'translateY(-3%) rotate(4deg)', offset: .42 }, { transform: 'translateY(-14%) rotate(5deg)', offset: .64 }, { transform: 'translateY(-5%) rotate(-3deg)', offset: .82 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1200, easing: rhythmCurve }, origin: '50% 85%' },
+  jugglingBeat: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-10%) rotate(-7deg)', offset: .22 }, { transform: 'translateY(0) rotate(7deg)', offset: .44 }, { transform: 'translateY(-7%) rotate(-5deg)', offset: .66 }, { transform: 'translateY(0) rotate(3deg)', offset: .84 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1100, easing: rhythmCurve }, origin: '50% 85%' },
+  gestureBeat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-11%) scale(1.06)', offset: .25 }, { transform: 'translateY(0) scale(.97)', offset: .5 }, { transform: 'translateY(-5%) scale(1.03)', offset: .74 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1000, easing: rhythmCurve }, origin: '50% 90%' },
+  hatTip: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-12%) rotate(-9deg)', offset: .25 }, { transform: 'translateY(-4%) rotate(8deg)', offset: .52 }, { transform: 'translateY(-6%) rotate(-4deg)', offset: .74 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1100, easing: rhythmCurve }, origin: '50% 80%' },
+  cleaningBeat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-10%) scale(1.05)', offset: .25 }, { transform: 'translateY(0) scale(1.06,.94)', offset: .5 }, { transform: 'translateY(-5%) scale(1.02)', offset: .73 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 1050, easing: rhythmCurve }, origin: '50% 85%' },
+  mailFloat: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-12%) rotate(-6deg)', offset: .25 }, { transform: 'translateY(-4%) rotate(6deg)', offset: .5 }, { transform: 'translateY(-8%) rotate(-3deg)', offset: .75 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1150, easing: rhythmCurve } },
+  shoeStep: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-14%) rotate(-7deg)', offset: .22 }, { transform: 'translateY(0) rotate(4deg)', offset: .45 }, { transform: 'translateY(-8%) rotate(-4deg)', offset: .68 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: rhythmCurve }, origin: '50% 85%' },
+  drumBeat: { keyframes: [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-9%) scale(1.06)', offset: .2 }, { transform: 'translateY(0) scale(1.08,.92)', offset: .4 }, { transform: 'translateY(-6%) scale(1.04)', offset: .62 }, { transform: 'translateY(0) scale(1.06,.94)', offset: .8 }, { transform: 'translateY(0) scale(1)' }], options: { duration: 950, easing: rhythmCurve }, origin: '50% 85%' },
+  leafDrift: { keyframes: [{ transform: 'translate(0,0) rotate(0deg)' }, { transform: 'translate(-9%,-10%) rotate(-10deg)', offset: .25 }, { transform: 'translate(9%,2%) rotate(9deg)', offset: .5 }, { transform: 'translate(-4%,-5%) rotate(-5deg)', offset: .76 }, { transform: 'translate(0,0) rotate(0deg)' }], options: { duration: 1250, easing: rhythmCurve } },
+  aircraftHover: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-14%) rotate(-5deg)', offset: .26 }, { transform: 'translateY(-6%) rotate(5deg)', offset: .52 }, { transform: 'translateY(-10%) rotate(-3deg)', offset: .76 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1200, easing: rhythmCurve } },
+  // Direction-neutral transport motions: the complete glyph stays in place,
+  // so native emoji may face either way without the movement appearing reversed.
+  flightLift: { keyframes: [
+    { transform: 'translateY(0) scale(1) rotate(0deg)', offset: 0, easing: crouch },
+    { transform: 'translateY(5%) scale(.94) rotate(-3deg)', offset: .12, easing: rise },
+    { transform: 'translateY(-26%) scale(1.12) rotate(5deg)', offset: .36, easing: 'linear' },
+    { transform: 'translateY(-23%) scale(1.1) rotate(3deg)', offset: .46, easing: fall },
+    { transform: 'translateY(-8%) scale(.97) rotate(-4deg)', offset: .68, easing: rise },
+    { transform: 'translateY(-13%) scale(1.04) rotate(2deg)', offset: .82, easing: settle },
+    { transform: 'translateY(0) scale(1) rotate(0deg)', offset: 1 }
+  ], options: { duration: 1250, easing: 'linear' } },
+  trainRhythm: { keyframes: [
+    { transform: 'translateY(0) scale(1) rotate(0deg)', offset: 0, easing: crouch },
+    { transform: 'translateY(3%) scale(1.05,.95) rotate(-2deg)', offset: .1, easing: rise },
+    { transform: 'translateY(-12%) scale(.98,1.02) rotate(3deg)', offset: .27, easing: fall },
+    { transform: 'translateY(0) scale(1.04,.96) rotate(-3deg)', offset: .44, easing: rise },
+    { transform: 'translateY(-9%) scale(1) rotate(2deg)', offset: .62, easing: fall },
+    { transform: 'translateY(0) scale(1.02,.98) rotate(-1deg)', offset: .8, easing: settle },
+    { transform: 'translateY(0) scale(1) rotate(0deg)', offset: 1 }
+  ], options: { duration: 1000, easing: 'linear' }, origin: '50% 85%' },
+  roadBounce: { keyframes: [
+    { transform: 'translateY(0) scale(1) rotate(0deg)', offset: 0, easing: crouch },
+    { transform: 'translateY(3%) scale(1.08,.92) rotate(-4deg)', offset: .12, easing: rise },
+    { transform: 'translateY(-20%) scale(.97,1.04) rotate(6deg)', offset: .34, easing: fall },
+    { transform: 'translateY(0) scale(1.1,.9) rotate(-4deg)', offset: .53, easing: rise },
+    { transform: 'translateY(-10%) scale(1) rotate(4deg)', offset: .71, easing: fall },
+    { transform: 'translateY(0) scale(1.03,.97) rotate(-2deg)', offset: .86, easing: settle },
+    { transform: 'translateY(0) scale(1) rotate(0deg)', offset: 1 }
+  ], options: { duration: 1050, easing: 'linear' }, origin: '50% 85%' },
+  seaSwell: { keyframes: [
+    { transform: 'translateY(0) rotate(0deg) scale(1)', offset: 0, easing: rise },
+    { transform: 'translateY(-16%) rotate(-10deg) scale(1.04)', offset: .23, easing: fall },
+    { transform: 'translateY(5%) rotate(9deg) scale(.98)', offset: .48, easing: rise },
+    { transform: 'translateY(-9%) rotate(-6deg) scale(1.02)', offset: .69, easing: fall },
+    { transform: 'translateY(2%) rotate(3deg) scale(1)', offset: .86, easing: settle },
+    { transform: 'translateY(0) rotate(0deg) scale(1)', offset: 1 }
+  ], options: { duration: 1400, easing: 'linear' }, origin: '50% 80%' },
+  rocketLift: { keyframes: [
+    { transform: 'translateY(0) scale(1)', opacity: 1, offset: 0, easing: crouch },
+    { transform: 'translateY(6%) scale(1.1,.9)', opacity: 1, offset: .14, easing: rise },
+    { transform: 'translateY(-38%) scale(.86)', opacity: .65, offset: .4, easing: 'linear' },
+    { transform: 'translateY(-36%) scale(.86)', opacity: .65, offset: .49, easing: fall },
+    { transform: 'translateY(1%) scale(1.08,.92)', opacity: 1, offset: .71, easing: rise },
+    { transform: 'translateY(-8%) scale(.98,1.02)', opacity: 1, offset: .84, easing: settle },
+    { transform: 'translateY(0) scale(1)', opacity: 1, offset: 1 }
+  ], options: { duration: 1300, easing: 'linear' }, origin: '50% 85%' },
+  etherealFade: { keyframes: [
+    { transform: 'translateY(0) scale(1)', opacity: 1, offset: 0, easing: crouch },
+    { transform: 'translateY(4%) scale(.84)', opacity: .35, offset: .16, easing: 'linear' },
+    { transform: 'translateY(4%) scale(.84)', opacity: .35, offset: .28, easing: rise },
+    { transform: 'translateY(-24%) scale(1.18)', opacity: 1, offset: .5, easing: fall },
+    { transform: 'translateY(1%) scale(.96)', opacity: .72, offset: .7, easing: rise },
+    { transform: 'translateY(-7%) scale(1.05)', opacity: 1, offset: .84, easing: settle },
+    { transform: 'translateY(0) scale(1)', opacity: 1, offset: 1 }
+  ], options: { duration: 1150, easing: 'linear' }, origin: '50% 85%' },
+  meltAway: { keyframes: [
+    { transform: 'translateY(0) scale(1)', opacity: 1, offset: 0, easing: crouch },
+    { transform: 'translateY(-10%) scale(.95,1.1)', opacity: 1, offset: .18, easing: fall },
+    { transform: 'translateY(18%) scale(1.25,.62)', opacity: .35, offset: .42, easing: 'linear' },
+    { transform: 'translateY(18%) scale(1.25,.62)', opacity: .35, offset: .52, easing: rise },
+    { transform: 'translateY(-12%) scale(.94,1.12)', opacity: 1, offset: .74, easing: fall },
+    { transform: 'translateY(2%) scale(1.04,.96)', opacity: 1, offset: .88, easing: settle },
+    { transform: 'translateY(0) scale(1)', opacity: 1, offset: 1 }
+  ], options: { duration: 1300, easing: 'linear' }, origin: '50% 90%' },
+  leafFade: { keyframes: [
+    { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1, offset: 0, easing: rise },
+    { transform: 'translate(-18%,-18%) rotate(-15deg) scale(1.08)', opacity: .95, offset: .23, easing: 'linear' },
+    { transform: 'translate(20%,14%) rotate(16deg) scale(.9)', opacity: .25, offset: .52, easing: rise },
+    { transform: 'translate(-8%,-8%) rotate(-8deg) scale(1.04)', opacity: .85, offset: .78, easing: settle },
+    { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1, offset: 1 }
+  ], options: { duration: 1350, easing: 'linear' } },
+  screenWake: { keyframes: [
+    { transform: 'translateY(0) scale(1)', offset: 0, easing: crouch },
+    { transform: 'translateY(4%) scale(.82)', offset: .16, easing: 'linear' },
+    { transform: 'translateY(4%) scale(.82)', offset: .32, easing: rise },
+    { transform: 'translateY(-22%) scale(1.14)', offset: .55, easing: fall },
+    { transform: 'translateY(0) scale(.96)', offset: .72, easing: rise },
+    { transform: 'translateY(-5%) scale(1.04)', offset: .84, easing: settle },
+    { transform: 'translateY(0) scale(1)', offset: 1 }
+  ], options: { duration: 1050, easing: 'linear' }, origin: '50% 85%' },
+  creatureSkitter: { keyframes: [{ transform: 'translate(0,0) rotate(0deg)' }, { transform: 'translate(-5%,-5%) rotate(-7deg)', offset: .2 }, { transform: 'translate(5%,0) rotate(7deg)', offset: .4 }, { transform: 'translate(-3%,-3%) rotate(-4deg)', offset: .62 }, { transform: 'translate(3%,0) rotate(3deg)', offset: .8 }, { transform: 'translate(0,0) rotate(0deg)' }], options: { duration: 950, easing: rhythmCurve }, origin: '50% 85%' },
+  birdBounce: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-15%) rotate(-6deg)', offset: .24 }, { transform: 'translateY(0) rotate(4deg)', offset: .48 }, { transform: 'translateY(-8%) rotate(4deg)', offset: .7 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1050, easing: rhythmCurve }, origin: '50% 90%' },
+  mealJiggle: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-10%) rotate(-7deg)', offset: .24 }, { transform: 'translateY(0) rotate(7deg)', offset: .48 }, { transform: 'translateY(-5%) rotate(-4deg)', offset: .7 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 950, easing: rhythmCurve }, origin: '50% 85%' },
+  limbStep: { keyframes: [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-13%) rotate(-5deg)', offset: .24 }, { transform: 'translateY(0) rotate(3deg)', offset: .48 }, { transform: 'translateY(-7%) rotate(4deg)', offset: .7 }, { transform: 'translateY(0) rotate(0deg)' }], options: { duration: 1000, easing: rhythmCurve }, origin: '50% 85%' },
+  vehicleRumble: { keyframes: [{ transform: 'translate(0,0) rotate(0deg)' }, { transform: 'translate(-4%,-6%) rotate(-4deg)', offset: .2 }, { transform: 'translate(4%,0) rotate(4deg)', offset: .4 }, { transform: 'translate(-3%,-4%) rotate(-3deg)', offset: .62 }, { transform: 'translate(3%,0) rotate(2deg)', offset: .8 }, { transform: 'translate(0,0) rotate(0deg)' }], options: { duration: 1100, easing: rhythmCurve }, origin: '50% 85%' },
+  sportSwing: { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-11deg)', offset: .22 }, { transform: 'rotate(10deg)', offset: .47 }, { transform: 'rotate(-6deg)', offset: .7 }, { transform: 'rotate(3deg)', offset: .86 }, { transform: 'rotate(0deg)' }], options: { duration: 950, easing: rhythmCurve }, origin: '50% 75%' },
   // Rhythm motions: a beat of anticipation, the move, a held pause, then a reversal into rest.
   // Tumble up, hang near the top, drop flat, overshoot and settle back.
   toss: { keyframes: [
@@ -142,8 +258,77 @@ export const motions = {
     { transform: 'translateY(-4%) rotate(2deg) scale(.96,1.04)', offset: .72, easing: settle },
     { transform: 'translateY(0) rotate(0deg) scale(1)' }
   ], options: { duration: 900, easing: 'linear' }, origin: '50% 90%' },
-  steps: { keyframes: [{ transform: 'translateY(0)' }, { transform: 'translateY(-7%)', offset: .25 }, { transform: 'translateY(0)', offset: .5 }, { transform: 'translateY(-5%)', offset: .75 }, { transform: 'translateY(0)' }], options: { duration: 1000, easing: curve }, origin: '50% 90%' }
+  steps: { keyframes: [{ transform: 'translateY(0) rotate(0deg)', offset: 0, easing: crouch }, { transform: 'translateY(3%) rotate(-4deg)', offset: .1, easing: rise }, { transform: 'translateY(-24%) rotate(8deg)', offset: .28, easing: fall }, { transform: 'translateY(0) rotate(-6deg)', offset: .46, easing: rise }, { transform: 'translateY(-17%) rotate(-8deg)', offset: .64, easing: fall }, { transform: 'translateY(0) rotate(5deg)', offset: .82, easing: settle }, { transform: 'translateY(0) rotate(0deg)', offset: 1 }], options: { duration: 1050, easing: 'linear' }, origin: '50% 90%' }
 };
+
+// Keep each motion's own trajectory, while making its anticipation, accent and
+// recovery readable at ordinary emoji sizes. This only changes built-in presets;
+// the public motion builders and caller-supplied definitions remain untouched.
+function emphasisTransform(transform, amount) {
+  const number = value => String(Math.round(value * 100) / 100);
+  return transform
+    .replace(/translate(?:X|Y)?\(([^)]*)\)/g, (match, args) => match.replace(args, args.replace(/(-?\d*\.?\d+)%/g, (_, n) => `${number(Math.max(-42, Math.min(42, Number(n) * amount)))}%`)))
+    .replace(/rotate(?:X|Y)?\((-?\d*\.?\d+)deg\)/g, (match, n) => {
+      const angle = Number(n); if (Math.abs(angle) >= 90) return match;
+      return match.replace(`${n}deg`, `${number(Math.max(-45, Math.min(45, angle * amount)))}deg`);
+    })
+    .replace(/scale(?:X|Y)?\(([^)]*)\)/g, (match, args) => {
+      const scaled = args.replace(/-?\d*\.?\d+/g, n => number(Math.max(.78, Math.min(1.3, 1 + (Number(n) - 1) * amount))));
+      return match.replace(args, scaled);
+    });
+}
+function rhythmicAccent(motion, amount, accentIndex, timing) {
+  const frames = motion.keyframes;
+  const beginning = { ...frames[0], offset: 0, easing: crouch };
+  // Pull back gently before the original motion, then retain its own trajectory.
+  const anticipation = { ...frames[1], transform: emphasisTransform(frames[1].transform, -.32), offset: timing.anticipation, easing: rise };
+  const middle = frames.slice(1, -1).map((frame, index) => {
+    const sourceOffset = frame.offset ?? (index + 1) / (frames.length - 1);
+    return { ...frame, transform: emphasisTransform(frame.transform, amount), offset: timing.start + timing.span * sourceOffset, easing: index % 2 ? fall : rise };
+  });
+  const target = Math.min(Math.max(0, accentIndex), middle.length - 1);
+  if (target >= 0) {
+    const frame = middle[target];
+    const nextOffset = middle[target + 1]?.offset ?? 1;
+    const pauseOffset = Math.min(frame.offset + timing.hold, nextOffset - .015);
+    if (pauseOffset > frame.offset) { frame.easing = 'linear'; middle.splice(target + 1, 0, { ...frame, offset: pauseOffset, easing: fall }); }
+  }
+  return { ...motion, keyframes: [beginning, anticipation, ...middle, { ...frames.at(-1), offset: 1 }], options: { ...motion.options, easing: 'linear' } };
+}
+// Motion-specific amplitudes and accents retain the distinction between a sip,
+// a flight, a tool stroke, a footstep, a wave and a floating object.
+const rhythmAdjustments = {
+  glide: [1.5, 1], ride: [1.5, 0], wave: [1.35, 1], pulse: [1.35, 0], wobble: [1.5, 1],
+  launch: [1.5, 1], search: [1.55, 0], swing: [1.3, 1], float: [1.5, 0], shake: [1.5, 1],
+  flutter: [1.5, 1], sway: [1.65, 0], sip: [1.8, 1], twirl: [1.5, 1], nod: [2, 0], bob: [1.65, 0],
+  breathe: [2, 0], leafSway: [1.8, 0], hoverFlight: [1.55, 0], gentleSip: [1.55, 1], carousel: [1.25, 0],
+  underwater: [1.55, 1], railRide: [1.75, 1], rhythm: [1.7, 1], curiousTilt: [1.6, 0], cloudDrift: [1.6, 1],
+  orbitFloat: [1.6, 0], writingTilt: [1.65, 0], gardenBounce: [1.7, 0], fabricSway: [1.6, 1], toolWiggle: [1.6, 1],
+  bookPeek: [1.5, 0], handEmphasis: [1.65, 0], vesselRock: [1.6, 1], treatPop: [1.65, 1], mantelSwing: [1.7, 1],
+  dropletBounce: [1.6, 1], clockTick: [1.7, 1], gentleFall: [1.65, 1], softSettle: [1.7, 1], climbStep: [1.65, 2],
+  jugglingBeat: [1.6, 1], gestureBeat: [1.65, 0], hatTip: [1.6, 0], cleaningBeat: [1.7, 0],
+  mailFloat: [1.6, 1], shoeStep: [1.6, 0], drumBeat: [1.7, 1], leafDrift: [1.55, 1], aircraftHover: [1.6, 1],
+  creatureSkitter: [1.8, 1], birdBounce: [1.6, 0], mealJiggle: [1.7, 1], limbStep: [1.6, 0], vehicleRumble: [1.8, 1], sportSwing: [1.6, 1]
+};
+const driftingMotions = new Set(['glide', 'float', 'hoverFlight', 'underwater', 'cloudDrift', 'orbitFloat', 'leafDrift', 'aircraftHover', 'mailFloat', 'gentleFall']);
+const quickMotions = new Set(['shake', 'wave', 'wobble', 'handEmphasis', 'toolWiggle', 'clockTick', 'drumBeat', 'creatureSkitter', 'jugglingBeat', 'railRide', 'vehicleRumble']);
+for (const [name, [amount, accent]] of Object.entries(rhythmAdjustments)) {
+  const timing = driftingMotions.has(name) ? { anticipation: .14, start: .2, span: .56, hold: .09 }
+    : quickMotions.has(name) ? { anticipation: .06, start: .1, span: .75, hold: .03 }
+      : { anticipation: .1, start: .15, span: .68, hold: .055 };
+  motions[name] = rhythmicAccent(motions[name], amount, accent, timing);
+}
+// The standard bounce and its distinct high and soft variants share a builder.
+motions.bounce = rhythmicSpring(30, 950);
+// Rotations need their own staging; a full turn must not be amplitude-scaled.
+motions.spin = { keyframes: [{ transform: 'rotate(0deg)', offset: 0, easing: crouch }, { transform: 'rotate(-15deg)', offset: .14, easing: rise }, { transform: 'rotate(185deg)', offset: .48, easing: 'linear' }, { transform: 'rotate(195deg)', offset: .55, easing: fall }, { transform: 'rotate(370deg)', offset: .82, easing: settle }, { transform: 'rotate(360deg)', offset: 1 }], options: { duration: 1000, easing: 'linear' } };
+for (const [name, axis] of [['flipHorizontal', 'Y'], ['flipVertical', 'X']]) motions[name] = { keyframes: [{ transform: `perspective(500px) rotate${axis}(0deg)`, offset: 0, easing: crouch }, { transform: `perspective(500px) rotate${axis}(-15deg)`, offset: .14, easing: rise }, { transform: `perspective(500px) rotate${axis}(180deg)`, offset: .48, easing: 'linear' }, { transform: `perspective(500px) rotate${axis}(180deg)`, offset: .56, easing: fall }, { transform: `perspective(500px) rotate${axis}(370deg)`, offset: .83, easing: settle }, { transform: `perspective(500px) rotate${axis}(360deg)`, offset: 1 }], options: { duration: 1100, easing: 'linear' } };
+motions.hourglassTurn = { keyframes: [{ transform: 'rotate(0deg)', offset: 0, easing: crouch }, { transform: 'rotate(-12deg)', offset: .14, easing: rise }, { transform: 'rotate(180deg)', offset: .42, easing: 'linear' }, { transform: 'rotate(180deg)', offset: .6, easing: fall }, { transform: 'rotate(-8deg)', offset: .86, easing: settle }, { transform: 'rotate(0deg)', offset: 1 }], options: { duration: 1300, easing: 'linear' } };
+
+Object.assign(motions, semanticMotions);
+
+// Preserve legacy IDs while sharing the canonical motion implementation.
+for (const [alias, canonical] of Object.entries(motionAliases)) motions[alias] = motions[canonical];
 
 // Groups describe semantic families; emoji entries may override the group's motion.
 export const groups = {
@@ -181,6 +366,28 @@ const walkerMembers = ['🚶', '🚶‍♂️', '🚶‍♀️', '🏃‍♂️'
 const walkerAliases = genderedToneAliases(walkerMembers);
 // Members are reviewed explicitly; no entire Unicode subgroup is assumed to move alike.
 export const families = {
+  climbers: { label: 'Climbers', group: 'people', motion: 'climbStep', members: gendered('🧗'), aliases: genderedToneAliases(gendered('🧗')) },
+  jugglers: { label: 'Jugglers', group: 'people', motion: 'jugglingBeat', members: gendered('🤹'), aliases: genderedToneAliases(gendered('🤹')) },
+  bodyGestures: { label: 'Body gestures', group: 'people', motion: 'gestureBeat', members: [...gendered('🤷'), ...gendered('🙅'), ...gendered('🙆')], aliases: genderedToneAliases([...gendered('🤷'), ...gendered('🙅'), ...gendered('🙆')]) },
+  hats: { label: 'Hats', group: 'objects', motion: 'hatTip', members: ['🎩', '🧢', '👒', '🎓', '⛑️', '🪖'], aliases: { '⛑': '⛑️' } },
+  labware: { label: 'Lab equipment', group: 'objects', motion: 'labSwirl', members: ['🧪', '🧫', '⚗️'], aliases: { '⚗': '⚗️' } },
+  optics: { label: 'Optical instruments', group: 'objects', motion: 'search', members: ['🔬', '🔭'] },
+  toys: { label: 'Toys', group: 'activities', motion: 'toyBounce', members: ['🧸', '🪆', '🪅'] },
+  cleaning: { label: 'Cleaning supplies', group: 'objects', motion: 'cleaningBeat', members: ['🧼', '🧽', '🪥', '🧴', '🪣'] },
+  etherealFaces: { label: 'Ethereal faces', group: 'faces', motion: 'etherealFade', members: ['👽', '👻', '🫥'] },
+  mail: { label: 'Mail', group: 'objects', motion: 'mailFloat', members: ['📩', '📨', '📧', '📮'] },
+  footwear: { label: 'Footwear', group: 'objects', motion: 'shoeStep', members: ['👟', '👞', '👠', '👢', '🥿', '🩴', '🥾'] },
+  percussion: { label: 'Percussion', group: 'activities', motion: 'drumBeat', members: ['🪘', '🪇'], decoration: 'sound' },
+  fallenLeaves: { label: 'Falling leaves', group: 'nature', motion: 'leafFade', members: ['🍂', '🍁'] },
+  aircraft: { label: 'Aircraft', group: 'travel', motion: 'flightLift', members: ['🛩️', '🛫', '🛬'], aliases: { '🛩': '🛩️' } },
+  cutlery: { label: 'Cutlery', group: 'food', motion: 'toolWiggle', members: ['🍴', '🍽️', '🥄', '🥢'], aliases: { '🍽': '🍽️' } },
+  smallCreatures: { label: 'Small creatures', group: 'nature', motion: 'creatureSkitter', members: ['🐛', '🐌', '🦗', '🪲', '🐞', '🐜', '🪳', '🕷️'], aliases: { '🕷': '🕷️' } },
+  birds: { label: 'Birds', group: 'nature', motion: 'birdBounce', members: ['🐦', '🐤', '🐓', '🦆', '🦢', '🦩', '🕊️', '🦃', '🐣'], aliases: { '🕊': '🕊️' } },
+  meals: { label: 'Meals', group: 'food', motion: 'mealJiggle', members: ['🍔', '🍟', '🌮', '🌯', '🥪', '🥙', '🧆', '🥟', '🫔'] },
+  limbs: { label: 'Legs and feet', group: 'people', motion: 'limbStep', members: ['🦵', '🦶'], aliases: familyToneAliases(['🦵', '🦶']) },
+  roadVehicles: { label: 'Road vehicles', group: 'travel', motion: 'roadBounce', members: ['🚙', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚜'] },
+  shyFaces: { label: 'Shy faces', group: 'faces', motion: 'peekTilt', members: ['🫢', '🤭'] },
+  sportsGear: { label: 'Sports gear', group: 'activities', motion: 'sportSwing', members: ['🏸', '🏒', '🏑', '🥍', '🏏'] },
   clocks: { label: 'Clocks', group: 'objects', motion: 'clockTick', members: ['⌚', '🕰️', '⏲️', '🕛', '🕧'], aliases: { '🕰': '🕰️', '⏲': '⏲️' } },
   rain: { label: 'Rain and water', group: 'nature', motion: 'gentleFall', members: ['💧', '💦', '🌨️', '☔'], aliases: { '🌨': '🌨️' } },
   containers: { label: 'Containers', group: 'objects', motion: 'softSettle', members: ['🧳', '🧰', '🧺', '🗃️', '🗄️', '🗳️', '🗑️'], aliases: { '🗃': '🗃️', '🗄': '🗄️', '🗳': '🗳️', '🗑': '🗑️' } },
@@ -190,7 +397,7 @@ export const families = {
   handTools: { label: 'Hand tools', group: 'objects', motion: 'toolWiggle', members: ['🪓', '🪚', '🪛', '🔧', '🪠', '🔩'] },
   books: { label: 'Books', group: 'objects', motion: 'bookPeek', members: ['📕', '📗', '📘', '📙', '📔', '📓', '📒'] },
   handGestures: { label: 'Hand gestures', group: 'gestures', motion: 'handEmphasis', members: ['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵'], aliases: familyToneAliases(['🤏', '🫳', '🫴', '🫲', '🫱', '🫷', '🫸', '🤌', '🫵']) },
-  vessels: { label: 'Boats', group: 'travel', motion: 'vesselRock', members: ['🚤', '🛥️', '🛳️', '⛴️', '🛶'], aliases: { '🛥': '🛥️', '🛳': '🛳️', '⛴': '⛴️' }, decoration: 'wake' },
+  vessels: { label: 'Boats', group: 'travel', motion: 'seaSwell', members: ['🚤', '🛥️', '🛳️', '⛴️', '🛶'], aliases: { '🛥': '🛥️', '🛳': '🛳️', '⛴': '⛴️' }, decoration: 'wake' },
   treats: { label: 'Sweet treats', group: 'food', motion: 'treatPop', members: ['🍬', '🍭', '🍫', '🍮', '🧁', '🍨'], decoration: 'sparkle' },
   fruit: { label: 'Fruit', group: 'food', motion: 'fruitBounce', members: ['🍊', '🍋', '🍐', '🍑', '🍇', '🫐', '🍒', '🥝', '🍍', '🥭'], decoration: 'sparkle' },
   animalFaces: { label: 'Animal faces', group: 'nature', motion: 'curiousTilt', members: ['🐶', '🦊', '🐹', '🦝', '🐨', '🐯', '🐭', '🐻‍❄️'] },
@@ -198,7 +405,7 @@ export const families = {
   celestial: { label: 'Celestial bodies', group: 'nature', motion: 'orbitFloat', members: ['🌛', '🌜', '🌝', '🪐', '🌍', '🌎', '🌏', '🌚'] },
   writingTools: { label: 'Writing tools', group: 'objects', motion: 'writingTilt', members: ['✏️', '🖊️', '🖋️', '🖌️', '🖍️'], aliases: { '✏': '✏️', '🖊': '🖊️', '🖋': '🖋️', '🖌': '🖌️', '🖍': '🖍️' } },
   balls: { label: 'Balls', group: 'activities', motion: 'spring', members: ['⚾', '🥎', '🎱', '🎳'], animation: { duration: 900 }, decorations: ['impact', 'sparkle'] },
-  plants: { label: 'Plants', group: 'nature', motion: 'leafSway', members: ['🌷', '🌹', '🌺', '🪻', '🌴', '🌿', '🍀'] },
+  plants: { label: 'Plants', group: 'nature', motion: 'leafSway', members: ['🌷', '🌹', '🌺', '🪻', '🌴', '🌿', '🍀', '🌾'] },
   drinks: { label: 'Drinks', group: 'food', motion: 'gentleSip', members: ['🥤', '🧃', '🧋', '🍹', '🍸'] },
   flying: { label: 'Flying animals', group: 'nature', motion: 'hoverFlight', members: ['🦜', '🦉', '🦅', '🪰', '🦟'] },
   poses: { label: 'People in poses', group: 'people', motion: 'pose', members: ['🧎', '🧍', '🙇'], aliases: familyToneAliases(['🧎', '🧍', '🙇']) },
@@ -206,18 +413,22 @@ export const families = {
   walkers: { label: 'Walking and running', group: 'people', motion: 'steps', members: walkerMembers, aliases: walkerAliases },
   ringers: { label: 'Ringing things', group: 'objects', motion: 'alarmRing', members: ['☎️', '📞', '🛎️'], aliases: { '☎': '☎️', '🛎': '🛎️' }, decoration: 'sound' },
   peekers: { label: 'Peeking faces', group: 'faces', motion: 'peek', members: ['🫣', '🙈', '🙉', '🙊'] },
-  screens: { label: 'Screens and documents', group: 'objects', motion: 'steady', members: ['💻', '🖥️', '📠', '🧾', '📋'], aliases: { '🖥': '🖥️' }, decoration: 'scan' },
+  screens: { label: 'Screens and documents', group: 'objects', motion: 'screenWake', members: ['💻', '🖥️', '📠', '🧾', '📋'], aliases: { '🖥': '🖥️' }, decoration: 'scan' },
   swimmers: { label: 'Swimmers', group: 'people', motion: 'bob', members: gendered('🏊'), aliases: genderedToneAliases(gendered('🏊')), decoration: 'ripple' },
   surfers: { label: 'Surfers', group: 'people', motion: 'ride', members: gendered('🏄'), aliases: genderedToneAliases(gendered('🏄')), decoration: 'splash' },
   waterPolo: { label: 'Water polo', group: 'people', motion: 'bob', members: gendered('🤽'), aliases: genderedToneAliases(gendered('🤽')), decoration: 'splash' },
   rowers: { label: 'Rowers', group: 'people', motion: 'vesselRock', members: gendered('🚣'), aliases: genderedToneAliases(gendered('🚣')), decoration: 'wake' },
   seaLife: { label: 'Sea life', group: 'nature', motion: 'underwater', members: ['🐠', '🐡', '🦈', '🐋', '🐳', '🦭'], decoration: 'bubbles' },
   bakery: { label: 'Bakery', group: 'food', motion: 'pastryBounce', members: ['🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇'] },
-  rail: { label: 'Rail vehicles', group: 'travel', motion: 'railRide', members: ['🚄', '🚅', '🚆', '🚇', '🚈', '🚊', '🚝', '🚞'] },
+  rail: { label: 'Rail vehicles', group: 'travel', motion: 'trainRhythm', members: ['🚄', '🚅', '🚆', '🚇', '🚈', '🚊', '🚝', '🚞'] },
   instruments: { label: 'Instruments', group: 'activities', motion: 'rhythm', members: ['🎹', '🎷', '🎺', '🪕', '🪗', '🎻', '🪈'], decoration: 'sound' }
 };
 // Variants are explicit: unrelated sequences are never silently normalized.
 export const emoji = {
+  '🫠': { group: 'faces', name: 'Melting face', motion: 'meltAway' },
+  '🕰️': { group: 'objects', name: 'mantelpiece clock', motion: 'mantelSwing', variants: ['🕰'] },
+  '💧': { group: 'nature', name: 'droplet', motion: 'dropletBounce' },
+  '🧳': { group: 'objects', name: 'luggage', motion: 'luggageHop' },
   '👋': { group: 'gestures', name: 'Waving hand', skinTones: skinTones('👋') },
   '👍': { group: 'gestures', name: 'Thumbs up', motion: 'bounce', skinTones: skinTones('👍') },
   '👏': { group: 'gestures', name: 'Clapping hands', motion: 'shake', skinTones: skinTones('👏') },
@@ -244,8 +455,8 @@ export const emoji = {
   '💡': { group: 'objects', name: 'Light bulb', motion: 'breathe', decoration: 'glow' }, '📷': { group: 'objects', name: 'Camera', motion: 'bounce', decoration: 'flash' }, '🔑': { group: 'objects', name: 'Key', motion: 'wobble' }, '📌': { group: 'objects', name: 'Pushpin', motion: 'bounce' }, '📦': { group: 'objects', name: 'Package', motion: 'shake' }, '🧭': { group: 'objects', name: 'Compass', motion: 'wobble' },
   '🌸': { group: 'nature', name: 'Blossom', decoration: 'petals' }, '🍃': { group: 'nature', name: 'Leaves' }, '☀️': { group: 'nature', name: 'Sun', motion: 'spin', decoration: 'glow', variants: ['☀'] },
   '🌻': { group: 'nature', name: 'Sunflower', motion: 'leafSway' }, '🌈': { group: 'nature', name: 'Rainbow', motion: 'float' }, '🌙': { group: 'nature', name: 'Crescent moon', motion: 'float' }, '⭐': { group: 'nature', name: 'Star', motion: 'pulse', decoration: 'sparkle' }, '🔥': { group: 'nature', name: 'Fire', motion: 'wobble', decoration: 'flicker' }, '🌊': { group: 'nature', name: 'Water wave', motion: 'float', decoration: 'splash' },
-  '🚀': { group: 'travel', name: 'Rocket' }, '✈️': { group: 'travel', name: 'Airplane', motion: 'glide', variants: ['✈'] }, '🚲': { group: 'travel', name: 'Bicycle', motion: 'ride' },
-  '🚗': { group: 'travel', name: 'Car', motion: 'ride' }, '🚂': { group: 'travel', name: 'Locomotive', motion: 'ride' }, '🛸': { group: 'travel', name: 'Flying saucer', motion: 'float' }, '🚢': { group: 'travel', name: 'Ship', motion: 'vesselRock', decoration: 'wake' },
+  '🚀': { group: 'travel', name: 'Rocket', motion: 'rocketLift' }, '✈️': { group: 'travel', name: 'Airplane', motion: 'flightLift', variants: ['✈'] }, '🚲': { group: 'travel', name: 'Bicycle', motion: 'ride' },
+  '🚗': { group: 'travel', name: 'Car', motion: 'roadBounce' }, '🚂': { group: 'travel', name: 'Locomotive', motion: 'trainRhythm' }, '🛸': { group: 'travel', name: 'Flying saucer', motion: 'float' }, '🚢': { group: 'travel', name: 'Ship', motion: 'seaSwell', decoration: 'wake' },
   '✨': { group: 'symbols', name: 'Sparkles', motion: 'pulse', decoration: 'sparkle' }, '⚙️': { group: 'symbols', name: 'Gear', variants: ['⚙'] }, '🎯': { group: 'symbols', name: 'Target', motion: 'bounce' }, '🎵': { group: 'symbols', name: 'Musical note', motion: 'swing', decoration: 'sound' }, '💤': { group: 'symbols', name: 'Sleeping symbol', motion: 'float' }, '💥': { group: 'symbols', name: 'Collision', motion: 'pulse' }, '❗': { group: 'symbols', name: 'Exclamation mark', motion: 'bounce' }, '❓': { group: 'symbols', name: 'Question mark', motion: 'wobble' }, '✅': { group: 'symbols', name: 'Check mark', motion: 'bounce' },
   '🐰': { group: 'nature', name: 'Rabbit face', motion: 'hop' }, '🦋': { group: 'nature', name: 'Butterfly', motion: 'flutter' }, '🐝': { group: 'nature', name: 'Bee', motion: 'flutter' }, '🌱': { group: 'nature', name: 'Seedling', motion: 'sway' }, '🌧️': { group: 'nature', name: 'Cloud with rain', motion: 'float', decoration: 'rain', variants: ['🌧'] },
   '☕': { group: 'food', name: 'Hot beverage', motion: 'sip', decoration: 'steam' }, '🍵': { group: 'food', name: 'Teacup', motion: 'sip', decoration: 'steam' }, '🍕': { group: 'food', name: 'Pizza', motion: 'bounce' }, '🍦': { group: 'food', name: 'Soft ice cream', motion: 'sway' },
@@ -281,8 +492,8 @@ export const emoji = {
   '📱': { group: 'objects', name: 'Mobile phone', motion: 'shake' }, '📚': { group: 'objects', name: 'Books', motion: 'nod' }, '✉️': { group: 'objects', name: 'Envelope', motion: 'bob', variants: ['✉'] },
   '💌': { group: 'objects', name: 'Love letter', motion: 'bob', decoration: 'sparkle' }, '🔒': { group: 'objects', name: 'Locked', motion: 'wobble' }, '🔓': { group: 'objects', name: 'Unlocked', motion: 'pop' },
   '🔦': { group: 'objects', name: 'Flashlight', motion: 'nod', decoration: 'flash' }, '🪄': { group: 'objects', name: 'Magic wand', motion: 'twirl', decoration: 'sparkle' }, '🎤': { group: 'objects', name: 'Microphone', motion: 'swing', decoration: 'sound' },
-  '🚌': { group: 'travel', name: 'Bus', motion: 'ride' }, '🚕': { group: 'travel', name: 'Taxi', motion: 'ride' }, '🚁': { group: 'travel', name: 'Helicopter', motion: 'bob' },
-  '🎡': { group: 'travel', name: 'Ferris wheel', motion: 'steady' }, '⛵': { group: 'travel', name: 'Sailboat', motion: 'vesselRock', decoration: 'wake' }, '🎠': { group: 'travel', name: 'Carousel horse', motion: 'carousel' },
+  '🚌': { group: 'travel', name: 'Bus', motion: 'roadBounce' }, '🚕': { group: 'travel', name: 'Taxi', motion: 'roadBounce' }, '🚁': { group: 'travel', name: 'Helicopter', motion: 'flightLift' },
+  '🎡': { group: 'travel', name: 'Ferris wheel', motion: 'steady' }, '⛵': { group: 'travel', name: 'Sailboat', motion: 'seaSwell', decoration: 'wake' }, '🎠': { group: 'travel', name: 'Carousel horse', motion: 'carousel' },
   // Direction-neutral lighting for other objects that naturally emit or reflect light.
   '📸': { group: 'objects', name: 'Camera with flash', motion: 'bounce', decoration: 'flash' },
   '🪔': { group: 'objects', name: 'Oil lamp', motion: 'sway', decoration: 'flicker' },

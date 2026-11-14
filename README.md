@@ -24,13 +24,13 @@ Bring 👋, ❤️, 📡 and more to life in React, Vue, Svelte or plain HTML. E
 
 ## 📊 Collection at a glance
 
-| In version 0.7.0 | Count | What it covers |
+| In version 0.7.1 | Count | What it covers |
 | --- | ---: | --- |
-| Handcrafted presets | 182 | Individually configured base emoji |
-| Reviewed motion families | 34 | 223 additional base emoji sharing reviewed motions |
-| Categories | 10 | Groups used to organize the collection |
-| Reusable motions | 58 | Motions shared by presets and families |
-| Emoji with optional SVG effects | 106 | Base emoji with decorative effects |
+| Handcrafted presets | 186 | Individually configured base emoji |
+| Reviewed motion families | 56 | 323 additional base emoji sharing reviewed motions |
+| Motion categories | 7 | Groups used to browse motions |
+| Reusable motions | 104 | Motions shared by presets and families |
+| Emoji with optional SVG effects | 108 | Base emoji with decorative effects |
 | Recognized Unicode sequences | 5,235 | Unicode Emoji 18.0 sequences, including skin tones and other variants |
 
 Skin tones and other variants count as additional Unicode sequences. Similar emoji may share a motion. Recognized emoji without a preset or reviewed family receive a category-based fallback.

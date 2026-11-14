@@ -68,3 +68,11 @@ img.brand-mark{display:inline-block;vertical-align:middle;background:none;object
 /* Give the keyboard focus ring enough room inside the scrolling filter strip. */
 .filters{padding:8px 8px 12px;scroll-padding-inline:8px}
 .example-tabpanel[hidden]{display:none}.panel-intro{display:grid;grid-template-columns:1fr 1fr;gap:16px 32px;align-items:end;margin:32px 0 16px}.panel-intro h3{font-size:24px;line-height:32px;letter-spacing:-.03em;margin:0}.panel-intro p{font-size:14px;line-height:20px;color:#817b72;margin:0;max-width:420px}#custom-preview:focus-visible{outline:3px solid #825ced;outline-offset:4px;border-radius:8px}@media(max-width:650px){.panel-intro{grid-template-columns:1fr;margin:24px 0 16px}}
+
+/* Let short previews keep their own height beside longer examples. */
+.enhance-preview #enhance-content{margin:16px 0}.enhance-preview .enhance-hint{margin-top:auto}
+/* The preview defines the row height; long code scrolls within that same height. */
+.enhance-layout,.custom-layout{align-items:stretch}.enhance-layout>.example-code,.custom-layout>.example-code{height:0;min-height:100%;display:flex;flex-direction:column;overflow:hidden}.enhance-layout>.example-code pre,.custom-layout>.example-code pre{flex:1;min-height:0;overflow:auto}.enhance-layout>.example-code pre[hidden]{display:none}.code-tabs{display:flex;align-items:center;gap:16px;min-width:0}.code-tabs button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:8px 0;cursor:pointer;white-space:nowrap}.code-tabs button[aria-selected=true]{color:#eee8df;border-bottom-color:#c7a7e5}.code-tabs button:focus-visible{outline:2px solid #c7a7e5;outline-offset:2px}
+@media(max-width:650px){.enhance-layout>.example-code,.custom-layout>.example-code{height:320px;min-height:0}}
+
+.semantic-preview-link{color:var(--accent,#69548d);font-weight:600;text-decoration-thickness:1px;text-underline-offset:4px}

@@ -97,7 +97,7 @@ test('every generated Unicode entry resolves without treating text as emoji', ()
 });
 
 test('unknown emoji choose semantic group and preserve the entire sequence', () => {
-  for (const [glyph, group, subgroup, motion] of [['🐷', 'nature', 'animal-mammal', 'bounce'], ['🍔', 'food', 'food-prepared', 'bounce'], ['🇨🇳', 'flags', 'country-flag', 'float'], ['👩🏽‍🚀', 'people', 'person-role', 'bounce']]) {
+  for (const [glyph, group, subgroup, motion] of [['🐷', 'nature', 'animal-mammal', 'animalCuriosity'], ['🍲', 'food', 'food-prepared', 'softJiggle'], ['🇨🇳', 'flags', 'country-flag', 'symbolTwinkle'], ['👩🏽‍🚀', 'people', 'person-role', 'bowGesture']]) {
     const result = emojiMotion.resolve(glyph);
     assert.equal(result.source, 'unicode'); assert.equal(result.glyph, glyph); assert.equal(result.groupId, group); assert.equal(result.unicodeSubgroup, subgroup); assert.equal(result.motionId, motion);
   }
@@ -264,8 +264,9 @@ test('gentle clock, rain and container motions are distinct and preserve variant
     for (const glyph of families[id].members) {
       for (const registry of [emojiMotion, lite]) {
         const result = registry.resolve(glyph);
-        assert.equal(result.source, 'family');
-        assert.equal(result.motionId, motion);
+        const overrides = { '🕰️': 'mantelSwing', '💧': 'dropletBounce', '🧳': 'luggageHop' };
+        assert.equal(result.source, overrides[glyph] ? 'preset' : 'family');
+        assert.equal(result.motionId, overrides[glyph] ?? motion);
         assert.equal(result.glyph, glyph);
       }
     }
@@ -277,4 +278,105 @@ test('gentle clock, rain and container motions are distinct and preserve variant
   const custom = createEmojiMotion({ emoji: { '💧': { group: 'nature', motion: 'spin' } } });
   assert.equal(custom.resolve('💧').source, 'user');
   assert.equal(custom.resolve('💧').motionId, 'spin');
+});
+
+test('new motion families preserve reviewed members, variants and user priority', () => {
+  for (const id of ['smallCreatures', 'birds', 'meals', 'limbs', 'roadVehicles', 'shyFaces', 'sportsGear']) {
+    for (const glyph of families[id].members) {
+      assert.ok(lookupUnicode(glyph), glyph);
+      for (const registry of [emojiMotion, lite]) {
+        const result = registry.resolve(glyph);
+        assert.equal(result.source, 'family', glyph);
+        assert.equal(result.familyId, id, glyph);
+        assert.equal(result.glyph, glyph, glyph);
+      }
+    }
+  }
+  for (const [glyph, canonical] of [['🕷', '🕷️'], ['🕊', '🕊️']]) {
+    assert.equal(lite.resolve(glyph).canonical, canonical);
+    assert.equal(emojiMotion.resolve(glyph).glyph, glyph);
+  }
+  for (const glyph of families.limbs.members) {
+    const tones = lookupUnicode(glyph).skinTones;
+    assert.equal(Object.keys(tones).length, 5);
+    for (const [tone, variant] of Object.entries(tones)) {
+      for (const registry of [emojiMotion, lite]) {
+        assert.equal(registry.resolve(glyph, { skinTone: tone }).glyph, variant);
+        assert.equal(registry.resolve(variant).familyId, 'limbs');
+        assert.equal(registry.resolve(variant, { skinTone: 'default' }).glyph, glyph);
+      }
+    }
+  }
+  const custom = createEmojiMotion({ emoji: { '🦶': { group: 'people', motion: 'spin', skinTones: lookupUnicode('🦶').skinTones } }, classifications: { subgroups: { 'animal-bird': { group: 'nature', motion: 'pulse' } } } });
+  assert.equal(custom.resolve('🦶🏽').source, 'user');
+  assert.equal(custom.resolve('🦶🏽').motionId, 'spin');
+  assert.equal(custom.resolve('🦆').source, 'user-classification');
+  assert.equal(custom.resolve('🦆').motionId, 'pulse');
+});
+
+test('clock, droplet and luggage use visible individual motions without changing their families', () => {
+  for (const [glyph, motion] of [['🕰️', 'mantelSwing'], ['💧', 'dropletBounce'], ['🧳', 'luggageHop']]) {
+    for (const registry of [emojiMotion, lite]) {
+      const result = registry.resolve(glyph);
+      assert.equal(result.source, 'preset');
+      assert.equal(result.motionId, motion);
+      assert.ok(result.motion.keyframes.length >= 5);
+    }
+  }
+  for (const [glyph, motion] of [['⌚', 'clockTick'], ['💦', 'gentleFall'], ['🧰', 'softSettle']]) assert.equal(emojiMotion.resolve(glyph).motionId, motion);
+  assert.equal(lite.resolve('🕰').canonical, '🕰️');
+  assert.equal(lite.resolve('🕰').glyph, '🕰');
+  const custom = createEmojiMotion({ emoji: { '💧': { group: 'nature', motion: 'spin' } } });
+  assert.equal(custom.resolve('💧').source, 'user');
+  assert.equal(custom.resolve('💧').motionId, 'spin');
+});
+
+test('new everyday families resolve in full and lite registries and respect overrides', () => {
+  const examples = [['📩', 'mail', 'mailFloat'], ['👟', 'footwear', 'shoeStep'], ['🪘', 'percussion', 'drumBeat'], ['🍂', 'fallenLeaves', 'leafFade'], ['🛩️', 'aircraft', 'flightLift'], ['🥄', 'cutlery', 'toolWiggle']];
+  for (const registry of [emojiMotion, lite]) {
+    for (const [glyph, family, motion] of examples) {
+      const result = registry.resolve(glyph);
+      assert.equal(result.source, 'family');
+      assert.equal(result.familyId, family);
+      assert.equal(result.motionId, motion);
+      assert.ok(result.motion.keyframes.length >= 5);
+    }
+    assert.equal(registry.resolve('🛩').familyId, 'aircraft');
+    assert.equal(registry.resolve('🍽').familyId, 'cutlery');
+    assert.ok(registry.resolve('🪘').decorationPreset);
+    assert.equal(registry.resolve('✉️').source, 'preset');
+    assert.equal(registry.resolve('🚁').source, 'preset');
+  }
+  for (const create of [createEmojiMotion, createLite]) {
+    const custom = create({ emoji: { '👟': { group: 'objects', name: 'Custom shoe', motion: 'spin' } } });
+    assert.equal(custom.resolve('👟').source, 'user');
+    assert.equal(custom.resolve('👟').motionId, 'spin');
+  }
+});
+
+test('new activities and object families support variants and custom priority', () => {
+  const cases = [['🧗', 'climbers', 'climbStep'], ['🤹', 'jugglers', 'jugglingBeat'], ['🤷', 'bodyGestures', 'gestureBeat'], ['🎩', 'hats', 'hatTip'], ['🧪', 'labware', 'labSwirl'], ['🔬', 'optics', 'search'], ['🧸', 'toys', 'toyBounce'], ['🧼', 'cleaning', 'cleaningBeat']];
+  for (const registry of [emojiMotion, lite]) {
+    for (const [glyph, family, motion] of cases) {
+      const result = registry.resolve(glyph);
+      assert.equal(result.source, 'family');
+      assert.equal(result.familyId, family);
+      assert.equal(result.motionId, motion);
+    }
+    for (const family of ['climbers', 'jugglers', 'bodyGestures']) {
+      for (const base of families[family].members) {
+        for (const [tone, variant] of Object.entries(lookupUnicode(base).skinTones)) {
+          assert.equal(registry.resolve(base, { skinTone: tone }).glyph, variant);
+          assert.equal(registry.resolve(variant).familyId, family);
+        }
+      }
+    }
+    assert.equal(registry.resolve('⛑').familyId, 'hats');
+    assert.equal(registry.resolve('⚗').familyId, 'labware');
+  }
+  for (const create of [createEmojiMotion, createLite]) {
+    const custom = create({ emoji: { '🤹': { group: 'people', name: 'Custom juggler', motion: 'spin' } } });
+    assert.equal(custom.resolve('🤹').source, 'user');
+    assert.equal(custom.resolve('🤹').motionId, 'spin');
+  }
 });

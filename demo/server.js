@@ -15,7 +15,7 @@ const server = createServer(async (req, res) => {
       const { version } = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
       data = data.toString().replaceAll('__PACKAGE_VERSION__', version);
     }
-    res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'application/octet-stream' }); res.end(data);
+    res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'application/octet-stream', 'Cache-Control': 'no-store' }); res.end(data);
   } catch { res.writeHead(404); res.end('Not found'); }
 });
 server.listen(Number(process.env.PORT || 4173), '127.0.0.1', () => console.log(`Demo: http://127.0.0.1:${server.address().port}`));

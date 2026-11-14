@@ -13,6 +13,7 @@ test('local demo serves syntax highlighter assets', async () => {
       const response = await fetch(url + path);
       assert.equal(response.status, 200, `${path} should load`);
       assert.match(response.headers.get('content-type'), /javascript/);
+      assert.equal(response.headers.get('cache-control'), 'no-store');
       assert.ok((await response.text()).length > 100);
     }
     for (const [path, type] of [['/docs/', /text\/html/], ['/docs/style.css', /text\/css/], ['/docs/main.js', /javascript/], ['/assets/logo.svg', /image\/svg/]]) {
